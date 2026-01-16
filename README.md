@@ -1,1 +1,1 @@
-This is the code for my Computer Science NEA. The project is a Music Player app with an ability to download the audio of videos from YouTube with yt-dlp. The documentation side of the project is stored in the other branches with the most updated version of documentation being held in the most recently dated branch (yes I was using github as a backup medium). Dates follow YY-MM-DD format. The master branch will be for the code.
+The project is a Music Player app with an ability to download the audio of videos from YouTube with yt-dlp.
