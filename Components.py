@@ -108,3 +108,32 @@ class SongFrame(customtkinter.CTkFrame):
             i+=1
 
 
+class PlaylistFrame(customtkinter.CTkFrame):
+    def __init__(self, master, playlist_list, is_scrollable=True):
+        super().__init__(master)
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        if is_scrollable:
+            self.container = customtkinter.CTkScrollableFrame(self)
+        else:
+            self.container = customtkinter.CTkFrame(self)
+
+        # This line below is there so the frame scales to take up the free space
+        self.container.grid(row=0, column=0, sticky="nsew")
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=1)
+
+        self.playlist_list = playlist_list
+        self.labels = []
+        i=0
+        for playlist_info in self.playlist_list:
+            playlist_name = playlist_info[0]
+            playlist_song_count = playlist_info[1]
+            playlist_duration = playlist_info[2]
+            self.playlist_label = PlaylistLabel(self.container, playlist_name=playlist_name,
+                                                song_count=playlist_song_count, duration=playlist_duration)
+            self.playlist_label.grid(row=i, column=0, padx=(10,10), pady=1, sticky="ew")
+            self.labels.append(self.playlist_label)
+            i+=1

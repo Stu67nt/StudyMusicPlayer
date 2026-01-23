@@ -55,6 +55,32 @@ class Tracks(customtkinter.CTkFrame): # Inheriting CTk class
     def hi(self, event=None):  # event=None is needed for when called by label.
         print("hi")
 
+class Playlists(customtkinter.CTkFrame):
+    def __init__(self, master, title: str="My App"):
+        super().__init__(master, fg_color="transparent")  # Calls parent class
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+
+        TOPBAR = [["Create Playlist", self.hi], ["Select Multiple", self.hi]]
+        PLAYLISTS = [["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],
+                 ["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],
+                 ["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],
+                 ["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],
+                 ["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],]
+        playlist_count = len(PLAYLISTS)
+
+        self.topbar = ButtonFrame(self, button_values=TOPBAR, title=f"{playlist_count} Playlists",
+                                  title_fg_color="transparent", is_horizontal=True, title_sticky="w",
+                                  button_sticky="e")
+        self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
+
+        self.track_list = PlaylistFrame(self, PLAYLISTS)
+        self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
+
+    def hi(self, event=None):  # event=None is needed for when called by label.
+        print("hi")
+
 class MyTabView(customtkinter.CTkTabview):
     def __init__(self, master):
         super().__init__(master, anchor="s")
@@ -71,12 +97,19 @@ class MyTabView(customtkinter.CTkTabview):
         self.tab("Tracks").grid_columnconfigure(0, weight=1)
         self.tab("Tracks").grid_rowconfigure(0, weight=1)
 
+        self.add("Playlists")
+        self.tab("Playlists").grid_columnconfigure(0, weight=1)
+        self.tab("Playlists").grid_rowconfigure(0, weight=1)
+
 		# add widgets on tabs
         self.home = Home(master=self.tab("Home"))
         self.home.grid(row=0, column=0, sticky="nsew")
 
         self.tracks = Tracks(master=self.tab("Tracks"))
         self.tracks.grid(row=0, column=0, sticky="nsew")
+
+        self.playlists = Playlists(master=self.tab("Playlists"))
+        self.playlists.grid(row=0, column=0, sticky="nsew")
 
 class App(customtkinter.CTk):
     def __init__(self, title="My App"):
