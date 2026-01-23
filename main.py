@@ -27,15 +27,15 @@ class Home(customtkinter.CTkFrame): # Inheriting CTk class
     def hi(self):
         print("hi")
 
+
 class Tracks(customtkinter.CTkFrame): # Inheriting CTk class
     def __init__(self, master, title: str="My App"):
         super().__init__(master, fg_color="transparent") # Calls parent class
 
-
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(2, weight=1)
 
-        TOPBAR = [["Select Multiple", self.hi]]
+        TOPBAR = [["Select Multiple", self.select_multiple]]
         SONGS = [["Song 1", "Balls", "852", None], ["Song 2", "Balls", "852", None],
                  ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None],
                  ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None],
@@ -43,17 +43,26 @@ class Tracks(customtkinter.CTkFrame): # Inheriting CTk class
                  ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None]]
         song_count = len(SONGS)
 
-        self.topbar = ButtonFrame(self, button_values = TOPBAR, title = f"{song_count} Songs",
-                                  title_fg_color = "transparent", is_horizontal = True, title_sticky = "w",
-                                  button_sticky = "e")
-        self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
+        self.topbar = ButtonFrame(self,
+                                  button_values = TOPBAR,
+                                  title = f"{song_count} Songs",
+                                  title_fg_color = "transparent",
+                                  is_horizontal = True,
+                                  title_sticky = "w",
+                                  button_sticky = "ew")
+        self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
 
         self.track_list = SongFrame(self, SONGS)
         self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
 
+    # Event is a required argument as when button is pressed an argument is automatically passed
+    def create_playlist(event=None):
+        dialog = customtkinter.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
+        print("Name:", dialog.get_input())
 
-    def hi(self, event=None):  # event=None is needed for when called by label.
-        print("hi")
+    def select_multiple(self, event=None):
+        print("Select Multiple")
+
 
 class Playlists(customtkinter.CTkFrame):
     def __init__(self, master, title: str="My App"):
@@ -62,7 +71,7 @@ class Playlists(customtkinter.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(2, weight=1)
 
-        TOPBAR = [["Create Playlist", self.hi], ["Select Multiple", self.hi]]
+        TOPBAR = [["Create Playlist", self.create_playlist], ["Select Multiple", self.select_multiple]]
         PLAYLISTS = [["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],
                  ["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],
                  ["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],
@@ -73,13 +82,19 @@ class Playlists(customtkinter.CTkFrame):
         self.topbar = ButtonFrame(self, button_values=TOPBAR, title=f"{playlist_count} Playlists",
                                   title_fg_color="transparent", is_horizontal=True, title_sticky="w",
                                   button_sticky="e")
-        self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
+        self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
 
         self.track_list = PlaylistFrame(self, PLAYLISTS)
         self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
 
-    def hi(self, event=None):  # event=None is needed for when called by label.
-        print("hi")
+    # Event is a required argument as when button is pressed an argument is automatically passed
+    def create_playlist(event=None):
+        dialog = customtkinter.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
+        print("Name:", dialog.get_input())
+
+    def select_multiple(self, event=None):
+        print("Select Multiple")
+
 
 class MyTabView(customtkinter.CTkTabview):
     def __init__(self, master):

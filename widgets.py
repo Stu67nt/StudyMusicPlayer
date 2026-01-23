@@ -24,9 +24,9 @@ class ButtonFrame(customtkinter.CTkFrame):
                  button_sticky: str = "nsew"):
         super().__init__(master) # Calls/runs parent class. This is necessary so it initialises the inherited class.
 
-        """self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
-"""
+
         self.button_values = button_values
         self.buttons = []
         self.title = title
@@ -36,10 +36,8 @@ class ButtonFrame(customtkinter.CTkFrame):
             self.title_label = customtkinter.CTkLabel(self, text=self.title, fg_color=title_fg_color,
                                                       corner_radius=title_corner_radius)
             self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky=title_sticky)
-            if is_horizontal:
-                self.grid_columnconfigure(0, weight=0)
-            else:
-                self.grid_rowconfigure(0, weight=0)
+            self.grid_columnconfigure(0, weight=0)
+            self.grid_rowconfigure(0, weight=0)
 
         self.button_frame = customtkinter.CTkFrame(self, fg_color="transparent")
         self.button_frame.grid(row=0 if is_horizontal else 1,
@@ -48,18 +46,17 @@ class ButtonFrame(customtkinter.CTkFrame):
                                    pady=20,
                                    sticky=button_sticky)
 
-        self.button_frame.grid_propagate(True)
 
         # Iterating through each item in values and creating a button for it.
         # Each button is then added to a list of buttons so we can track their state.
         for i, value in enumerate(self.button_values):
             self.button = customtkinter.CTkButton(self.button_frame, text=value[0], command=value[1])
             if is_horizontal:
-                self.grid_columnconfigure(i, weight=1)
                 self.button.grid(row=0, column=i, padx=20, pady=20, sticky=button_sticky)
+                self.grid_columnconfigure(i, weight=1)
             else:
-                self.grid_rowconfigure(i, weight=1)
                 self.button.grid(row=i, column=0, padx=20, pady=20, sticky=button_sticky)
+                self.grid_rowconfigure(i, weight=1)
 
             self.buttons.append(self.button)
 

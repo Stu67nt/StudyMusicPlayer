@@ -27,11 +27,14 @@ class ToDoList(customtkinter.CTkFrame):
         self.input = customtkinter.CTkEntry(self)
         self.input.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nwe")
 
-        self.buttons = ButtonFrame(self, [["Create Task", self.balls], ["Delete Tasks", self.balls]], is_horizontal = True)
-        self.buttons.grid(row=3, column=0, padx=10, pady=(10, 10), sticky="nwe")
+        self.buttons = ButtonFrame(self, [["Create Task", self.create_task], ["Delete Tasks", self.delete_tasks]], is_horizontal = True, button_sticky = "ew")
+        self.buttons.grid(row=3, column=0, padx=10, pady=(10, 10), sticky="ew")
 
-    def balls(self):
+    def create_task(self):
         print("Balls")
+    def delete_tasks(self):
+        print("Delete Tasks")
+
 
 class TimerCreate(customtkinter.CTkFrame):
     def __init__(self, master):
@@ -40,7 +43,7 @@ class TimerCreate(customtkinter.CTkFrame):
         self.grid_rowconfigure((1,2,3), weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        self.BUTTON = [["Start Timer", self.test]]
+        self.BUTTON = [["Start Timer", self.get_num]]
 
         self.title_label = customtkinter.CTkLabel(self, text="Timer", fg_color="gray30", corner_radius=6)
         self.title_label.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="new", columnspan=2)
@@ -70,11 +73,10 @@ class TimerCreate(customtkinter.CTkFrame):
         self.secs_spinbox.grid(row=3, column=1, padx=10, pady=(10, 10), sticky="e")
 
 
-        self.button = ButtonFrame(self, self.BUTTON, is_horizontal = True, button_sticky = "nsew")
-        self.button.grid(row=4, column=0, padx=10, pady=(10, 10), sticky="nsew", columnspan=2)
+        self.button = ButtonFrame(self, self.BUTTON, is_horizontal = True, button_sticky = "ew")
+        self.button.grid(row=4, column=0, padx=10, pady=(10, 10), sticky="ew", columnspan=2)
 
-    def test(self):
-        print("test")
+
 
 class SongFrame(customtkinter.CTkFrame):
     def __init__(self, master, track_list, is_scrollable=True):
@@ -137,3 +139,10 @@ class PlaylistFrame(customtkinter.CTkFrame):
             self.playlist_label.grid(row=i, column=0, padx=(10,10), pady=1, sticky="ew")
             self.labels.append(self.playlist_label)
             i+=1
+
+
+
+class PlaylistConfigure(customtkinter.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
