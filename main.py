@@ -1,17 +1,17 @@
-import customtkinter
+import customtkinter as ctk
 import tkinter as tk
 from widgets import *
 from Components import *
 
 
-class Home(customtkinter.CTkFrame): # Inheriting CTk class
+class Home(ctk.CTkFrame): # Inheriting CTk class
     def __init__(self, master):
         super().__init__(master, fg_color="transparent") # Calls parent class
 
         self.grid_columnconfigure((0, 1), weight=1)
         self.grid_rowconfigure(1, weight=1)
 
-        BUTTONS = [["Scan Music", self.hi], ["Add Folder", self.hi]]
+        BUTTONS = [["Scan Music", self.scan_music], ["Add Folder", self.add_folder]]
 
         # Creating To Do List
         self.todo = ToDoList(self)
@@ -24,12 +24,14 @@ class Home(customtkinter.CTkFrame): # Inheriting CTk class
         self.buttons = ButtonFrame(self, button_values=BUTTONS, is_horizontal=True)
         self.buttons.grid(row=2, column=1, padx=10, pady=(10, 10), sticky="sew")
 
-    def hi(self):
-        print("hi")
+    def scan_music(self, event=None):
+        print("Scan Music")
 
+    def add_folder(self, event=None):
+        print("Add Folder")
 
-class Tracks(customtkinter.CTkFrame): # Inheriting CTk class
-    def __init__(self, master, title: str="My App"):
+class Tracks(ctk.CTkFrame): # Inheriting CTk class
+    def __init__(self, master):
         super().__init__(master, fg_color="transparent") # Calls parent class
 
         self.grid_columnconfigure(0, weight=1)
@@ -57,15 +59,15 @@ class Tracks(customtkinter.CTkFrame): # Inheriting CTk class
 
     # Event is a required argument as when button is pressed an argument is automatically passed
     def create_playlist(event=None):
-        dialog = customtkinter.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
+        dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
         print("Name:", dialog.get_input())
 
     def select_multiple(self, event=None):
         print("Select Multiple")
 
 
-class Playlists(customtkinter.CTkFrame):
-    def __init__(self, master, title: str="My App"):
+class Playlists(ctk.CTkFrame):
+    def __init__(self, master):
         super().__init__(master, fg_color="transparent")  # Calls parent class
 
         self.grid_columnconfigure(0, weight=1)
@@ -79,8 +81,12 @@ class Playlists(customtkinter.CTkFrame):
                  ["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],]
         playlist_count = len(PLAYLISTS)
 
-        self.topbar = ButtonFrame(self, button_values=TOPBAR, title=f"{playlist_count} Playlists",
-                                  title_fg_color="transparent", is_horizontal=True, title_sticky="w",
+        self.topbar = ButtonFrame(self,
+                                  button_values=TOPBAR,
+                                  title=f"{playlist_count} Playlists",
+                                  title_fg_color="transparent",
+                                  is_horizontal=True,
+                                  title_sticky="w",
                                   button_sticky="e")
         self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
 
@@ -89,34 +95,47 @@ class Playlists(customtkinter.CTkFrame):
 
     # Event is a required argument as when button is pressed an argument is automatically passed
     def create_playlist(event=None):
-        dialog = customtkinter.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
+        dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
         print("Name:", dialog.get_input())
 
     def select_multiple(self, event=None):
         print("Select Multiple")
 
+class MusicFinder(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master, fg_color = "transparent")
 
-class MyTabView(customtkinter.CTkTabview):
+        self.grid_rowconfigure(0, weight=0)
+        self.grid_rowconfigure(1, weight=1)
+
+        SONGS = [["Song 1", "Balls", "852", None], ["Song 2", "Balls", "852", None],
+                 ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None],
+                 ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None],
+                 ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None],
+                 ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None]]
+
+        self.search_frame = SearchFrame(master)
+        self.search_frame.grid(row = 0, column = 0, sticky = "new")
+
+        self.search_results = SongFrame(master, track_list = SONGS)
+        self.search_results.grid(row = 1, column = 0, sticky = "nsew")
+
+
+
+class MyTabView(ctk.CTkTabview):
     def __init__(self, master):
         super().__init__(master, anchor="s")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.configure(fg_color="gray10")
 
-		# create tabs
-        self.add("Home")
-        self.tab("Home").grid_columnconfigure(0, weight=1)
-        self.tab("Home").grid_rowconfigure(0, weight=1)
+        TABS = ["Home", "Tracks", "Playlists", "Music Finder"]
 
-        self.add("Tracks")
-        self.tab("Tracks").grid_columnconfigure(0, weight=1)
-        self.tab("Tracks").grid_rowconfigure(0, weight=1)
+        for current_tab in TABS:
+            self.add(current_tab)
+            self.tab(current_tab).grid_columnconfigure(0, weight=1)
+            self.tab(current_tab).grid_rowconfigure(0, weight=1)
 
-        self.add("Playlists")
-        self.tab("Playlists").grid_columnconfigure(0, weight=1)
-        self.tab("Playlists").grid_rowconfigure(0, weight=1)
-
-		# add widgets on tabs
         self.home = Home(master=self.tab("Home"))
         self.home.grid(row=0, column=0, sticky="nsew")
 
@@ -126,13 +145,16 @@ class MyTabView(customtkinter.CTkTabview):
         self.playlists = Playlists(master=self.tab("Playlists"))
         self.playlists.grid(row=0, column=0, sticky="nsew")
 
-class App(customtkinter.CTk):
+        self.finder = MusicFinder(master=self.tab("Music Finder"))
+        self.finder.grid(row=0, column=0, sticky="nsew")
+
+class App(ctk.CTk):
     def __init__(self, title="My App"):
         super().__init__()
 
         # Initialising Window
         self.title(title)
-        customtkinter.set_appearance_mode("dark")  # light/dark/system (system is not functional on linux)
+        ctk.set_appearance_mode("dark")  # light/dark/system (system is not functional on linux)
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 

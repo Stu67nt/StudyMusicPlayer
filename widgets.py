@@ -1,4 +1,4 @@
-import customtkinter
+import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
 
@@ -11,7 +11,7 @@ Widgets exists to hold the most fundamental GUI elements which make up the progr
 the To Do Lists will be found in Components.py
 """
 
-class ButtonFrame(customtkinter.CTkFrame):
+class ButtonFrame(ctk.CTkFrame):
     """A frame which holds buttons. Not Scrollable."""
     def __init__(self,
                  master,
@@ -24,6 +24,7 @@ class ButtonFrame(customtkinter.CTkFrame):
                  button_sticky: str = "nsew"):
         super().__init__(master) # Calls/runs parent class. This is necessary so it initialises the inherited class.
 
+        self.grid(row=0, column=0, sticky="nsew")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
@@ -33,24 +34,22 @@ class ButtonFrame(customtkinter.CTkFrame):
 
         # Creating and positioning title in frame
         if self.title != "":
-            self.title_label = customtkinter.CTkLabel(self, text=self.title, fg_color=title_fg_color,
+            self.title_label = ctk.CTkLabel(self, text=self.title, fg_color=title_fg_color,
                                                       corner_radius=title_corner_radius)
             self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky=title_sticky)
             self.grid_columnconfigure(0, weight=0)
             self.grid_rowconfigure(0, weight=0)
 
-        self.button_frame = customtkinter.CTkFrame(self, fg_color="transparent")
+        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.grid(row=0 if is_horizontal else 1,
                                    column=1 if is_horizontal else 0,
-                                   padx=20,
-                                   pady=20,
                                    sticky=button_sticky)
 
 
         # Iterating through each item in values and creating a button for it.
         # Each button is then added to a list of buttons so we can track their state.
         for i, value in enumerate(self.button_values):
-            self.button = customtkinter.CTkButton(self.button_frame, text=value[0], command=value[1])
+            self.button = ctk.CTkButton(self.button_frame, text=value[0], command=value[1])
             if is_horizontal:
                 self.button.grid(row=0, column=i, padx=20, pady=20, sticky=button_sticky)
                 self.grid_columnconfigure(i, weight=1)
@@ -61,7 +60,7 @@ class ButtonFrame(customtkinter.CTkFrame):
             self.buttons.append(self.button)
 
 
-class CheckboxFrame(customtkinter.CTkFrame):  # Inheriting CTkFrame class
+class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
     # A frame holding Checkboxes
     def __init__(self,
                  master,
@@ -72,9 +71,9 @@ class CheckboxFrame(customtkinter.CTkFrame):  # Inheriting CTkFrame class
         super().__init__(master) # Calls/runs parent class. This is necessary so it initialises the inherited class.
 
         if is_scrollable:
-            self.container = customtkinter.CTkScrollableFrame(self)
+            self.container = ctk.CTkScrollableFrame(self)
         else:
-            self.container = customtkinter.CTkFrame(self)
+            self.container = ctk.CTkFrame(self)
 
         # This line below is there so the frame scales to take up the free space
         self.container.grid(row=0, column=0, sticky="nsew")
@@ -87,13 +86,13 @@ class CheckboxFrame(customtkinter.CTkFrame):  # Inheriting CTkFrame class
 
         # Creating and positioning title in frame
         if self.title != "":
-            self.title_label = customtkinter.CTkLabel(self.container, text=self.title, fg_color="gray30", corner_radius=6)
+            self.title_label = ctk.CTkLabel(self.container, text=self.title, fg_color="gray30", corner_radius=6)
             self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nwe")
 
         # Iterating through each item in values and creating a checkbox for it.
         # Each checkbox is then added to a list of checkboxes so we can track their state.
         for i, value in enumerate(self.values):
-            self.checkbox = customtkinter.CTkCheckBox(self.container, text=value)
+            self.checkbox = ctk.CTkCheckBox(self.container, text=value)
             if is_horizontal:
                 self.checkbox.grid(row=0, column=i+1, padx=20, pady=20, sticky="w")
             else:
@@ -109,42 +108,51 @@ class CheckboxFrame(customtkinter.CTkFrame):  # Inheriting CTkFrame class
         return checked
 
 
-class RadioButtonFrame(customtkinter.CTkFrame):
+class RadioButtonFrame(ctk.CTkFrame):
     def __init__(self,
                  master,
                  values: list,
                  title: str,
                  is_horizontal: bool = False,
                  is_scrollable: bool = False,
-                 title_sticky: str = "nesw",
-                 title_fg_color: str = "gray30",
+                 title_sticky: str = "ew",
+                 title_fg_color: str = "transparent",
                  title_corner_radius:int = 6,
                  button_sticky: str = "nesw"):
         super().__init__(master)  # Initilising parent class
 
         if is_scrollable:
-            self.container = customtkinter.CTkScrollableFrame(self)
+            self.container = ctk.CTkScrollableFrame(self)
         else:
-            self.container = customtkinter.CTkFrame(self)
+            self.container = ctk.CTkFrame(self)
 
-        self.container.grid(row=0, column=0, sticky="new")
+        self.container.configure(fg_color = "transparent")
+        self.container.grid(row=0, column=0, sticky="ew")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
         # Initialising vars
         self.values = values
         self.title = title
-        self.var = customtkinter.StringVar(value = "")
+        self.var = ctk.StringVar(value = "")
 
         # Creating title label
         if self.title != "":
-            self.title_label = customtkinter.CTkLabel(self.container, text=self.title, fg_color=title_fg_color,
-                                                corner_radius=title_corner_radius)
-            self.title_label.grid(row=0, column=0, sticky=title_sticky)
+            self.title_label = ctk.CTkLabel(self.container,
+                                            text=self.title,
+                                            fg_color=title_fg_color,
+                                            corner_radius=title_corner_radius,
+                                            )
+            self.title_label.grid(row=0, column=0, sticky="ew")
+
+        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.button_frame.grid(row=0 if is_horizontal else 1,
+                               column=1 if is_horizontal else 0,
+                               sticky=button_sticky)
 
         # Iterating thorugh each value
         for i, value in enumerate(self.values):
-            self.radio_button = customtkinter.CTkRadioButton(self.container, text=value, variable=self.var, value=value)
+            self.radio_button = ctk.CTkRadioButton(self.button_frame, text=value, variable=self.var, value=value)
             if is_horizontal:
                 self.radio_button.grid(row=0, column=i+1, padx=20, pady=20, sticky=button_sticky)
             else:
@@ -153,7 +161,8 @@ class RadioButtonFrame(customtkinter.CTkFrame):
     def get_radio_val(self):
         return self.var.get()
 
-class LabelFrame(customtkinter.CTkFrame):
+
+class LabelFrame(ctk.CTkFrame):
     def __init__(self,
                  master,
                  values: list,
@@ -167,9 +176,9 @@ class LabelFrame(customtkinter.CTkFrame):
         super().__init__(master)  # Calls/runs parent class. This is necessary so it initialises the inherited class.
 
         if is_scrollable:
-            self.container = customtkinter.CTkScrollableFrame(self)
+            self.container = ctk.CTkScrollableFrame(self)
         else:
-            self.container = customtkinter.CTkFrame(self)
+            self.container = ctk.CTkFrame(self)
 
         # This line below is there so the frame scales to take up the free space
         self.container.grid(row=0, column=0, sticky="nsew")
@@ -182,14 +191,14 @@ class LabelFrame(customtkinter.CTkFrame):
 
         # Creating and positioning title in frame
         if self.title != "":  # As empty string is default if this is true means title is wanted.
-            self.title_label = customtkinter.CTkLabel(self.container, text=self.title, fg_color=title_fg_color,
+            self.title_label = ctk.CTkLabel(self.container, text=self.title, fg_color=title_fg_color,
                                                       corner_radius=title_corner_radius)
             self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky=title_sticky)
 
         # Iterating through each item in values and creating a button for it.
         # Each button is then added to a list of buttons so we can track their state.
         for i, value in enumerate(self.values):
-            self.label = customtkinter.CTkLabel(self.container, text=value[0])
+            self.label = ctk.CTkLabel(self.container, text=value[0])
             if is_horizontal:
                 self.label.grid(row=0, column=i + 1, padx=20, pady=20, sticky=button_sticky)
             else:
@@ -199,7 +208,8 @@ class LabelFrame(customtkinter.CTkFrame):
         for i in range(len(self.labels)):
             self.labels[i].bind("<Button-1>", self.values[i][1])
 
-class SongLabel(customtkinter.CTkFrame):
+
+class SongLabel(ctk.CTkFrame):
     """
     TODO: Add default thumbnail.
           Create Checkboxable version
@@ -216,19 +226,19 @@ class SongLabel(customtkinter.CTkFrame):
         self.grid_columnconfigure(1, weight=1)
 
         if thumbnail != None:
-            self.thumbnail_label = customtkinter.CTkLabel(self, image = thumbnail)
+            self.thumbnail_label = ctk.CTkLabel(self, image = thumbnail)
             self.thumbnail_label.grid(column=0, row=0, sticky="nw", rowspan = 2)
 
-        self.name_label = customtkinter.CTkLabel(self, text = song_name)
+        self.name_label = ctk.CTkLabel(self, text = song_name)
         self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
 
-        self.artist_label = customtkinter.CTkLabel(self, text = artist)
+        self.artist_label = ctk.CTkLabel(self, text = artist)
         self.artist_label.grid(column=1, row=1, padx=(10, 10), sticky="nw")
 
-        self.duration_label = customtkinter.CTkLabel(self, text=duration)
+        self.duration_label = ctk.CTkLabel(self, text=duration)
         self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        self.options_button = customtkinter.CTkLabel(self, text = "⋮")
+        self.options_button = ctk.CTkLabel(self, text = "⋮")
         self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
         MENU_OPTIONS = ["Add to Playlist", "Delete Song", "Add to Queue"]
@@ -246,7 +256,8 @@ class SongLabel(customtkinter.CTkFrame):
         finally:
             self.menu.grab_release()
 
-class PlaylistLabel(customtkinter.CTkFrame):
+
+class PlaylistLabel(ctk.CTkFrame):
     """
     TODO: Add default thumbnail.
           Create Checkboxable version
@@ -262,16 +273,16 @@ class PlaylistLabel(customtkinter.CTkFrame):
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        self.name_label = customtkinter.CTkLabel(self, text = playlist_name)
+        self.name_label = ctk.CTkLabel(self, text = playlist_name)
         self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
 
-        self.song_count_label = customtkinter.CTkLabel(self, text = song_count)
+        self.song_count_label = ctk.CTkLabel(self, text = song_count)
         self.song_count_label.grid(column=1, row=1, padx=(10, 10), sticky="nw")
 
-        self.duration_label = customtkinter.CTkLabel(self, text=duration)
+        self.duration_label = ctk.CTkLabel(self, text=duration)
         self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        self.options_button = customtkinter.CTkLabel(self, text = "⋮")
+        self.options_button = ctk.CTkLabel(self, text = "⋮")
         self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
         MENU_OPTIONS = ["Delete Playlist", "Add to Queue", "Rename Playlist", "Overwrite Queue", ""]

@@ -1,9 +1,9 @@
 from widgets import *
-import customtkinter
+import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
 
-class ToDoList(customtkinter.CTkFrame):
+class ToDoList(ctk.CTkFrame):
     """
     TODO:
         Tie todo_checkboxes list to the db
@@ -16,7 +16,7 @@ class ToDoList(customtkinter.CTkFrame):
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        self.title_label = customtkinter.CTkLabel(self, text="To Do List:", fg_color="gray30", corner_radius=6)
+        self.title_label = ctk.CTkLabel(self, text="To Do List:", fg_color="gray30", corner_radius=6)
         self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="new", columnspan=2)
 
         todo_checkboxes = ["Task 1", "Task 2", "Task 3", "Task 2", "Task 2", "Task 2", "Task 2", "Task 2", "Task 2",
@@ -24,32 +24,33 @@ class ToDoList(customtkinter.CTkFrame):
         self.todo = CheckboxFrame(self, values=todo_checkboxes, is_scrollable=True)
         self.todo.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
 
-        self.input = customtkinter.CTkEntry(self)
+        self.input = ctk.CTkEntry(self)
         self.input.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nwe")
 
         self.buttons = ButtonFrame(self, [["Create Task", self.create_task], ["Delete Tasks", self.delete_tasks]], is_horizontal = True, button_sticky = "ew")
         self.buttons.grid(row=3, column=0, padx=10, pady=(10, 10), sticky="ew")
 
     def create_task(self):
-        print("Balls")
+        print("Create task")
     def delete_tasks(self):
         print("Delete Tasks")
 
 
-class TimerCreate(customtkinter.CTkFrame):
+class TimerCreate(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
         self.grid_rowconfigure((1,2,3), weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        self.BUTTON = [["Start Timer", self.get_num]]
+        self.BUTTON = [["Start Timer", self.start_timer]]
+        self.timer = None
 
-        self.title_label = customtkinter.CTkLabel(self, text="Timer", fg_color="gray30", corner_radius=6)
+        self.title_label = ctk.CTkLabel(self, text="Timer", fg_color="gray30", corner_radius=6)
         self.title_label.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="new", columnspan=2)
 
 
-        self.hours_label = customtkinter.CTkLabel(self, text="Enter Hours: ", fg_color="transparent", corner_radius=6)
+        self.hours_label = ctk.CTkLabel(self, text="Enter Hours: ", fg_color="transparent", corner_radius=6)
         self.hours_label.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="w")
 
         self.hours_spinbox = tk.Spinbox(self, from_=0, to=23, repeatdelay=500, repeatinterval=100,
@@ -57,7 +58,7 @@ class TimerCreate(customtkinter.CTkFrame):
         self.hours_spinbox.grid(row=1, column=1, padx=10, pady=(10, 10), sticky="e")
 
 
-        self.mins_label = customtkinter.CTkLabel(self, text="Enter Miniutes: ", fg_color="transparent", corner_radius=6)
+        self.mins_label = ctk.CTkLabel(self, text="Enter Miniutes: ", fg_color="transparent", corner_radius=6)
         self.mins_label.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="w")
 
         self.mins_spinbox = tk.Spinbox(self, from_=0, to=59, repeatdelay=500, repeatinterval=100,
@@ -65,7 +66,7 @@ class TimerCreate(customtkinter.CTkFrame):
         self.mins_spinbox.grid(row=2, column=1, padx=10, pady=(10, 10), sticky="e")
 
 
-        self.secs_label = customtkinter.CTkLabel(self, text="Enter Seconds: ", fg_color="transparent", corner_radius=6)
+        self.secs_label = ctk.CTkLabel(self, text="Enter Seconds: ", fg_color="transparent", corner_radius=6)
         self.secs_label.grid(row=3, column=0, padx=10, pady=(10, 10), sticky="w")
 
         self.secs_spinbox = tk.Spinbox(self, from_=0, to=59, repeatdelay=500, repeatinterval=100,
@@ -77,8 +78,23 @@ class TimerCreate(customtkinter.CTkFrame):
         self.button.grid(row=4, column=0, padx=10, pady=(10, 10), sticky="ew", columnspan=2)
 
 
+    def start_timer(self, event=None):
+        if self.timer is None or not self.time.winfo_exists():
+            self.timer = Timer(self)  # create window if its None or destroyed
+        self.timer.focus()
+        self.timer.focus() # if window exists focus it
 
-class SongFrame(customtkinter.CTkFrame):
+
+class Timer(ctk.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.geometry("400x300")
+
+        self.label = ctk.CTkLabel(self, text="ToplevelWindow")
+        self.label.pack(padx=20, pady=20)
+
+
+class SongFrame(ctk.CTkFrame):
     def __init__(self, master, track_list, is_scrollable=True):
         super().__init__(master)
 
@@ -86,9 +102,9 @@ class SongFrame(customtkinter.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
 
         if is_scrollable:
-            self.container = customtkinter.CTkScrollableFrame(self)
+            self.container = ctk.CTkScrollableFrame(self)
         else:
-            self.container = customtkinter.CTkFrame(self)
+            self.container = ctk.CTkFrame(self)
 
         # This line below is there so the frame scales to take up the free space
         self.container.grid(row=0, column=0, sticky="nsew")
@@ -110,7 +126,7 @@ class SongFrame(customtkinter.CTkFrame):
             i+=1
 
 
-class PlaylistFrame(customtkinter.CTkFrame):
+class PlaylistFrame(ctk.CTkFrame):
     def __init__(self, master, playlist_list, is_scrollable=True):
         super().__init__(master)
 
@@ -118,9 +134,9 @@ class PlaylistFrame(customtkinter.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
 
         if is_scrollable:
-            self.container = customtkinter.CTkScrollableFrame(self)
+            self.container = ctk.CTkScrollableFrame(self)
         else:
-            self.container = customtkinter.CTkFrame(self)
+            self.container = ctk.CTkFrame(self)
 
         # This line below is there so the frame scales to take up the free space
         self.container.grid(row=0, column=0, sticky="nsew")
@@ -141,8 +157,31 @@ class PlaylistFrame(customtkinter.CTkFrame):
             i+=1
 
 
-
-class PlaylistConfigure(customtkinter.CTkFrame):
+class SearchFrame(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
+        self.grid_columnconfigure(0, weight=1)
+        RADIO_BUTTONS = [["Keyword"], ["Direct"]]
+        BUTTONS = [["Search" ,self.search],["Downloads", self.downloads],["Download Settings", self.download_settings]]
+
+        self.mode_radio_buttons = RadioButtonFrame(self,
+                                                   values = RADIO_BUTTONS,
+                                                   title = "Search for a song on Youtube",
+                                                   is_horizontal = True)
+        self.mode_radio_buttons.grid(row = 0, column = 0, sticky = "new", padx=(10,10), pady=(10,10))
+
+        self.entry = ctk.CTkEntry(self, placeholder_text="Enter song URL/Keyword")
+        self.entry.grid(row=1, column=0, sticky = "new", padx=(10,10), pady=(10,10))
+
+        self.buttons = ButtonFrame(self, button_values=BUTTONS, is_horizontal=True)
+        self.buttons.grid(row=2, column = 0, sticky = "ew", padx=(10,10), pady=(10,10))
+
+    def search(self, event = None):
+        print("Search")
+
+    def downloads(self, event = None):
+        print("Downloads")
+
+    def download_settings(self, event = None):
+        print("Download Settings")
