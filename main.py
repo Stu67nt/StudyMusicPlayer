@@ -107,6 +107,7 @@ class MusicFinder(ctk.CTkFrame):
 
         self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight = 1)
 
         SONGS = [["Song 1", "Balls", "852", None], ["Song 2", "Balls", "852", None],
                  ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None],
@@ -114,11 +115,11 @@ class MusicFinder(ctk.CTkFrame):
                  ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None],
                  ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None]]
 
-        self.search_frame = SearchFrame(master)
-        self.search_frame.grid(row = 0, column = 0, sticky = "new")
+        self.search_frame = SearchFrame(self)
+        self.search_frame.grid(row = 0, column = 0, sticky = "new", padx=(10,10), pady=(10, 10))
 
-        self.search_results = SongFrame(master, track_list = SONGS)
-        self.search_results.grid(row = 1, column = 0, sticky = "nsew")
+        self.search_results = SongFrame(self, track_list = SONGS)
+        self.search_results.grid(row = 1, column = 0, sticky = "nsew", padx=(10,10), pady=(10, 10))
 
 
 
@@ -159,7 +160,7 @@ class App(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
 
         self.tab_view = MyTabView(self)
-        self.tab_view.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
+        self.tab_view.grid(row=0, column=0, padx=(10,10), pady=(10,10), sticky="nsew")
         self.tab_view.grid_columnconfigure(0, weight=1)
         self.tab_view.grid_rowconfigure(0, weight=1)
 
