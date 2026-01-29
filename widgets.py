@@ -16,13 +16,15 @@ class ButtonFrame(ctk.CTkFrame):
     def __init__(self,
                  master,
                  button_values: list,
+                 font: ctk.CTkFont,
                  title: str = "",
                  is_horizontal: bool = False,
                  title_sticky: str = "nsew",
                  title_fg_color: str = "gray30",
                  title_corner_radius:int = 6,
-                 button_sticky: str = "nsew"):
-        super().__init__(master) # Calls/runs parent class. This is necessary so it initialises the inherited class.
+                 button_sticky: str = "nsew",
+                 button_frame_color = "gray20"):
+        super().__init__(master, fg_color = button_frame_color) # Calls/runs parent class. This is necessary so it initialises the inherited class.
 
         self.grid(row=0, column=0, sticky="nsew")
         self.grid_rowconfigure(0, weight=1)
@@ -34,8 +36,11 @@ class ButtonFrame(ctk.CTkFrame):
 
         # Creating and positioning title in frame
         if self.title != "":
-            self.title_label = ctk.CTkLabel(self, text=self.title, fg_color=title_fg_color,
-                                                      corner_radius=title_corner_radius)
+            self.title_label = ctk.CTkLabel(self,
+                                            text=self.title,
+                                            fg_color=title_fg_color,
+                                            corner_radius=title_corner_radius,
+                                            font = font)
             self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky=title_sticky)
             self.grid_columnconfigure(0, weight=0)
             self.grid_rowconfigure(0, weight=0)
@@ -49,7 +54,7 @@ class ButtonFrame(ctk.CTkFrame):
         # Iterating through each item in values and creating a button for it.
         # Each button is then added to a list of buttons so we can track their state.
         for i, value in enumerate(self.button_values):
-            self.button = ctk.CTkButton(self.button_frame, text=value[0], command=value[1])
+            self.button = ctk.CTkButton(self.button_frame, text=value[0], command=value[1], font = font)
             if is_horizontal:
                 self.button.grid(row=0, column=i, padx=20, pady=20, sticky=button_sticky)
                 self.grid_columnconfigure(i, weight=1)
@@ -65,6 +70,7 @@ class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
     def __init__(self,
                  master,
                  values: list,
+                 font: ctk.CTkFont,
                  title: str = "",
                  is_horizontal: bool = False,
                  is_scrollable: bool = False):
@@ -86,13 +92,17 @@ class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
 
         # Creating and positioning title in frame
         if self.title != "":
-            self.title_label = ctk.CTkLabel(self.container, text=self.title, fg_color="gray30", corner_radius=6)
+            self.title_label = ctk.CTkLabel(self.container,
+                                            text=self.title,
+                                            fg_color="gray30",
+                                            corner_radius=6,
+                                            font = font)
             self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nwe")
 
         # Iterating through each item in values and creating a checkbox for it.
         # Each checkbox is then added to a list of checkboxes so we can track their state.
         for i, value in enumerate(self.values):
-            self.checkbox = ctk.CTkCheckBox(self.container, text=value)
+            self.checkbox = ctk.CTkCheckBox(self.container, text=value, font=font)
             if is_horizontal:
                 self.checkbox.grid(row=0, column=i+1, padx=20, pady=20, sticky="w")
             else:
@@ -113,6 +123,7 @@ class RadioButtonFrame(ctk.CTkFrame):
                  master,
                  values: list,
                  title: str,
+                 font: ctk.CTkFont,
                  is_horizontal: bool = False,
                  is_scrollable: bool = False,
                  title_sticky: str = "ew",
@@ -142,7 +153,7 @@ class RadioButtonFrame(ctk.CTkFrame):
                                             text=self.title,
                                             fg_color=title_fg_color,
                                             corner_radius=title_corner_radius,
-                                            )
+                                            font = font)
             self.title_label.grid(row=0, column=0, sticky="ew")
 
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -152,7 +163,11 @@ class RadioButtonFrame(ctk.CTkFrame):
 
         # Iterating thorugh each value
         for i, value in enumerate(self.values):
-            self.radio_button = ctk.CTkRadioButton(self.button_frame, text=value, variable=self.var, value=value)
+            self.radio_button = ctk.CTkRadioButton(self.button_frame,
+                                                   text=value,
+                                                   variable=self.var,
+                                                   value=value,
+                                                   font = font)
             if is_horizontal:
                 self.radio_button.grid(row=0, column=i+1, padx=20, pady=20, sticky=button_sticky)
             else:
@@ -166,6 +181,7 @@ class LabelFrame(ctk.CTkFrame):
     def __init__(self,
                  master,
                  values: list,
+                 font = ctk.CTkFont,
                  title: str = "",
                  is_horizontal: bool = False,
                  is_scrollable: bool = False,
@@ -191,14 +207,17 @@ class LabelFrame(ctk.CTkFrame):
 
         # Creating and positioning title in frame
         if self.title != "":  # As empty string is default if this is true means title is wanted.
-            self.title_label = ctk.CTkLabel(self.container, text=self.title, fg_color=title_fg_color,
-                                                      corner_radius=title_corner_radius)
+            self.title_label = ctk.CTkLabel(self.container,
+                                            text=self.title,
+                                            fg_color=title_fg_color,
+                                            corner_radius=title_corner_radius,
+                                            font = font)
             self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky=title_sticky)
 
         # Iterating through each item in values and creating a button for it.
         # Each button is then added to a list of buttons so we can track their state.
         for i, value in enumerate(self.values):
-            self.label = ctk.CTkLabel(self.container, text=value[0])
+            self.label = ctk.CTkLabel(self.container, text=value[0], font= font)
             if is_horizontal:
                 self.label.grid(row=0, column=i + 1, padx=20, pady=20, sticky=button_sticky)
             else:
@@ -219,6 +238,7 @@ class SongLabel(ctk.CTkFrame):
                  song_name,
                  duration,
                  artist,
+                 font: ctk.CTkFont,
                  thumbnail = None):
         super().__init__(master)
 
@@ -229,16 +249,16 @@ class SongLabel(ctk.CTkFrame):
             self.thumbnail_label = ctk.CTkLabel(self, image = thumbnail)
             self.thumbnail_label.grid(column=0, row=0, sticky="nw", rowspan = 2)
 
-        self.name_label = ctk.CTkLabel(self, text = song_name)
+        self.name_label = ctk.CTkLabel(self, text = song_name, font = font)
         self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
 
-        self.artist_label = ctk.CTkLabel(self, text = artist)
+        self.artist_label = ctk.CTkLabel(self, text = artist, font = font)
         self.artist_label.grid(column=1, row=1, padx=(10, 10), sticky="nw")
 
-        self.duration_label = ctk.CTkLabel(self, text=duration)
+        self.duration_label = ctk.CTkLabel(self, text=duration, font = font)
         self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        self.options_button = ctk.CTkLabel(self, text = "⋮")
+        self.options_button = ctk.CTkLabel(self, text = "⋮", font = font)
         self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
         MENU_OPTIONS = ["Add to Playlist", "Delete Song", "Add to Queue"]
@@ -267,22 +287,23 @@ class PlaylistLabel(ctk.CTkFrame):
                  master,
                  playlist_name,
                  song_count,
-                 duration):
+                 duration,
+                 font: ctk.CTkFont):
         super().__init__(master)
 
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        self.name_label = ctk.CTkLabel(self, text = playlist_name)
+        self.name_label = ctk.CTkLabel(self, text = playlist_name, font = font)
         self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
 
-        self.song_count_label = ctk.CTkLabel(self, text = song_count)
+        self.song_count_label = ctk.CTkLabel(self, text = song_count, font = font)
         self.song_count_label.grid(column=1, row=1, padx=(10, 10), sticky="nw")
 
-        self.duration_label = ctk.CTkLabel(self, text=duration)
+        self.duration_label = ctk.CTkLabel(self, text=duration, font = font)
         self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        self.options_button = ctk.CTkLabel(self, text = "⋮")
+        self.options_button = ctk.CTkLabel(self, text = "⋮", font = font)
         self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
         MENU_OPTIONS = ["Delete Playlist", "Add to Queue", "Rename Playlist", "Overwrite Queue", ""]
