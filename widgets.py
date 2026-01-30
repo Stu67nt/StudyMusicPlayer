@@ -86,6 +86,7 @@ class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        self.font = font
         self.values = values
         self.checkboxes = []
         self.title = title
@@ -94,19 +95,18 @@ class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
         if self.title != "":
             self.title_label = ctk.CTkLabel(self.container,
                                             text=self.title,
-                                            fg_color="gray30",
-                                            corner_radius=6,
-                                            font = font)
+                                            fg_color="transparent",
+                                            font = self.font)
             self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nwe")
 
         # Iterating through each item in values and creating a checkbox for it.
         # Each checkbox is then added to a list of checkboxes so we can track their state.
         for i, value in enumerate(self.values):
-            self.checkbox = ctk.CTkCheckBox(self.container, text=value, font=font)
+            self.checkbox = ctk.CTkCheckBox(self.container, text=value, font=self.font)
             if is_horizontal:
-                self.checkbox.grid(row=0, column=i+1, padx=20, pady=20, sticky="w")
+                self.checkbox.grid(row=0, column=i+1, padx=(10,10), pady=(10,10), sticky="w")
             else:
-                self.checkbox.grid(row=i + 1, column=0, padx=20, pady=20, sticky="w")
+                self.checkbox.grid(row=i + 1, column=0, padx=(10,10), pady=(10,10), sticky="w")
             self.checkboxes.append(self.checkbox)
 
     # Returning which checkboxes have been ticked.

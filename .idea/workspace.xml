@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Fixed Music Finder search results scaling issue.">
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Added multi select framework and add to playlist framework.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/Components.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
@@ -59,7 +59,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/PycharmProjects/StudyMusicPlayer",
+    "last_opened_file_path": "C:/PycharmProjects/TerminalVideoPlayer",
     "settings.editor.selected.configurable": "preferences.sourceCode.Python"
   }
 }]]></component>
@@ -183,7 +183,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769353851420</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Added multi select framework and add to playlist framework.">
+      <option name="closed" value="true" />
+      <created>1769721057074</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1769721057074</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -211,6 +219,7 @@
     <MESSAGE value="not much" />
     <MESSAGE value="Added Musci Finder GUI" />
     <MESSAGE value="Fixed Music Finder search results scaling issue." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed Music Finder search results scaling issue." />
+    <MESSAGE value="Added multi select framework and add to playlist framework." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added multi select framework and add to playlist framework." />
   </component>
 </project>

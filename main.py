@@ -57,7 +57,6 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
                           ["Playlist 5", "27", "852"], ["Playlist 6", "27", "852"],
                           ["Playlist 7", "27", "852"], ["Playlist 8", "27", "852"],
                           ["Playlist 9", "27", "852"], ["Playlist 10", "27", "852"]]
-        self.song_count = len(self.songs)
         self.font = font
 
         self.main_view()
@@ -66,11 +65,11 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         destroy_widgets(self.widgets)
         self.topbar = ButtonFrame(self,
                                   button_values=self.main_topbar_buttons,
-                                  title=f"{self.song_count} Songs",
+                                  title=f"{len(self.songs)} Songs",
                                   title_fg_color="transparent",
                                   is_horizontal=True,
                                   title_sticky="w",
-                                  button_sticky="ew",
+                                  button_sticky="e",
                                   font=self.font)
         self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
         self.widgets.append(self.topbar)
@@ -94,7 +93,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
                                   title_fg_color="transparent",
                                   is_horizontal=True,
                                   title_sticky="w",
-                                  button_sticky="ew",
+                                  button_sticky="e",
                                   font=self.font)
         self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
         self.widgets.append(self.topbar)
@@ -211,7 +210,44 @@ class MusicFinder(ctk.CTkFrame):
         self.search_results = SongFrame(self, track_list = SONGS, font=font)
         self.search_results.grid(row = 1, column = 0, sticky = "nsew")
 
+class Player(ctk.CTkFrame):
+    def __init__(self, master, song: list = ["No Song", "---", "0", None]):
+        super().__init__(master)
 
+        self.grid_rowconfigure((0,1), weight=0)
+        self.grid_columnconfigure((0,2), weight=1)
+        self.grid_columnconfigure(1, weight=2)
+
+        self.song_name_font = ctk.CTkFont(family="Arial", size = 20)
+        self.song_artist_font = ctk.CTkFont(family="Arial", size = 16)
+        self.icons_font = ctk.CTkFont(family="Arial", size=22)
+
+        self.song_name = song[0]
+        self.artist = song[1]
+        self.duration = song[2]
+        self.thumbnail = song[3]
+
+        self.song_name_label = ctk.CTkLabel(self, text=self.song_name, font=self.song_name_font)
+        self.song_name_label.grid(row=0, column=0, padx=(5,5), pady=(5,5), sticky="w")
+
+        self.artist_name_label = ctk.CTkLabel(self, text=self.artist, font=self.song_artist_font)
+        self.song_name_label.grid(row=1, column=0, padx=(5, 5), pady=(5, 5), sticky="w")
+
+        self.playbar_buttons_frame = ctk.CTkFrame(self, bg_color="transparent")
+        self.playbar_buttons_frame.grid(row=0, column=1, padx=(5,5), pady=(5,5), sticky="new")
+
+        # Label frame here
+        self.pla
+
+        self.playbar = ctk.CTkSlider(self, from_=0, to=int(self.duration), command=self.retrive_slider_val)
+        self.playbar.grid(row=1, column=1, padx=(5, 5), pady=(5, 5), sticky="sew")
+
+        self.volume_slider= self.playbar = ctk.CTkSlider(self, from_=0, to=100, command=self.retrive_slider_val)
+        self.playbar.grid(row=0, column=2, rowspan=2, padx=(5, 5), pady=(5, 5), sticky="e")
+
+
+    def retrive_slider_val(self, value):
+        print(value)
 
 class MyTabView(ctk.CTkTabview):
     def __init__(self, master, font: ctk.CTkFont):
@@ -242,7 +278,7 @@ class MyTabView(ctk.CTkTabview):
 class App(ctk.CTk):
     def __init__(self, title="My App"):
         super().__init__()
-        DEFAULT_FONT = ctk.CTkFont(family="Comic Sans MS", size=18)
+        DEFAULT_FONT = ctk.CTkFont(family="Arial", size=18)
         # Initialising Window
         self.title(title)
         ctk.set_appearance_mode("dark")  # light/dark/system (system is not functional on linux)
@@ -254,9 +290,8 @@ class App(ctk.CTk):
         self.tab_view.grid_columnconfigure(0, weight=1)
         self.tab_view.grid_rowconfigure(0, weight=1)
 
-        self.song_label = SongLabel(self, song_name="song_name", artist="song_artist",
-                                    duration="song_duration", font=DEFAULT_FONT)
-        self.song_label.grid(row=1, column=0, padx=(10, 10), pady=(10,10), sticky="ew")
+        self.player = Player(self)
+        self.player.grid(row=1, column=0, padx=(10, 10), pady=(10,10), sticky="ew")
 
 def destroy_widgets(widgets):
     for widget in widgets:

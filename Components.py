@@ -143,7 +143,7 @@ class AddToPlaylist(ctk.CTkToplevel):
     def __init__(self, playlists, font: ctk.CTkFont, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.geometry('300x700')
+        self.geometry('450x600')
         self.title("Add To Playlist")
         self.resizable(width=False, height=False)
         self.rowconfigure(0, weight=1)
@@ -175,7 +175,7 @@ class AddToPlaylist(ctk.CTkToplevel):
         self.submit.grid(row=1, column=0, padx=(10,10), pady=(10,10), sticky = "ew")
 
     def submit_playlists(self):
-        print("Submit Playlists")
+        print(self.playlists_checkbox.get_checkboxes())
 
 
 class SongFrame(ctk.CTkFrame):
