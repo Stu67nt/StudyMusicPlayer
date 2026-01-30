@@ -6,15 +6,15 @@ import tkinter as tk
 class ToDoList(ctk.CTkFrame):
     """
     TODO:
-        Tie todo_checkboxes list to the db
+        Tie todo_tasks list to the db
         Create the to_do db
         Pretty much make the thing functional
     """
     def __init__(self, master, font: ctk.CTkFont):
         super().__init__(master)
 
-        todo_checkboxes = ["Task 1", "Task 2", "Task 3", "Task 2", "Task 2", "Task 2", "Task 2", "Task 2", "Task 2",
-                           "Task 2", "Task 2", "Task 2", "Task 2", "Task 2", "Task 2"]
+        self.font = font
+        self.todo_tasks = ["Default Task", "Default Task 2", "Default Task 3"]
 
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -23,8 +23,8 @@ class ToDoList(ctk.CTkFrame):
         self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="new", columnspan=2)
 
 
-        self.todo = CheckboxFrame(self, values=todo_checkboxes, is_scrollable=True, font=font)
-        self.todo.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
+        self.todo_checkboxes = CheckboxFrame(self, values=self.todo_tasks, is_scrollable=True, font=font)
+        self.todo_checkboxes.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
 
         self.input = ctk.CTkEntry(self, font=font)
         self.input.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nwe")
@@ -37,10 +37,20 @@ class ToDoList(ctk.CTkFrame):
         self.buttons.grid(row=3, column=0, padx=10, pady=(10, 10), sticky="ew")
 
     def create_task(self):
-        print("Create task")
-    def delete_tasks(self):
-        print("Delete Tasks")
+        # Getting text input adding it to list and regenerating new checkbox frame
+        task = self.input.get()
+        self.todo_tasks.append(task)
+        self.todo_checkboxes.destroy()
+        self.todo_checkboxes = CheckboxFrame(self, values=self.todo_tasks, is_scrollable=True, font=self.font)
+        self.todo_checkboxes.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
 
+    def delete_tasks(self):
+        ticked = self.todo_checkboxes.get_checkboxes()
+        for task in ticked:
+            self.todo_tasks.remove(task)
+        self.todo_checkboxes.destroy()
+        self.todo_checkboxes = CheckboxFrame(self, values=self.todo_tasks, is_scrollable=True, font=self.font)
+        self.todo_checkboxes.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
 
 class TimerCreate(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
@@ -176,6 +186,7 @@ class AddToPlaylist(ctk.CTkToplevel):
 
     def submit_playlists(self):
         print(self.playlists_checkbox.get_checkboxes())
+        self.destroy()
 
 
 class SongFrame(ctk.CTkFrame):
