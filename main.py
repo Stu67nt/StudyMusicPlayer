@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from widgets import *
 from Components import *
+from PIL import Image
 
 
 class Home(ctk.CTkFrame): # Inheriting CTk class
@@ -52,13 +53,12 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
                  ["Song 5", "Johnathan", "852", None], ["Song 6", "Sinera", "852", None],
                  ["Song 7", "Fred", "852", None], ["Song 8", "Flavio", "852", None],
                  ["Song 9", "Trap", "852", None], ["Song 10", "Honest", "852", None]]
-        self.playlists = [["Playlist 1", "27", "852"], ["Playlist 2", "27", "852"],
-                          ["Playlist 3", "27", "852"], ["Playlist 4", "27", "852"],
-                          ["Playlist 5", "27", "852"], ["Playlist 6", "27", "852"],
-                          ["Playlist 7", "27", "852"], ["Playlist 8", "27", "852"],
-                          ["Playlist 9", "27", "852"], ["Playlist 10", "27", "852"]]
-        self.font = font
+        self.playlists = [["Playlist 1", "1"],
+                          ["Playlist 2", "2"],
+                          ["Playlist 3", "3"],
+                          ["Playlist 4", "4"]]
 
+        self.font = font
         self.main_view()
 
     def main_view(self):
@@ -129,11 +129,10 @@ class Playlists(ctk.CTkFrame):
         self.widgets = []
         self.font=font
         self.main_topbar_buttons = [["Create Playlist", self.create_playlist], ["Select Multiple", self.select_multiple]]
-        self.playlists = [["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],
-                 ["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],
-                 ["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],
-                 ["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],
-                 ["Playlist 1", "27", "852"], ["Playlist 1", "27", "852"],]
+        self.playlists = [["Playlist 1", "1", "123", lambda: self.retrieve_playlist(1)],
+                          ["Playlist 2", "2", "246", lambda: self.retrieve_playlist(2)],
+                          ["Playlist 3", "3", "369", lambda: self.retrieve_playlist(3)],
+                          ["Playlist 4", "4", "492", lambda: self.retrieve_playlist(4)]]
 
         self.main_view()
 
@@ -183,12 +182,16 @@ class Playlists(ctk.CTkFrame):
         self.widgets.append(self.topbar)
 
     # Event is a required argument as when button is pressed an argument is automatically passed
-    def create_playlist(self ,event=None):
+    def create_playlist(self, event=None):
         dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
         print("Name:", dialog.get_input())
 
     def delete_playlist(self):
         print("Delete Playlist")
+
+    def retrieve_playlist(self, param):
+        pass
+
 
 class MusicFinder(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
@@ -211,7 +214,7 @@ class MusicFinder(ctk.CTkFrame):
         self.search_results.grid(row = 1, column = 0, sticky = "nsew")
 
 class Player(ctk.CTkFrame):
-    def __init__(self, master, song: list = ["No Song", "---", "0", None]):
+    def __init__(self, master, song: list = ["No Song", "Frank Ocean", "180", None]):
         super().__init__(master)
 
         self.grid_rowconfigure((0,1), weight=0)
@@ -222,32 +225,84 @@ class Player(ctk.CTkFrame):
         self.song_artist_font = ctk.CTkFont(family="Arial", size = 16)
         self.icons_font = ctk.CTkFont(family="Arial", size=22)
 
+        self.button_icons = [["↺", self.rewind],
+                             ["🔀", self.shuffle],
+                             ["⏮", self.previous_song],
+                             ["⏯", self.toggle_pause],
+                             ["⏭", self.skip_song],
+                             ["🔁", self.toggle_loop],
+                             ["↻", self.skip_foward]]
+
         self.song_name = song[0]
         self.artist = song[1]
         self.duration = song[2]
-        self.thumbnail = song[3]
+        self.thumbnail_path = song[3]
 
-        self.song_name_label = ctk.CTkLabel(self, text=self.song_name, font=self.song_name_font)
-        self.song_name_label.grid(row=0, column=0, padx=(5,5), pady=(5,5), sticky="w")
+        # Thumbnail Rendering
+        if self.thumbnail_path == None:
+            self.thumbnail = ctk.CTkImage(light_image=Image.open("No-album-art.png"),
+                                          dark_image=Image.open("No-album-art.png"),
+                                          size = (75,75))
+        else:
+            self.thumbnail = ctk.CTkImage(light_image=Image.open(self.thumbnail_path),
+                         dark_image=Image.open(self.thumbnail_path),
+                         size=(35, 35))
 
-        self.artist_name_label = ctk.CTkLabel(self, text=self.artist, font=self.song_artist_font)
-        self.song_name_label.grid(row=1, column=0, padx=(5, 5), pady=(5, 5), sticky="w")
+        self.song_details_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.song_details_frame.grid(row=0, column=0, rowspan=2, padx=(5, 5), pady=(5, 5), sticky="nsw")
 
+        self.song_thumbnail = ctk.CTkLabel(self.song_details_frame, image=self.thumbnail, text="")
+        self.song_thumbnail.grid(row=0, column=0, rowspan=2, padx=(10, 10), pady=(5, 5), sticky="w")
+
+        self.song_name_label = ctk.CTkLabel(self.song_details_frame, text=self.song_name, font=self.song_name_font)
+        self.song_name_label.grid(row=0, column=1, padx=(10,10), pady=(5,5), sticky="w")
+
+        self.artist_name_label = ctk.CTkLabel(self.song_details_frame, text=self.artist, font=self.song_artist_font)
+        self.artist_name_label.grid(row=1, column=1, padx=(10, 10), pady=(5, 5), sticky="w")
+        """
         self.playbar_buttons_frame = ctk.CTkFrame(self, bg_color="transparent")
-        self.playbar_buttons_frame.grid(row=0, column=1, padx=(5,5), pady=(5,5), sticky="new")
+        self.playbar_buttons_frame.grid(row=0, column=1, padx=(5,5), pady=(5,5), sticky="ew")
+        self.playbar_buttons_frame.columnconfigure(0, weight=1)
+        """
 
-        # Label frame here
-        self.pla
+        self.playbar_buttons = LabelFrame(self,
+                                          values=self.button_icons,
+                                          font=self.icons_font,
+                                          is_horizontal=True,
+                                          button_sticky="ew",
+                                          frame_fg_color="transparent")
+        self.playbar_buttons.grid(row=0, column=1, padx=(5,5), pady=(5,5), sticky="ew")
 
         self.playbar = ctk.CTkSlider(self, from_=0, to=int(self.duration), command=self.retrive_slider_val)
         self.playbar.grid(row=1, column=1, padx=(5, 5), pady=(5, 5), sticky="sew")
 
-        self.volume_slider= self.playbar = ctk.CTkSlider(self, from_=0, to=100, command=self.retrive_slider_val)
-        self.playbar.grid(row=0, column=2, rowspan=2, padx=(5, 5), pady=(5, 5), sticky="e")
+        self.volume_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.retrive_slider_val)
+        self.volume_slider.grid(row=0, column=2, rowspan=2, padx=(5, 5), pady=(5, 5), sticky="e")
 
 
     def retrive_slider_val(self, value):
         print(value)
+
+    def rewind(self, event=None):
+        print("Rewind")
+
+    def shuffle(self, event=None):
+        print("Shuffle")
+
+    def toggle_pause(self, event=None):
+        print("Toggle Pause")
+
+    def skip_foward(self, event=None):
+        print("Skip Foward")
+
+    def skip_song(self, event=None):
+        print("Skip Song")
+
+    def toggle_loop(self, event=None):
+        print("Toggle Loop")
+
+    def previous_song(self, event=None):
+        print("Previous Song")
 
 class MyTabView(ctk.CTkTabview):
     def __init__(self, master, font: ctk.CTkFont):
@@ -286,12 +341,12 @@ class App(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
 
         self.tab_view = MyTabView(self, DEFAULT_FONT)
-        self.tab_view.grid(row=0, column=0, padx=(10,10), pady=(10,10), sticky="nsew")
+        self.tab_view.grid(row=0, column=0, padx=(10,10), pady=(5,5), sticky="nsew")
         self.tab_view.grid_columnconfigure(0, weight=1)
         self.tab_view.grid_rowconfigure(0, weight=1)
 
         self.player = Player(self)
-        self.player.grid(row=1, column=0, padx=(10, 10), pady=(10,10), sticky="ew")
+        self.player.grid(row=1, column=0, padx=(10, 10), pady=(5,5), sticky="ew")
 
 def destroy_widgets(widgets):
     for widget in widgets:

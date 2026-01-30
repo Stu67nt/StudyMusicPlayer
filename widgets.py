@@ -188,16 +188,17 @@ class LabelFrame(ctk.CTkFrame):
                  title_sticky: str = "nesw",
                  title_fg_color: str = "gray30",
                  title_corner_radius: int = 6,
-                 button_sticky: str = "nesw"):
-        super().__init__(master)  # Calls/runs parent class. This is necessary so it initialises the inherited class.
+                 button_sticky: str = "nesw",
+                 frame_fg_color = "transparent"):
+        super().__init__(master, fg_color=frame_fg_color)  # Calls/runs parent class. This is necessary so it initialises the inherited class.
 
         if is_scrollable:
-            self.container = ctk.CTkScrollableFrame(self)
+            self.container = ctk.CTkScrollableFrame(self, fg_color = frame_fg_color)
         else:
-            self.container = ctk.CTkFrame(self)
+            self.container = ctk.CTkFrame(self, fg_color = frame_fg_color)
 
         # This line below is there so the frame scales to take up the free space
-        self.container.grid(row=0, column=0, sticky="nsew")
+        self.container.grid(row=0, column=0, sticky="ew")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
@@ -220,8 +221,11 @@ class LabelFrame(ctk.CTkFrame):
             self.label = ctk.CTkLabel(self.container, text=value[0], font= font)
             if is_horizontal:
                 self.label.grid(row=0, column=i + 1, padx=20, pady=20, sticky=button_sticky)
+                self.container.grid_columnconfigure(i+1, weight=1)
             else:
                 self.label.grid(row=i + 1, column=0, padx=20, pady=20, sticky=button_sticky)
+                self.container.grid_rowconfigure(i+1, weight=1)
+
             self.labels.append(self.label)
 
         for i in range(len(self.labels)):
@@ -229,10 +233,6 @@ class LabelFrame(ctk.CTkFrame):
 
 
 class SongLabel(ctk.CTkFrame):
-    """
-    TODO: Add default thumbnail.
-          Create Checkboxable version
-    """
     def __init__(self,
                  master,
                  song_name,
@@ -244,11 +244,11 @@ class SongLabel(ctk.CTkFrame):
 
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(1, weight=1)
-
+        """
         if thumbnail != None:
             self.thumbnail_label = ctk.CTkLabel(self, image = thumbnail)
             self.thumbnail_label.grid(column=0, row=0, sticky="nw", rowspan = 2)
-
+        """
         self.name_label = ctk.CTkLabel(self, text = song_name, font = font)
         self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
 
