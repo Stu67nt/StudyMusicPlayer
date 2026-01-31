@@ -2,7 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from widgets import *
 from Components import *
-from PIL import Image
+from PIL import Image  # Used for thumbnails
 
 
 class Home(ctk.CTkFrame): # Inheriting CTk class

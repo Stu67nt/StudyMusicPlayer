@@ -24,7 +24,7 @@ class ButtonFrame(ctk.CTkFrame):
                  title_corner_radius:int = 6,
                  button_sticky: str = "nsew",
                  button_frame_color = "gray20"):
-        super().__init__(master, fg_color = button_frame_color) # Calls/runs parent class. This is necessary so it initialises the inherited class.
+        super().__init__(master, fg_color = button_frame_color)
 
         self.grid(row=0, column=0, sticky="nsew")
         self.grid_rowconfigure(0, weight=1)
@@ -69,7 +69,7 @@ class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
     # A frame holding Checkboxes
     def __init__(self,
                  master,
-                 values: list,
+                 values,
                  font: ctk.CTkFont,
                  title: str = "",
                  is_horizontal: bool = False,

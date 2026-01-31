@@ -2,19 +2,14 @@ from widgets import *
 import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
+import sqlite3
 
 class ToDoList(ctk.CTkFrame):
-    """
-    TODO:
-        Tie todo_tasks list to the db
-        Create the to_do db
-        Pretty much make the thing functional
-    """
     def __init__(self, master, font: ctk.CTkFont):
         super().__init__(master)
 
+        self.db = self.init_database()
         self.font = font
-        self.todo_tasks = ["Default Task", "Default Task 2", "Default Task 3"]
 
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -22,35 +17,85 @@ class ToDoList(ctk.CTkFrame):
         self.title_label = ctk.CTkLabel(self, text="To Do List:", fg_color="gray30", corner_radius=6, font=font)
         self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="new", columnspan=2)
 
+        self.task_frame = ctk.CTkScrollableFrame(self, fg_color="transparent")
+        self.task_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
-        self.todo_checkboxes = CheckboxFrame(self, values=self.todo_tasks, is_scrollable=True, font=font)
-        self.todo_checkboxes.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
-
-        self.input = ctk.CTkEntry(self, font=font)
+        self.input = ctk.CTkEntry(self, font=self.font)
         self.input.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nwe")
 
         self.buttons = ButtonFrame(self,
-                                   [["Create Task", self.create_task], ["Delete Tasks", self.delete_tasks]],
+                                   button_values=[["Create Task",self.create_task],
+                                    ["Delete Tasks", self.delete_tasks]],
                                    is_horizontal = True,
                                    button_sticky = "ew",
-                                   font = font)
+                                   font = self.font)
         self.buttons.grid(row=3, column=0, padx=10, pady=(10, 10), sticky="ew")
+
+        self.load_tasks()
+
+    def init_database(self):
+        db = sqlite3.connect("todo.db")
+        cursor = db.cursor()
+        query = ("CREATE TABLE IF NOT EXISTS "
+                 "todo(" 
+                 "taskID INTEGER PRIMARY KEY AUTOINCREMENT," 
+                 "task TEXT,"
+                 "is_checked INTEGER"
+                 ")")
+        cursor.execute(query)
+        db.commit()
+        return db
+
+    def retrieve_tasks(self):
+        cursor = self.db.cursor()
+        cursor.execute("SELECT * from todo")
+        tasks = cursor.fetchall()
+        return tasks
+
+    def load_tasks(self):
+        for widget in self.task_frame.winfo_children():
+            widget.destroy()
+
+        todo_tasks = self.retrieve_tasks()
+
+        for i, task in enumerate(todo_tasks):
+            task_id = task[0]
+            task_name = task[1]
+            is_completed = ctk.IntVar(value=task[2])
+
+            checkbox = ctk.CTkCheckBox(
+                self.task_frame,
+                text=task_name,
+                variable=is_completed,
+                command=lambda t_id=task_id, ticked = is_completed: self.toggle_task(t_id, ticked),
+                font=self.font
+            )
+            checkbox.grid(row=i, column=0, padx=(5,5), pady=(5,5), sticky="w")
+
+    def toggle_task(self, task_id, is_completed):
+        cursor = self.db.cursor()
+        cursor.execute(
+            "UPDATE todo SET is_checked = ? WHERE taskID = ?",
+            (is_completed.get(), task_id)
+        )
+        self.db.commit()
 
     def create_task(self):
         # Getting text input adding it to list and regenerating new checkbox frame
-        task = self.input.get()
-        self.todo_tasks.append(task)
-        self.todo_checkboxes.destroy()
-        self.todo_checkboxes = CheckboxFrame(self, values=self.todo_tasks, is_scrollable=True, font=self.font)
-        self.todo_checkboxes.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
+        task = self.input.get().strip()
+        cursor = self.db.cursor()
+        cursor.execute(
+            "INSERT INTO todo (task, is_checked) VALUES (?, 0)",
+            (task,)
+        )
+        self.db.commit()
+        self.load_tasks()
 
     def delete_tasks(self):
-        ticked = self.todo_checkboxes.get_checkboxes()
-        for task in ticked:
-            self.todo_tasks.remove(task)
-        self.todo_checkboxes.destroy()
-        self.todo_checkboxes = CheckboxFrame(self, values=self.todo_tasks, is_scrollable=True, font=self.font)
-        self.todo_checkboxes.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
+        cursor = self.db.cursor()
+        cursor.execute("DELETE FROM todo WHERE is_checked=1")
+        self.db.commit()
+        self.load_tasks()
 
 class TimerCreate(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
