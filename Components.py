@@ -3,6 +3,7 @@ import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
 import sqlite3
+import time
 
 class ToDoList(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
@@ -140,14 +141,34 @@ class TimerCreate(ctk.CTkFrame):
 
 
     def start_timer(self, event=None):
-        if self.timer is None or not self.timer.winfo_exists():
-            self.timer = Timer(self)  # create window if its None or destroyed
-        self.timer.focus()
-        self.timer.focus() # if window exists focus it
+        # Input validation
+        if self.hours_spinbox.get().isdigit() and self.mins_spinbox.get().isdigit() and self.secs_spinbox.get().isdigit():
+            valid = True
+            self.hours = int(self.hours_spinbox.get())
+            self.mins = int(self.mins_spinbox.get())
+            self.secs = int(self.secs_spinbox.get())
+            if self.hours > 23:
+                self.hours = 23
+            if self.mins > 59:
+                self.mins = 59
+            if self.secs > 59:
+                self.secs = 59
+            if (3600*self.hours)+(60*self.mins)+self.secs == 0:
+                valid = False
+        else:
+            valid = False
+
+        if (self.timer is None or not self.timer.winfo_exists()) and valid:
+            self.timer = Timer(self,
+                               hours=self.hours,
+                               mins=self.mins,
+                               secs=self.secs)
+        if self.timer is not None and self.timer.winfo_exists():
+            self.timer.focus() # if window exists focus it
 
 
 class Timer(ctk.CTkToplevel):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, event, hours, mins, secs, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.title("Timer")
@@ -155,19 +176,19 @@ class Timer(ctk.CTkToplevel):
         self.rowconfigure((0,2), weight=1)
         self.columnconfigure(0, weight=1)
 
-        TEXT_FONT = ctk.CTkFont(family="Comic Sans MS", size= 25)
-        TIMER_FONT = ctk.CTkFont(family="Comic Sans MS", size= 50)
-        BUTTON_FONT = ctk.CTkFont(family="Comic Sans MS", size = 20)
-        BUTTONS = [["⏸", self.toggle_pause], ["⟳", self.reset_timer]]
+        self.TEXT_FONT = ctk.CTkFont(family="Comic Sans MS", size= 25)
+        self.TIMER_FONT = ctk.CTkFont(family="Comic Sans MS", size= 50)
+        self.BUTTON_FONT = ctk.CTkFont(family="Comic Sans MS", size = 20)
+        self.BUTTONS = [["⏸", self.toggle_pause], ["⟳", self.reset_timer]]
 
-
-        self.hours_remaining = tk.IntVar(value=23)
-        self.mins_remaining = tk.IntVar(value=59)
-        self.secs_remaining = tk.IntVar(value=59)
+        self.init_secs = (3600*hours)+(60*mins)+secs
+        self.total_remaining_secs = self.init_secs
+        self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
+        self.is_paused = False
 
         self.label = ctk.CTkLabel(self,
                                   text="Time Remaining",
-                                  font = TEXT_FONT)
+                                  font = self.TEXT_FONT)
         self.label.grid(row=0, column=0, padx=(10,10), pady=(10,10))
 
         self.timer_frame = ctk.CTkFrame(self,
@@ -176,23 +197,88 @@ class Timer(ctk.CTkToplevel):
                                         fg_color="transparent")
         self.timer_frame.grid(row=1, column=0)
 
-        self.time_remaining = ctk.CTkLabel(self.timer_frame,
-                                           text = f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}",
-                                           font = TIMER_FONT)
-        self.time_remaining.grid(row=0, column=0, sticky="nsew", padx=(10,10), pady=(10,10))
+        self.time_remaining_label = ctk.CTkLabel(self.timer_frame,
+                                                 text = f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}",
+                                                 font = self.TIMER_FONT)
+        self.time_remaining_label.grid(row=0, column=0, sticky="nsew", padx=(10, 10), pady=(10, 10))
 
         self.buttons = ButtonFrame(self,
-                                   button_values = BUTTONS,
+                                   button_values = self.BUTTONS,
                                    is_horizontal=True,
                                    button_frame_color = "transparent",
-                                   font = BUTTON_FONT)
+                                   font = self.BUTTON_FONT)
         self.buttons.grid(row=2, column = 0, sticky = "ew", padx=(10,10), pady=(10,10))
 
+        # DOCUMENT BUG
+        # No warning given once time finishes. Due to total_remaining_secs only being checked once at start.
+        # TO recreate add the following lines to __init__():
+        """
+                if self.total_remaining_secs <= 0:
+            print("TIMEEEE")
+            self.reset_timer()
+        """
+        # And remove the code in update time
+        if self.total_remaining_secs > 0:
+            self.after(1000, self.update_time)
+        if self.total_remaining_secs <= 0:
+            print("TIMEEEE")
+            self.reset_timer()
+
+
+
     def toggle_pause(self):
-        print("Toggle Pause")
+        if not self.is_paused:
+            self.is_paused = True
+        else:
+            self.is_paused = False
+            if self.total_remaining_secs > 0:
+                self.after(1000, self.update_time)
+
 
     def reset_timer(self):
-        print("Reset Timer")
+        self.total_remaining_secs = self.init_secs
+
+        # DOCUMNET BUG
+        # When timer reset the reset time is not immediately displayed instead only displayed after waiting a second for time to deincrement
+        # Recreate by adding the 3 lines below. REmove to recreate
+        """
+        self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
+        self.time_remaining_label = ctk.CTkLabel(self.timer_frame,
+                                                 text=f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}",
+                                                 font=self.TIMER_FONT)
+        self.time_remaining_label.grid(row=0, column=0, sticky="nsew", padx=(10, 10), pady=(10, 10))
+        """
+        # Displaying updated time
+        self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
+        self.time_remaining_label = ctk.CTkLabel(self.timer_frame,
+                                                 text=f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}",
+                                                 font=self.TIMER_FONT)
+        self.time_remaining_label.grid(row=0, column=0, sticky="nsew", padx=(10, 10), pady=(10, 10))
+        pass
+
+    def convert_time(self, secs):
+        hours = ctk.IntVar(value=int(secs / 3600))
+        mins = ctk.IntVar(value=int((secs % 3600) / 60))
+        secs = ctk.IntVar(value=int((secs % 3600) % 60))
+
+        return hours, mins, secs
+
+    def update_time(self):
+        if self.total_remaining_secs <= 0:
+            print("TIMEEEE")
+            self.reset_timer()
+            self.toggle_pause()
+        if (self.total_remaining_secs > 0) and not self.is_paused:
+            self.after(1000, self.update_time)  # Recursive
+
+
+        self.total_remaining_secs -= 1
+        self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
+        self.time_remaining_label = ctk.CTkLabel(self.timer_frame,
+                                                 text=f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}",
+                                                 font=self.TIMER_FONT)
+        self.time_remaining_label.grid(row=0, column=0, sticky="nsew", padx=(10, 10), pady=(10, 10))
+
 
 class AddToPlaylist(ctk.CTkToplevel):
     def __init__(self, playlists, font: ctk.CTkFont, *args, **kwargs):
