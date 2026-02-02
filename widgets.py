@@ -12,7 +12,15 @@ the To Do Lists will be found in Components.py
 """
 
 class ButtonFrame(ctk.CTkFrame):
-    """A frame which holds buttons. Not Scrollable."""
+    """
+    A frame which holds buttons. Not Scrollable.
+    :param master: tkinter frame where the button should be held
+    :param button_values: 2D list where each element is a list with the following structure
+    [Button_text, button_function]
+    :param font: Custom Tkinter font object. Selects font the button text uses.
+    :param title: title text of the button frame if needed. Leave blank for no text
+    :param is_horizontal: Selects if buttons go veritcally down or horizontaally across
+    """
     def __init__(self,
                  master,
                  button_values: list,
@@ -23,18 +31,19 @@ class ButtonFrame(ctk.CTkFrame):
                  title_fg_color: str = "gray30",
                  title_corner_radius:int = 6,
                  button_sticky: str = "nsew",
-                 button_frame_color = "gray20"):
-        super().__init__(master, fg_color = button_frame_color)
+                 button_frame_color = "grey20"):
 
+        # Setting up grid structure
+        super().__init__(master, fg_color = button_frame_color)
         self.grid(row=0, column=0, sticky="nsew")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        # Initialising variables
         self.button_values = button_values
-        self.buttons = []
         self.title = title
 
-        # Creating and positioning title in frame
+        # Creating and positioning title in frame only if requested
         if self.title != "":
             self.title_label = ctk.CTkLabel(self,
                                             text=self.title,
@@ -45,6 +54,7 @@ class ButtonFrame(ctk.CTkFrame):
             self.grid_columnconfigure(0, weight=0)
             self.grid_rowconfigure(0, weight=0)
 
+        # Creating frame to place buttons in
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.button_frame.grid(row=0 if is_horizontal else 1,
                                    column=1 if is_horizontal else 0,
@@ -55,6 +65,8 @@ class ButtonFrame(ctk.CTkFrame):
         # Each button is then added to a list of buttons so we can track their state.
         for i, value in enumerate(self.button_values):
             self.button = ctk.CTkButton(self.button_frame, text=value[0], command=value[1], font = font)
+            # Gridding is based on whether the frame is ment to be horizontal or vertical.
+            # Weights added so buttons spread out evenly
             if is_horizontal:
                 self.button.grid(row=0, column=i, padx=20, pady=20, sticky=button_sticky)
                 self.grid_columnconfigure(i, weight=1)
@@ -62,11 +74,17 @@ class ButtonFrame(ctk.CTkFrame):
                 self.button.grid(row=i, column=0, padx=20, pady=20, sticky=button_sticky)
                 self.grid_rowconfigure(i, weight=1)
 
-            self.buttons.append(self.button)
-
 
 class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
-    # A frame holding Checkboxes
+    """
+    A frame which holds Checkboxes.
+    :param master: tkinter/customtkinter frame where the Checkbox should be held
+    :param button_values: List where each element is the text/value of the checkbox
+    :param font: Custom Tkinter font object. Selects font the Checkbox text uses.
+    :param title: title text of the Checkbox frame if needed. Leave blank for no text
+    :param is_horizontal: Selects if Checkbox go veritcally down or horizontally across
+    :param is_scrollable: Selects if the frame can be scrolled or not
+    """
     def __init__(self,
                  master,
                  values,
@@ -74,18 +92,21 @@ class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
                  title: str = "",
                  is_horizontal: bool = False,
                  is_scrollable: bool = False):
-        super().__init__(master) # Calls/runs parent class. This is necessary so it initialises the inherited class.
+        super().__init__(master)
 
+        # self.container needed to add a scrollable frame inside the main frame if requested
+        # All widgets inside class to be placed in self.container
         if is_scrollable:
             self.container = ctk.CTkScrollableFrame(self)
         else:
             self.container = ctk.CTkFrame(self)
 
-        # This line below is there so the frame scales to take up the free space
+        # placing self.container inside the main frame
         self.container.grid(row=0, column=0, sticky="nsew")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        # Initialising variables
         self.font = font
         self.values = values
         self.checkboxes = []
@@ -107,10 +128,14 @@ class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
                 self.checkbox.grid(row=0, column=i+1, padx=(10,10), pady=(10,10), sticky="w")
             else:
                 self.checkbox.grid(row=i + 1, column=0, padx=(10,10), pady=(10,10), sticky="w")
+            # All checkboxes stored so we can easily refrence them to get if they are ticked
             self.checkboxes.append(self.checkbox)
 
-    # Returning which checkboxes have been ticked.
     def get_checkboxes(self):
+        """
+        Returning which checkboxes have been ticked.
+        :return: List of all checkboxes which have been ticked
+        """
         checked = []
         for box in self.checkboxes:
             if box.get() == 1:
@@ -119,6 +144,15 @@ class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
 
 
 class RadioButtonFrame(ctk.CTkFrame):
+    """
+    A frame which holds Radio Buttons.
+    :param master: tkinter/customtkinter frame where the Radio Buttons should be held
+    :param button_values: List where each element is the text/value of the Radio Button
+    :param font: Custom Tkinter font object. Selects font the Radio Button text uses.
+    :param title: title text of the Radio Button frame if needed. Leave blank for no text
+    :param is_horizontal: Selects if Radio Buttons go veritcally down or horizontaally across
+    :param is_scrollable: Selects if the frame can be scrolled or not
+    """
     def __init__(self,
                  master,
                  values: list,
@@ -132,11 +166,14 @@ class RadioButtonFrame(ctk.CTkFrame):
                  button_sticky: str = "nesw"):
         super().__init__(master)  # Initilising parent class
 
+        # self.container needed to add a scrollable frame inside the main frame if requested
+        # All widgets inside class to be placed in self.container
         if is_scrollable:
             self.container = ctk.CTkScrollableFrame(self)
         else:
             self.container = ctk.CTkFrame(self)
 
+        # Configuring grid
         self.container.configure(fg_color = "transparent")
         self.container.grid(row=0, column=0, sticky="ew")
         self.grid_rowconfigure(0, weight=1)
@@ -192,16 +229,19 @@ class LabelFrame(ctk.CTkFrame):
                  frame_fg_color = "transparent"):
         super().__init__(master, fg_color=frame_fg_color)  # Calls/runs parent class. This is necessary so it initialises the inherited class.
 
+        # self.container needed to add a scrollable frame inside the main frame if requested
+        # All widgets inside class to be placed in self.container
         if is_scrollable:
             self.container = ctk.CTkScrollableFrame(self, fg_color = frame_fg_color)
         else:
             self.container = ctk.CTkFrame(self, fg_color = frame_fg_color)
 
-        # This line below is there so the frame scales to take up the free space
+        # Configuring grid
         self.container.grid(row=0, column=0, sticky="ew")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        # Initalising variables
         self.values = values
         self.labels = []
         self.title = title
@@ -228,6 +268,7 @@ class LabelFrame(ctk.CTkFrame):
 
             self.labels.append(self.label)
 
+        # Binds each label to it's relevant function
         for i in range(len(self.labels)):
             self.labels[i].bind("<Button-1>", self.values[i][1])
 
