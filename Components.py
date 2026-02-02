@@ -3,18 +3,20 @@ import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
 import sqlite3
-import time
 
 class ToDoList(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
         super().__init__(master)
 
+        # Initialising database & font
         self.db = self.init_database()
         self.font = font
 
+        # Configuring grid
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        # Drawing and gridding all static elements
         self.title_label = ctk.CTkLabel(self, text="To Do List:", fg_color="gray30", corner_radius=6, font=font)
         self.title_label.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="new", columnspan=2)
 
@@ -32,49 +34,74 @@ class ToDoList(ctk.CTkFrame):
                                    font = self.font)
         self.buttons.grid(row=3, column=0, padx=10, pady=(10, 10), sticky="ew")
 
+        # Drawing the tasks. Redrawn after every checklist update
         self.load_tasks()
 
     def init_database(self):
+        """
+        Initialises todo.db or creates it if does not exists.
+        :return: SQLite3 db object
+        """
         db = sqlite3.connect("todo.db")
         cursor = db.cursor()
-        query = ("CREATE TABLE IF NOT EXISTS "
+        query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise of the table is lost the program will not boot
                  "todo(" 
-                 "taskID INTEGER PRIMARY KEY AUTOINCREMENT," 
+                 "taskID INTEGER PRIMARY KEY AUTOINCREMENT,"  # AUTOINCREMENT ensures a unique id
                  "task TEXT,"
-                 "is_checked INTEGER"
+                 "is_checked INTEGER"  # Held as int as customtkinter checkboxes hold state of being checked as int.
                  ")")
         cursor.execute(query)
-        db.commit()
+        db.commit()  # Committing the query
         return db
 
     def retrieve_tasks(self):
+        """
+        Returns all current tasks in the db
+        :return: 1D list with all current tasks
+        """
         cursor = self.db.cursor()
         cursor.execute("SELECT * from todo")
         tasks = cursor.fetchall()
         return tasks
 
     def load_tasks(self):
+        """
+        Displays the current tasks on the todo list
+        """
+        # Wiping previous tasks to prevent memory leak
         for widget in self.task_frame.winfo_children():
             widget.destroy()
 
+        # Retireving all current tasks
         todo_tasks = self.retrieve_tasks()
 
+        # iterating through all tasks
         for i, task in enumerate(todo_tasks):
+            # Initalising variables
             task_id = task[0]
             task_name = task[1]
             is_completed = ctk.IntVar(value=task[2])
 
+            # All checkboxes placed in decicated frame for the checkboxes inside the main todo list
             checkbox = ctk.CTkCheckBox(
                 self.task_frame,
                 text=task_name,
                 variable=is_completed,
+                # Lambda function needed to pass arguments for this specific checkbox
                 command=lambda t_id=task_id, ticked = is_completed: self.toggle_task(t_id, ticked),
                 font=self.font
             )
             checkbox.grid(row=i, column=0, padx=(5,5), pady=(5,5), sticky="w")
 
-    def toggle_task(self, task_id, is_completed):
+    def toggle_task(self, task_id: int, is_completed: int):
+        """
+        Updates state of whether a task is checked or not.
+        :param task_id: Unique identifier of a specific task
+        :param is_completed: 1/0 dependant on if a task should be checked or not
+        :return:
+        """
         cursor = self.db.cursor()
+        # Query striiuctured like this to prevent SQL injection.
         cursor.execute(
             "UPDATE todo SET is_checked = ? WHERE taskID = ?",
             (is_completed.get(), task_id)
@@ -82,6 +109,9 @@ class ToDoList(ctk.CTkFrame):
         self.db.commit()
 
     def create_task(self):
+        """
+        Creates a task to add to todo list and database and updates the frame
+        """
         # Getting text input adding it to list and regenerating new checkbox frame
         task = self.input.get().strip()
         cursor = self.db.cursor()
@@ -90,9 +120,13 @@ class ToDoList(ctk.CTkFrame):
             (task,)
         )
         self.db.commit()
+        # Reloading task frame because of update
         self.load_tasks()
 
     def delete_tasks(self):
+        """
+        Removes all checked tasks and reloads task frame
+        """
         cursor = self.db.cursor()
         cursor.execute("DELETE FROM todo WHERE is_checked=1")
         self.db.commit()
@@ -177,7 +211,7 @@ class Timer(ctk.CTkToplevel):
         self.columnconfigure(0, weight=1)
 
         self.TEXT_FONT = ctk.CTkFont(family="Comic Sans MS", size= 25)
-        self.TIMER_FONT = ctk.CTkFont(family="Comic Sans MS", size= 50)
+        self.TIMER_FONT = ctk.CTkFont(family="Monospace", size= 50)
         self.BUTTON_FONT = ctk.CTkFont(family="Comic Sans MS", size = 20)
         self.BUTTONS = [["⏸", self.toggle_pause], ["⟳", self.reset_timer]]
 
@@ -217,22 +251,25 @@ class Timer(ctk.CTkToplevel):
             print("TIMEEEE")
             self.reset_timer()
         """
+
+        # DOCUMENT BUG
+        # When spamming unpausing after spamming pause seconds sick down much faster than expected.
+        # To recreate remove the self.after_cancel(self.deincrement)'s
+
         # And remove the code in update time
         if self.total_remaining_secs > 0:
-            self.after(1000, self.update_time)
-        if self.total_remaining_secs <= 0:
-            print("TIMEEEE")
-            self.reset_timer()
+            self.deincrement = self.after(1000, self.update_time)
 
 
 
     def toggle_pause(self):
         if not self.is_paused:
             self.is_paused = True
+            self.after_cancel(self.deincrement)
         else:
             self.is_paused = False
             if self.total_remaining_secs > 0:
-                self.after(1000, self.update_time)
+                self.deincrement = self.after(1000, self.update_time)
 
 
     def reset_timer(self):
@@ -254,7 +291,6 @@ class Timer(ctk.CTkToplevel):
                                                  text=f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}",
                                                  font=self.TIMER_FONT)
         self.time_remaining_label.grid(row=0, column=0, sticky="nsew", padx=(10, 10), pady=(10, 10))
-        pass
 
     def convert_time(self, secs):
         hours = ctk.IntVar(value=int(secs / 3600))
@@ -268,9 +304,9 @@ class Timer(ctk.CTkToplevel):
             print("TIMEEEE")
             self.reset_timer()
             self.toggle_pause()
-        if (self.total_remaining_secs > 0) and not self.is_paused:
-            self.after(1000, self.update_time)  # Recursive
 
+        if (self.total_remaining_secs > 0) and not self.is_paused:
+            self.deincrement = self.after(1000, self.update_time)  # Recursive
 
         self.total_remaining_secs -= 1
         self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
