@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="I forgor to add this asset">
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Added some comments and documentation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/Components.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +45,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Python.Components.executor": "Debug",
+    "Python.Components.executor": "Run",
     "Python.Snake.executor": "Run",
     "Python.main.executor": "Run",
     "Python.music_app.executor": "Run",
@@ -254,7 +253,23 @@
       <option name="project" value="LOCAL" />
       <updated>1769975045111</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Fixxed spam pausing causing faster timer tickdown bug and second de increment whilst paused.">
+      <option name="closed" value="true" />
+      <created>1770036037254</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1770036037254</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Added some comments and documentation">
+      <option name="closed" value="true" />
+      <created>1770036073393</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1770036073393</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -290,6 +305,8 @@
     <MESSAGE value="TODO list now tied to DB and fully functional" />
     <MESSAGE value="Timer functional with a few bugs. Commit to use as a reference point" />
     <MESSAGE value="I forgor to add this asset" />
-    <option name="LAST_COMMIT_MESSAGE" value="I forgor to add this asset" />
+    <MESSAGE value="Fixxed spam pausing causing faster timer tickdown bug and second de increment whilst paused." />
+    <MESSAGE value="Added some comments and documentation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added some comments and documentation" />
   </component>
 </project>

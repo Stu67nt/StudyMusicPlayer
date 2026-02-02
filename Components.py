@@ -231,10 +231,11 @@ class Timer(ctk.CTkToplevel):
                                         fg_color="transparent")
         self.timer_frame.grid(row=1, column=0)
 
+        self.time_text = ctk.StringVar(value=f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}")
         self.time_remaining_label = ctk.CTkLabel(self.timer_frame,
-                                                 text = f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}",
-                                                 font = self.TIMER_FONT)
-        self.time_remaining_label.grid(row=0, column=0, sticky="nsew", padx=(10, 10), pady=(10, 10))
+                                                 textvariable=self.time_text,
+                                                 font=self.TIMER_FONT)
+        self.time_remaining_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
         self.buttons = ButtonFrame(self,
                                    button_values = self.BUTTONS,
@@ -258,9 +259,7 @@ class Timer(ctk.CTkToplevel):
 
         # And remove the code in update time
         if self.total_remaining_secs > 0:
-            self.deincrement = self.after(1000, self.update_time)
-
-
+            self.deincrement = self.update_time()
 
     def toggle_pause(self):
         if not self.is_paused:
@@ -269,12 +268,12 @@ class Timer(ctk.CTkToplevel):
         else:
             self.is_paused = False
             if self.total_remaining_secs > 0:
-                self.deincrement = self.after(1000, self.update_time)
-
+                self.deincrement = self.update_time()
 
     def reset_timer(self):
+        self.after_cancel(self.deincrement)
         self.total_remaining_secs = self.init_secs
-
+        self.is_paused = True
         # DOCUMNET BUG
         # When timer reset the reset time is not immediately displayed instead only displayed after waiting a second for time to deincrement
         # Recreate by adding the 3 lines below. REmove to recreate
@@ -287,40 +286,34 @@ class Timer(ctk.CTkToplevel):
         """
         # Displaying updated time
         self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
-        self.time_remaining_label = ctk.CTkLabel(self.timer_frame,
-                                                 text=f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}",
-                                                 font=self.TIMER_FONT)
-        self.time_remaining_label.grid(row=0, column=0, sticky="nsew", padx=(10, 10), pady=(10, 10))
+        self.time_text.set(f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}")
+        pass
 
     def convert_time(self, secs):
         hours = ctk.IntVar(value=int(secs / 3600))
         mins = ctk.IntVar(value=int((secs % 3600) / 60))
         secs = ctk.IntVar(value=int((secs % 3600) % 60))
-
         return hours, mins, secs
 
     def update_time(self):
-        if self.total_remaining_secs <= 0:
-            print("TIMEEEE")
-            self.reset_timer()
-            self.toggle_pause()
-
-        if (self.total_remaining_secs > 0) and not self.is_paused:
-            self.deincrement = self.after(1000, self.update_time)  # Recursive
-
         self.total_remaining_secs -= 1
+
+
+        if (self.total_remaining_secs >= 0) and not self.is_paused:
+            self.deincrement = self.after(1000, self.update_time)  # Recursive
+        if self.total_remaining_secs < 0:
+            print("TIMEEEE")
+            self.toggle_pause()
+            return 0  # Needed so timer does not de icnrement once reset
         self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
-        self.time_remaining_label = ctk.CTkLabel(self.timer_frame,
-                                                 text=f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}",
-                                                 font=self.TIMER_FONT)
-        self.time_remaining_label.grid(row=0, column=0, sticky="nsew", padx=(10, 10), pady=(10, 10))
+        self.time_text.set(f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}")
 
 
 class AddToPlaylist(ctk.CTkToplevel):
     def __init__(self, playlists, font: ctk.CTkFont, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.geometry('450x600')
+        self.geometry('450x450')
         self.title("Add To Playlist")
         self.resizable(width=False, height=False)
         self.rowconfigure(0, weight=1)
