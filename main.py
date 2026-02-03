@@ -240,8 +240,8 @@ class Player(ctk.CTkFrame):
 
         # Thumbnail Rendering
         if self.thumbnail_path == None:
-            self.thumbnail = ctk.CTkImage(light_image=Image.open("No-album-art.png"),
-                                          dark_image=Image.open("No-album-art.png"),
+            self.thumbnail = ctk.CTkImage(light_image=Image.open("Images/No-album-art.png"),
+                                          dark_image=Image.open("Images/No-album-art.png"),
                                           size = (75,75))
         else:
             self.thumbnail = ctk.CTkImage(light_image=Image.open(self.thumbnail_path),

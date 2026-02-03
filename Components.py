@@ -3,6 +3,7 @@ import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
 import sqlite3
+import downloader
 
 class ToDoList(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
@@ -42,7 +43,7 @@ class ToDoList(ctk.CTkFrame):
         Initialises todo.db or creates it if does not exists.
         :return: SQLite3 db object
         """
-        db = sqlite3.connect("todo.db")
+        db = sqlite3.connect("Databases/todo.db")
         cursor = db.cursor()
         query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise of the table is lost the program will not boot
                  "todo(" 
@@ -441,7 +442,12 @@ class SearchFrame(ctk.CTkFrame):
         self.buttons.grid(row=2, column = 0, sticky = "ew", padx=(10,10), pady=(10,10))
 
     def search(self, event = None):
-        print("Search")
+        inp = self.entry.get()
+        mode = self.mode_radio_buttons.get_radio_val()
+
+        if mode == "Direct":
+            pass
+        if mode
 
     def downloads(self, event = None):
         print("Downloads")
