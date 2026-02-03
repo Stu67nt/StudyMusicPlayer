@@ -3,7 +3,6 @@ import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
 import sqlite3
-import downloader
 
 class ToDoList(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
@@ -427,6 +426,7 @@ class SearchFrame(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         RADIO_BUTTONS = [["Keyword"], ["Direct"]]
         BUTTONS = [["Search" ,self.search],["Downloads", self.downloads],["Download Settings", self.download_settings]]
+        self.settings_screen = None
 
         self.mode_radio_buttons = RadioButtonFrame(self,
                                                    values = RADIO_BUTTONS,
@@ -442,15 +442,42 @@ class SearchFrame(ctk.CTkFrame):
         self.buttons.grid(row=2, column = 0, sticky = "ew", padx=(10,10), pady=(10,10))
 
     def search(self, event = None):
-        inp = self.entry.get()
-        mode = self.mode_radio_buttons.get_radio_val()
-
-        if mode == "Direct":
-            pass
-        if mode
+        print("Search")
 
     def downloads(self, event = None):
         print("Downloads")
 
     def download_settings(self, event = None):
-        print("Download Settings")
+        if (self.settings_screen is None or not self.settings_screen.winfo_exists()):
+            self.settings_screen = DownloadSettings(self)
+        if self.settings_screen is not None and self.settings_screen.winfo_exists():
+            self.settings_screen.focus()  # if window exists focus it
+
+class DownloadSettings(ctk.CTkToplevel):
+    def __init__(self, event, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.title("Timer")
+        self.resizable(width = False, height = False)
+        self.rowconfigure((0,2), weight=1)
+        self.columnconfigure(0, weight=1)
+
+        self.TEXT_FONT = ctk.CTkFont(family="Comic Sans MS", size= 25)
+        self.TIMER_FONT = ctk.CTkFont(family="Monospace", size= 50)
+        self.BUTTON_FONT = ctk.CTkFont(family="Comic Sans MS", size = 20)
+        self.BUTTONS = [["⏸", self.temp], ["⟳", self.temp]]
+
+        self.label = ctk.CTkLabel(self,
+                                  text="Temporary",
+                                  font = self.TEXT_FONT)
+        self.label.grid(row=0, column=0, padx=(10,10), pady=(10,10))
+
+        self.buttons = ButtonFrame(self,
+                                   button_values = self.BUTTONS,
+                                   is_horizontal=True,
+                                   button_frame_color = "transparent",
+                                   font = self.BUTTON_FONT)
+        self.buttons.grid(row=2, column = 0, sticky = "ew", padx=(10,10), pady=(10,10))
+
+    def temp(self):
+        print("Temp")
