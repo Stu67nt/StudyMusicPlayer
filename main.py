@@ -12,8 +12,6 @@ class Home(ctk.CTkFrame): # Inheriting CTk class
         self.grid_columnconfigure((0, 1), weight=1)
         self.grid_rowconfigure(1, weight=1)
 
-        BUTTONS = [["Scan Music", self.scan_music], ["Add Folder", self.add_folder]]
-
         # Creating To Do List
         self.todo = ToDoList(self, font=font)
         self.todo.grid(row=1, column=0, padx=(10,10), pady=(10,10), sticky="nswe", rowspan = 2)
@@ -24,9 +22,6 @@ class Home(ctk.CTkFrame): # Inheriting CTk class
         self.timer.grid(row=1, column=1, padx=(10,10), pady=(10,10), sticky = "nwse")
         self.widgets.append(self.timer)
 
-        self.buttons = ButtonFrame(self, button_values=BUTTONS, is_horizontal=True, font=font)
-        self.buttons.grid(row=2, column=1, padx=10, pady=(10, 10), sticky="sew")
-        self.widgets.append(self.buttons)
 
     def scan_music(self, event=None):
         print("Scan Music")
