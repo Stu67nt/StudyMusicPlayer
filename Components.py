@@ -1,8 +1,10 @@
 from widgets import *
+from downloader import *
 import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
 import sqlite3
+
 
 class ToDoList(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
@@ -297,8 +299,6 @@ class Timer(ctk.CTkToplevel):
 
     def update_time(self):
         self.total_remaining_secs -= 1
-
-
         if (self.total_remaining_secs >= 0) and not self.is_paused:
             self.deincrement = self.after(1000, self.update_time)  # Recursive
         if self.total_remaining_secs < 0:
@@ -424,25 +424,30 @@ class SearchFrame(ctk.CTkFrame):
         super().__init__(master)
 
         self.grid_columnconfigure(0, weight=1)
-        RADIO_BUTTONS = [["Keyword"], ["Direct"]]
-        BUTTONS = [["Search" ,self.search],["Downloads", self.downloads],["Download Settings", self.download_settings]]
+        self.BUTTONS = [["Search" ,self.search],["Downloads", self.downloads],["Download Settings", self.download_settings]]
+        self.font = font
         self.settings_screen = None
 
-        self.mode_radio_buttons = RadioButtonFrame(self,
-                                                   values = RADIO_BUTTONS,
-                                                   title = "Search for a song on Youtube",
-                                                   is_horizontal = True,
-                                                   font = font)
-        self.mode_radio_buttons.grid(row = 0, column = 0, sticky = "new", padx=(10,10), pady=(10,10))
+        self.title = ctk.CTkLabel(self,
+                                  text = "Download a song from YouTube",
+                                  font = self.font,
+                                  fg_color="transparent")
+        self.title.grid(row = 0, column = 0, sticky = "new", padx=(10,10), pady=(10,10))
 
-        self.entry = ctk.CTkEntry(self, placeholder_text="Enter song URL/Keyword", font=font)
+        self.entry = ctk.CTkEntry(self, placeholder_text="Enter YouTube URL", font=self.font)
         self.entry.grid(row=1, column=0, sticky = "new", padx=(10,10), pady=(10,10))
 
-        self.buttons = ButtonFrame(self, button_values=BUTTONS, is_horizontal=True, font=font)
+        self.buttons = ButtonFrame(self, button_values=self.BUTTONS, is_horizontal=True, font=self.font)
         self.buttons.grid(row=2, column = 0, sticky = "ew", padx=(10,10), pady=(10,10))
 
     def search(self, event = None):
-        print("Search")
+        inp = self.entry.get()
+        print(f"Downloading the url {inp}")
+        try:
+            download(inp, download_config)
+        except Exception as err:
+            tk.messagebox.showerror("Download Error", err)
+            print("Complete!")
 
     def downloads(self, event = None):
         print("Downloads")
@@ -452,6 +457,7 @@ class SearchFrame(ctk.CTkFrame):
             self.settings_screen = DownloadSettings(self)
         if self.settings_screen is not None and self.settings_screen.winfo_exists():
             self.settings_screen.focus()  # if window exists focus it
+
 
 class DownloadSettings(ctk.CTkToplevel):
     def __init__(self, event, *args, **kwargs):
@@ -472,12 +478,9 @@ class DownloadSettings(ctk.CTkToplevel):
                                   font = self.TEXT_FONT)
         self.label.grid(row=0, column=0, padx=(10,10), pady=(10,10))
 
-        self.buttons = ButtonFrame(self,
-                                   button_values = self.BUTTONS,
-                                   is_horizontal=True,
-                                   button_frame_color = "transparent",
-                                   font = self.BUTTON_FONT)
-        self.buttons.grid(row=2, column = 0, sticky = "ew", padx=(10,10), pady=(10,10))
+        self.settings_frame = ctk.CTkScrollableFrame(self,fg_color = "transparent")
+        self.settings_frame.grid(row=1, column=0, padx=(10,10), pady=(10,10))
+
 
     def temp(self):
         print("Temp")
