@@ -165,6 +165,8 @@ class RadioButtonFrame(ctk.CTkFrame):
                  title_corner_radius:int = 6,
                  button_sticky: str = "nesw"):
         super().__init__(master)  # Initilising parent class
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
         # self.container needed to add a scrollable frame inside the main frame if requested
         # All widgets inside class to be placed in self.container
@@ -175,9 +177,10 @@ class RadioButtonFrame(ctk.CTkFrame):
 
         # Configuring grid
         self.container.configure(fg_color = "transparent")
-        self.container.grid(row=0, column=0, sticky="ew")
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self.container.grid(row=0, column=0, sticky="nsew")
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=0)
+        self.container.grid_columnconfigure(1, weight=1)
 
         # Initialising vars
         self.values = values
@@ -193,10 +196,11 @@ class RadioButtonFrame(ctk.CTkFrame):
                                             font = font)
             self.title_label.grid(row=0, column=0, sticky="ew")
 
-        self.button_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.button_frame = ctk.CTkFrame(self.container, fg_color="transparent")
         self.button_frame.grid(row=0 if is_horizontal else 1,
                                column=1 if is_horizontal else 0,
                                sticky=button_sticky)
+        self.button_frame.grid_columnconfigure("all", weight=1)
 
         # Iterating thorugh each value
         for i, value in enumerate(self.values):
@@ -207,6 +211,7 @@ class RadioButtonFrame(ctk.CTkFrame):
                                                    font = font)
             if is_horizontal:
                 self.radio_button.grid(row=0, column=i+1, padx=20, pady=20, sticky=button_sticky)
+
             else:
                 self.radio_button.grid(row=i + 1, column=0, padx=20, pady=20, sticky=button_sticky)
 
