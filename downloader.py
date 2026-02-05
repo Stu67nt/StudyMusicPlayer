@@ -6,6 +6,7 @@ import sqlite3
 import tinytag as tt
 import shutil
 import tkinter as tk
+import json
 
 def createConsoleLog():
     """
@@ -102,47 +103,51 @@ def download(url: list, config: dict):
                 print(f"{file} is not an audio file")  # Means file is not an audio file
                 print(err)
 
-
-dir = str(os.path.abspath(os.getcwd())) + r"\\Temp Downloads\\"
-
-download_config = {
-    # Used for detailed error logs
-    "verbose": True,
-    # Configures the file format of the video downloaded
-    'format': 'm4a/mp3/wav/bestaudio',  # If needed you can create an easy bug here
-    # Configures the file name of the output
-    'outtmpl': {'default': f'{dir}%(title)s.%(ext)s'},  # Allow user configure
-    # Used so invalid file name not created.
-    "restrictfilenames": True,
-    "windowsfilenames": True,
-    # Used for thumbnails
-    'writethumbnail': True,
-    # Used for creating error logs
-    'logger': logging.getLogger(__name__),
-    # Does embedding stuff
-    'postprocessors': [
-       # Embeds Thumbnail
-       {'already_have_thumbnail': False,
-        'key': 'EmbedThumbnail'},
-       # Embeds Metadata
-       {'add_chapters': True,
-        'add_infojson': 'if_exists',
-        'add_metadata': True,
-        'key': 'FFmpegMetadata'},
-    ],
-    # Module needs to be frequently updated to ensure function
-    "warn_when_outdated": True,
-    # Any errors will always be logged
-    'ignoreerrors': False,
-    # Needed by yt-dlp for full Youtube Support
-    'js_runtimes': {'deno': {'path': r"C:\Users\Tanzil Chowdhury\.deno\bin\deno.exe"}}, # User needs to set
-    # Dependancy location Required for any embedding
-    'ffmpeg_location': 'utils',  # Alternatively, you can also create an easy bug here.
-    # Used for tracking download progress
-    'progress_hooks': [progressHook],
-}
+def create_download_config():
+    dir = str(os.path.abspath(os.getcwd())) + r"\\Temp Downloads\\"
+    f = open("Databases\\config.json")
+    settings = json.load(f)
+    f.close()
+    download_config = {
+        # Used for detailed error logs
+        "verbose": True,
+        # Configures the file format of the video downloaded
+        'format': settings['format'],  # If needed you can create an easy bug here
+        # Configures the file name of the output
+        'outtmpl': {'default': f'{dir}%(title)s.%(ext)s'},  # Allow user configure
+        # Used so invalid file name not created.
+        "restrictfilenames": True,
+        "windowsfilenames": True,
+        # Used for thumbnails
+        'writethumbnail': settings['write_thumbnail'],
+        # Used for creating error logs
+        'logger': logging.getLogger(__name__),
+        # Does embedding stuff
+        'postprocessors': [
+           # Embeds Thumbnail
+           {'already_have_thumbnail': False,
+            'key': 'EmbedThumbnail'},
+           # Embeds Metadata
+           {'add_chapters': True,
+            'add_infojson': 'if_exists',
+            'add_metadata': True,
+            'key': 'FFmpegMetadata'},
+        ],
+        # Module needs to be frequently updated to ensure function
+        "warn_when_outdated": True,
+        # Any errors will always be logged
+        'ignoreerrors': False,
+        # Needed by yt-dlp for full Youtube Support
+        'js_runtimes': {'deno': {'path': settings['deno_path']}}, # User needs to set
+        # Dependancy location Required for any embedding
+        'ffmpeg_location': settings['ffmpeg_path'],  # Alternatively, you can also create an easy bug here.
+        # Used for tracking download progress
+        'progress_hooks': [progressHook],
+    }
+    return download_config
 
 if __name__ == "__main__":
+    download_config = create_download_config()
     download("https://www.youtube.com/playlist?list=PLETosy7ETA_uKsH9Zi8WazVPMtHuri4gQ", download_config)
     print(str(os.path.abspath(os.getcwd()))+"\\Songs")
 

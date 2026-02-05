@@ -1,0 +1,15 @@
+{
+  "verbose": true,
+  "format": "m4a/mp3/wav/bestaudio",
+  "outtmpl": {
+    "default": "{output_dir}%(title)s.%(ext)s"
+  },
+  "writethumbnail": true,
+  "ignoreerrors": false,
+  "js_runtimes": {
+    "deno": {
+      "path": "C:\\Users\\Tanzil Chowdhury\\.deno\\bin\\deno.exe"
+    }
+  },
+  "ffmpeg_location": "utils"
+}
