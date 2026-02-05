@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="">
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Added config">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/Components.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/downloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/downloader.py" afterDir="false" />
@@ -46,25 +46,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Components.executor": "Run",
-    "Python.Snake.executor": "Run",
-    "Python.downloader.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.music_app.executor": "Run",
-    "Python.test.executor": "Run",
-    "Python.tkintertest.executor": "Run",
-    "Python.widgets.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/PycharmProjects/TerminalVideoPlayer",
-    "settings.editor.selected.configurable": "preferences.keymap"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Components.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Snake.executor&quot;: &quot;Run&quot;,
+    &quot;Python.downloader.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.music_app.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.tkintertest.executor&quot;: &quot;Run&quot;,
+    &quot;Python.widgets.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/PycharmProjects/TerminalVideoPlayer&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
   }
-}]]></component>
+}</component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings module-name="StudyMusicPlayer" is-module-sdk="true">
@@ -311,7 +311,23 @@
       <option name="project" value="LOCAL" />
       <updated>1770159125135</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Made downloader fully funtional and added support for adding to db">
+      <option name="closed" value="true" />
+      <created>1770239376415</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1770239376415</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Depricated Scan music and add folder buttons due to them being cut from final build">
+      <option name="closed" value="true" />
+      <created>1770239438639</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1770239438639</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -353,6 +369,8 @@
     <MESSAGE value="Changed file structure" />
     <MESSAGE value="Made downloader functional" />
     <MESSAGE value="Fixed syntax error" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed syntax error" />
+    <MESSAGE value="Made downloader fully funtional and added support for adding to db" />
+    <MESSAGE value="Depricated Scan music and add folder buttons due to them being cut from final build" />
+    <option name="LAST_COMMIT_MESSAGE" value="Depricated Scan music and add folder buttons due to them being cut from final build" />
   </component>
 </project>

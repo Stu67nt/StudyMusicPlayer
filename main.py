@@ -205,9 +205,6 @@ class MusicFinder(ctk.CTkFrame):
         self.search_frame = SearchFrame(self, font=font)
         self.search_frame.grid(row = 0, column = 0, sticky = "new", padx=(10, 10), pady=(10, 10))
 
-        self.search_results = SongFrame(self, track_list = SONGS, font=font)
-        self.search_results.grid(row = 1, column = 0, sticky = "nsew")
-
 class Player(ctk.CTkFrame):
     def __init__(self, master, song: list = ["No Song", "Frank Ocean", "180", None]):
         super().__init__(master)
