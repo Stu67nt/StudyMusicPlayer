@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
+import sqlite3
+import downloader
 
 """
 TODO: 
@@ -281,39 +283,44 @@ class LabelFrame(ctk.CTkFrame):
 class SongLabel(ctk.CTkFrame):
     def __init__(self,
                  master,
-                 song_name,
-                 duration,
-                 artist,
-                 font: ctk.CTkFont,
-                 thumbnail = None):
+                 songID,
+                 font: ctk.CTkFont):
         super().__init__(master)
 
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(1, weight=1)
-        """
-        if thumbnail != None:
-            self.thumbnail_label = ctk.CTkLabel(self, image = thumbnail)
-            self.thumbnail_label.grid(column=0, row=0, sticky="nw", rowspan = 2)
-        """
-        self.name_label = ctk.CTkLabel(self, text = song_name, font = font)
+
+        self.songID = songID
+        self.song_details = self.retrieve_song()
+        self.song_filepath = self.song_details[1]
+        self.song_name = self.song_details[2]
+        self.duration = self.song_details[3]
+        self.artist = self.song_details[4]
+
+        self.name_label = ctk.CTkLabel(self, text = self.song_name, font = font)
         self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
 
-        self.artist_label = ctk.CTkLabel(self, text = artist, font = font)
+        self.artist_label = ctk.CTkLabel(self, text = self.artist, font = font)
         self.artist_label.grid(column=1, row=1, padx=(10, 10), sticky="nw")
 
-        self.duration_label = ctk.CTkLabel(self, text=duration, font = font)
+        self.duration_label = ctk.CTkLabel(self, text=self.duration, font = font)
         self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        self.options_button = ctk.CTkLabel(self, text = "⋮", font = font)
+        self.options_button_font = ctk.CTkFont(family="Arial", size=30, weight="bold")
+        self.options_button = ctk.CTkLabel(self, text = "⋮", font = self.options_button_font)
         self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        MENU_OPTIONS = ["Add to Playlist", "Delete Song", "Add to Queue"]
+        MENU_OPTIONS = [["Add to Playlist", self.add_to_playlist], ["Delete Song", self.delete_song], ["Add to Queue", self.add_to_queue]]
 
         self.menu = tk.Menu(self, tearoff=0)
-        for name in MENU_OPTIONS:
-            self.menu.add_command(label=name)
+        for option in MENU_OPTIONS:
+            name = option[0]
+            func = option[1]
+            self.menu.add_command(label=name, command=func)
 
         self.options_button.bind("<Button-1>", self.menu_trigger)
+        self.bind("<Button-1>", self.play_song)
+
 
     # ChatGPT Slop - Change it
     def menu_trigger(self, event):
@@ -322,6 +329,31 @@ class SongLabel(ctk.CTkFrame):
         finally:
             self.menu.grab_release()
 
+    def play_song(self, event):
+        print("Play Song")
+
+    def retrieve_song(self):
+        self.db = downloader.init_database()
+        cursor = self.db.cursor()
+        query = "SELECT * FROM songs WHERE songID = ?"
+        cursor.execute(query, (self.songID,))
+        song_details = cursor.fetchone()
+        self.db.close()
+        return song_details
+
+    def add_to_playlist(self):
+        print("Add to playlist")
+
+    def delete_song(self):
+        db = downloader.init_database()
+        cursor = db.cursor()
+        query = "DELETE FROM songs WHERE songID = ?"
+        cursor.execute(query, (self.songID,))
+        db.commit()
+        db.close()
+
+    def add_to_queue(self):
+        print("Add To Queue")
 
 class PlaylistLabel(ctk.CTkFrame):
     """
@@ -349,10 +381,11 @@ class PlaylistLabel(ctk.CTkFrame):
         self.duration_label = ctk.CTkLabel(self, text=duration, font = font)
         self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        self.options_button = ctk.CTkLabel(self, text = "⋮", font = font)
+        self.options_button_font = ctk.CTkFont(family="Arial", size=30, weight="bold")
+        self.options_button = ctk.CTkLabel(self, text = "⋮", font = self.options_button_font)
         self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        MENU_OPTIONS = ["Delete Playlist", "Add to Queue", "Rename Playlist", "Overwrite Queue", ""]
+        MENU_OPTIONS = ["Delete Playlist", "Add to Queue", "Rename Playlist", "Overwrite Queue"]
 
         self.menu = tk.Menu(self, tearoff=0)
         for name in MENU_OPTIONS:
@@ -360,7 +393,6 @@ class PlaylistLabel(ctk.CTkFrame):
 
         self.options_button.bind("<Button-1>", self.menu_trigger)
 
-    # ChatGPT Slop - Change it
     def menu_trigger(self, event):
         try:
             self.menu.tk_popup(event.x_root, event.y_root)

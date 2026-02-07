@@ -1,9 +1,13 @@
 import customtkinter as ctk
 import tkinter as tk
+import downloader
 from widgets import *
 from Components import *
 from PIL import Image  # Used for thumbnails
-
+import pyglet  # Used for audio
+import tinytag as tt
+from mutagen.mp4 import MP4
+import io
 
 class Home(ctk.CTkFrame): # Inheriting CTk class
     def __init__(self, master, font: ctk.CTkFont):
@@ -43,11 +47,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         self.grid_rowconfigure(2, weight=1)
 
         self.main_topbar_buttons = [["Select Multiple", lambda: self.select_multiple()]]
-        self.songs = [["Song 1", "Jeremy", "852", None], ["Song 2", "Balls", "852", None],
-                 ["Song 3", "Kahled", "852", None], ["Song 4", "Polio", "852", None],
-                 ["Song 5", "Johnathan", "852", None], ["Song 6", "Sinera", "852", None],
-                 ["Song 7", "Fred", "852", None], ["Song 8", "Flavio", "852", None],
-                 ["Song 9", "Trap", "852", None], ["Song 10", "Honest", "852", None]]
+        self.song_ids = self.retrieve_songs()
         self.playlists = [["Playlist 1", "1"],
                           ["Playlist 2", "2"],
                           ["Playlist 3", "3"],
@@ -60,7 +60,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         destroy_widgets(self.widgets)
         self.topbar = ButtonFrame(self,
                                   button_values=self.main_topbar_buttons,
-                                  title=f"{len(self.songs)} Songs",
+                                  title=f"{len(self.song_ids)} Songs",
                                   title_fg_color="transparent",
                                   is_horizontal=True,
                                   title_sticky="w",
@@ -69,18 +69,21 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
         self.widgets.append(self.topbar)
 
-        self.track_list = SongFrame(self, self.songs, font=self.font)
+        self.track_list = SongFrame(self, song_ids=self.song_ids, font=self.font)
         self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
         self.widgets.append(self.track_list)
 
     def select_multiple(self):
         destroy_widgets(self.widgets)
-        self.select_mult_topbar_buttons = [["Exit Select", lambda: self.main_view()],
-                  ["Add to Playlist", self.add_to_playlist],
-                  ["Delete Songs", self.delete_songs]]
-        self.song_names = []
-        for song in self.songs:
-            self.song_names.append(f"{song[0]} - {song[1]}")
+        self.select_mult_topbar_buttons = [
+            ["Exit Select", lambda: self.main_view()],
+            ["Add to Playlist", self.add_to_playlist],
+            ["Delete Songs", self.delete_songs]]
+        self.song_names = self.retrieve_song_names()
+        self.songs = []
+
+        for song in self.song_names:
+            self.songs.append(f"{song[0]} - {song[1]} {song[2]}")
 
         self.topbar = ButtonFrame(self,
                                   button_values=self.select_mult_topbar_buttons,
@@ -94,11 +97,13 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         self.widgets.append(self.topbar)
 
         self.track_list = CheckboxFrame(master=self,
-                                        values=self.song_names,
+                                        values=self.songs,
                                         font=self.font,
                                         is_scrollable=True)
         self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
         self.widgets.append(self.track_list)
+
+
 
     def create_playlist(self):
         dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist", font = self.font)
@@ -110,9 +115,41 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         self.prompt.focus()
 
     def delete_songs(self):
-        print("Delete Songs")
+        checked = self.track_list.get_checkboxes()
 
+        db = downloader.init_database()
+        cursor = db.cursor()
+        query = "DELETE FROM songs WHERE songID = ?"
+        for song in checked:
+            song_id = song.split(" ")[-1]
+            cursor.execute(query, (song_id,))
+        db.commit()
+        db.close()
+        self.select_multiple()
 
+    def retrieve_songs(self):
+        db = downloader.init_database()
+        cursor = db.cursor()
+        query = "SELECT songID FROM songs"
+        cursor.execute(query)
+        raw_song_ids = cursor.fetchall()
+        db.close()
+        song_ids = []
+        for id in raw_song_ids:
+            song_ids.append(id[0])
+        return song_ids
+
+    def retrieve_song_names(self):
+        db = downloader.init_database()
+        cursor = db.cursor()
+        query = "SELECT song_name, artist, songID FROM songs"
+        cursor.execute(query)
+        raw_song_names = cursor.fetchall()
+        db.close()
+        song_names = []
+        for name in raw_song_names:
+            song_names.append([name[0], name[1], name[2]])
+        return song_names
 
 class Playlists(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
@@ -196,17 +233,11 @@ class MusicFinder(ctk.CTkFrame):
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight = 1)
 
-        SONGS = [["Song 1", "Balls", "852", None], ["Song 2", "Balls", "852", None],
-                 ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None],
-                 ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None],
-                 ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None],
-                 ["Song 3", "Balls", "852", None], ["Song 4", "Balls", "852", None]]
-
         self.search_frame = SearchFrame(self, font=font)
         self.search_frame.grid(row = 0, column = 0, sticky = "new", padx=(10, 10), pady=(10, 10))
 
 class Player(ctk.CTkFrame):
-    def __init__(self, master, song: list = ["No Song", "Frank Ocean", "180", None]):
+    def __init__(self, master, songID: int):
         super().__init__(master)
 
         self.grid_rowconfigure((0,1), weight=0)
@@ -225,20 +256,37 @@ class Player(ctk.CTkFrame):
                              ["🔁", self.toggle_loop],
                              ["↻", self.skip_foward]]
 
-        self.song_name = song[0]
-        self.artist = song[1]
-        self.duration = song[2]
-        self.thumbnail_path = song[3]
+        self.songID=songID
+        try:
+            self.song_details = self.retrieve_song()
+            print(self.song_details)
+            self.song_name = self.song_details[2]
+            self.artist = self.song_details[4]
+            self.duration = tk.IntVar(value=self.song_details[3])
+            self.filepath = self.song_details[1]
+        except:
+            self.song_name = "No Song"
+            self.artist = "Frank Ocean"
+            self.duration = tk.IntVar(value=100)
+            self.filepath = None
+
+        try:
+            self.thumbnail_img = Image.open(io.BytesIO(tt.TinyTag.get(self.filepath, image=True).images.any.data))
+        except:
+            self.thumbnail_img = None
+
+        self.player = pyglet.media.Player()
+        self.init_queue()
 
         # Thumbnail Rendering
-        if self.thumbnail_path == None:
+        if self.thumbnail_img == None:
             self.thumbnail = ctk.CTkImage(light_image=Image.open("Images/No-album-art.png"),
                                           dark_image=Image.open("Images/No-album-art.png"),
                                           size = (75,75))
         else:
-            self.thumbnail = ctk.CTkImage(light_image=Image.open(self.thumbnail_path),
-                         dark_image=Image.open(self.thumbnail_path),
-                         size=(35, 35))
+            self.thumbnail = ctk.CTkImage(light_image=self.thumbnail_img,
+                         dark_image=self.thumbnail_img,
+                         size=(75, 75))
 
         self.song_details_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.song_details_frame.grid(row=0, column=0, rowspan=2, padx=(5, 5), pady=(5, 5), sticky="nsw")
@@ -251,11 +299,6 @@ class Player(ctk.CTkFrame):
 
         self.artist_name_label = ctk.CTkLabel(self.song_details_frame, text=self.artist, font=self.song_artist_font)
         self.artist_name_label.grid(row=1, column=1, padx=(10, 10), pady=(5, 5), sticky="w")
-        """
-        self.playbar_buttons_frame = ctk.CTkFrame(self, bg_color="transparent")
-        self.playbar_buttons_frame.grid(row=0, column=1, padx=(5,5), pady=(5,5), sticky="ew")
-        self.playbar_buttons_frame.columnconfigure(0, weight=1)
-        """
 
         self.playbar_buttons = LabelFrame(self,
                                           values=self.button_icons,
@@ -265,33 +308,86 @@ class Player(ctk.CTkFrame):
                                           frame_fg_color="transparent")
         self.playbar_buttons.grid(row=0, column=1, padx=(5,5), pady=(5,5), sticky="ew")
 
-        self.playbar = ctk.CTkSlider(self, from_=0, to=int(self.duration), command=self.retrive_slider_val)
+        self.seeking = False
+        self.playbar = ctk.CTkSlider(self,
+                                     from_=0,
+                                     to=self.duration.get(),
+                                     command= self.seek,
+                                     )
         self.playbar.grid(row=1, column=1, padx=(5, 5), pady=(5, 5), sticky="sew")
+        self.playbar.set(0)
 
-        self.volume_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.retrive_slider_val)
+        self.volume_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.volume_adjust, width=200)
         self.volume_slider.grid(row=0, column=2, rowspan=2, padx=(5, 5), pady=(5, 5), sticky="e")
 
+        self.update_progress()
 
-    def retrive_slider_val(self, value):
-        print(value)
+    def retrieve_song(self):
+        self.db = downloader.init_database()
+        cursor = self.db.cursor()
+        query = "SELECT * FROM songs WHERE songID = ?"
+        cursor.execute(query, (self.songID,))
+        song_details = cursor.fetchone()
+        self.db.close()
+        return song_details
+
+    def update_progress(self):
+        if self.player.playing and not self.seeking:
+            self.playbar.set(self.player.time)
+        self.seeking = False
+        self.after(100, self.update_progress)
+
+    def delete_song(self):
+        db = downloader.init_database()
+        cursor = db.cursor()
+        query = "DELETE FROM songs WHERE songID = ?"
+        cursor.execute(query, (self.songID,))
+        db.commit()
+        db.close()
+
+    def seek(self, time):
+        self.seeking=True
+        self.player.seek(float(time))
+
+    def init_queue(self):
+        current_queue = [self.filepath]
+        for song_fp in current_queue:
+            try:
+                song_obj = pyglet.media.load(song_fp, streaming=False)
+                self.player.queue(song_obj)
+            except Exception as err:
+                tk.messagebox.showwarning("Can't play song", "Song cannot be played removing song from database.")
+                print(err)
+                self.delete_song()
+
+    def volume_adjust(self, value):
+        self.player.volume = value/100
 
     def rewind(self, event=None):
-        print("Rewind")
+        self.player.seek(self.player.time-10)
 
     def shuffle(self, event=None):
         print("Shuffle")
 
     def toggle_pause(self, event=None):
-        print("Toggle Pause")
+        if not self.player.playing:
+            self.player.play()
+        else:
+            self.player.pause()
 
     def skip_foward(self, event=None):
-        print("Skip Foward")
+        self.player.seek(self.player.time+10)
 
     def skip_song(self, event=None):
-        print("Skip Song")
+        self.player.next_source()
+        print("Skipped Song")
 
     def toggle_loop(self, event=None):
-        print("Toggle Loop")
+        if self.player.loop == False:
+            self.player.loop = True
+        elif self.player.loop == True:
+            self.player.loop = False
+        print(self.player.loop)
 
     def previous_song(self, event=None):
         print("Previous Song")
@@ -337,12 +433,13 @@ class App(ctk.CTk):
         self.tab_view.grid_columnconfigure(0, weight=1)
         self.tab_view.grid_rowconfigure(0, weight=1)
 
-        self.player = Player(self)
+        self.player = Player(self, 29)
         self.player.grid(row=1, column=0, padx=(10, 10), pady=(5,5), sticky="ew")
 
 def destroy_widgets(widgets):
     for widget in widgets:
         widget.destroy()
+
 
 app = App("Balls")
 

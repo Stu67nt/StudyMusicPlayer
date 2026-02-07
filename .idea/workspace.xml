@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Added config">
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Removed placeholder song frame. Deprecated song search.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/Components.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Databases/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/Databases/config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/downloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/downloader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
@@ -327,7 +328,31 @@
       <option name="project" value="LOCAL" />
       <updated>1770239438639</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Fixed scaling issue with radio button">
+      <option name="closed" value="true" />
+      <created>1770329387566</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1770329387566</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Created customisable config to adjust download settings">
+      <option name="closed" value="true" />
+      <created>1770329438282</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1770329438282</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Removed placeholder song frame. Deprecated song search.">
+      <option name="closed" value="true" />
+      <created>1770329533742</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1770329533742</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -348,7 +373,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Put widgets in a seperate file. Created a main file where the main app will be ran from." />
     <MESSAGE value="." />
     <MESSAGE value="Fixed A lot of formatting issues and created a slightly more proper track menu." />
     <MESSAGE value="Added playlist menu" />
@@ -371,6 +395,40 @@
     <MESSAGE value="Fixed syntax error" />
     <MESSAGE value="Made downloader fully funtional and added support for adding to db" />
     <MESSAGE value="Depricated Scan music and add folder buttons due to them being cut from final build" />
-    <option name="LAST_COMMIT_MESSAGE" value="Depricated Scan music and add folder buttons due to them being cut from final build" />
+    <MESSAGE value="Fixed scaling issue with radio button" />
+    <MESSAGE value="Created customisable config to adjust download settings" />
+    <MESSAGE value="Removed placeholder song frame. Deprecated song search." />
+    <option name="LAST_COMMIT_MESSAGE" value="Removed placeholder song frame. Deprecated song search." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>265</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>266</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>268</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>279</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="master" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

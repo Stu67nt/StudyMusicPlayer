@@ -1,6 +1,5 @@
 import downloader
 from widgets import *
-import downloader
 import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
@@ -352,7 +351,7 @@ class AddToPlaylist(ctk.CTkToplevel):
 
 
 class SongFrame(ctk.CTkFrame):
-    def __init__(self, master, track_list, font: ctk.CTkFont, is_scrollable=True):
+    def __init__(self, master, song_ids, font: ctk.CTkFont, is_scrollable=True):
         super().__init__(master)
 
         self.grid_rowconfigure(0, weight=1)
@@ -368,24 +367,29 @@ class SongFrame(ctk.CTkFrame):
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
 
-        self.track_list = track_list
+        self.track_list = song_ids
         self.labels = []
         i=0
-        for song_info in self.track_list:
-            song_name = song_info[0]
-            song_artist = song_info[1]
-            song_duration = song_info[2]
-            song_thumbnail = song_info[3]
-            self.song_label = SongLabel(self.container,
-                                        song_name=song_name,
-                                        artist=song_artist,
-                                        duration=song_duration,
-                                        thumbnail=song_thumbnail,
-                                        font=font)
-            self.song_label.grid(row=i, column=0, padx=(10,10), pady=1, sticky="ew")
-            self.labels.append(self.song_label)
-            i+=1
-
+        for songID in self.track_list:
+            try:
+                self.song_label = SongLabel(self.container,
+                                            songID=songID,
+                                            font=font)
+                self.song_label.grid(row=i, column=0, padx=(10,10), pady=1, sticky="ew")
+                self.labels.append(self.song_label)
+                i+=1
+            except:
+                try:
+                    tk.messagebox.showerror("Missing song", "Song ID not found. Removing entry from DB.")
+                    db = downloader.init_database()
+                    cursor = db.cursor()
+                    query = "DELETE FROM music_ops WHERE songID = ?"
+                    cursor.execute(query, (songID, ))
+                    db.commit()
+                    db.close()
+                    self.track_list.remove(songID)
+                except:
+                    pass
 
 class PlaylistFrame(ctk.CTkFrame):
     def __init__(self, master, playlist_list, font: ctk.CTkFont, is_scrollable=True):
@@ -488,7 +492,7 @@ class DownloadSettings(ctk.CTkToplevel):
         self.prefered_format_label = ctk.CTkLabel(self.settings_frame, text="Prefered Format:", font = self.TEXT_FONT)
         self.prefered_format_label.grid(row=1, column=0, padx=(10,10), sticky = "w")
         self.prefered_format_select = ctk.CTkOptionMenu(self.settings_frame,
-                                                        values=['mp3', 'wav', 'flac', 'm4a'],
+                                                        values=['mp3', 'flac', 'm4a'],
                                                         font=self.TEXT_FONT,
                                                         )
         self.prefered_format_select.grid(row=1, column=1, padx=(10, 10), pady=(10, 10), sticky="e")
@@ -529,13 +533,11 @@ class DownloadSettings(ctk.CTkToplevel):
 
 
         if prefered_format == "mp3":
-            self.options['format'] = 'mp3/m4a/wav/flac/bestaudio'
+            self.options['format'] = 'mp3/m4a/flac/bestaudio'
         elif prefered_format == "m4a":
-            self.options['format'] = 'm4a/mp3/wav/flac/bestaudio'
-        elif prefered_format == "wav":
-            self.options['format'] = 'wav/m4a/mp3/flac/bestaudio'
+            self.options['format'] = 'm4a/mp3/flac/bestaudio'
         elif prefered_format == "flac":
-            self.options['format'] = 'flac/m4a/mp3/wav/bestaudio'
+            self.options['format'] = 'flac/m4a/mp3/bestaudio'
 
         if add_thumbnail == "Yes":
             self.options["write_thumbnail"] = True
