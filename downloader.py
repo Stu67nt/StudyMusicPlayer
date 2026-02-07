@@ -49,8 +49,8 @@ def init_database():
     return db
 
 def add_song(db, song_file_name):
-    file_path = str(os.path.abspath(os.getcwd())) + "\\Temp Downloads\\" + song_file_name
-    song = tt.TinyTag.get(file_path)  # Extracting the metadata
+    file_path = str(os.path.abspath(os.getcwd())) + "\\Songs\\" + song_file_name
+    song = tt.TinyTag.get(str(os.path.abspath(os.getcwd())) + "\\Temp Downloads\\" + song_file_name)  # Extracting the metadata
     # Gives title of song if held in metadata otherise we use file name
     song_name = song.title if song.title != None else song_file_name
     song_duration = int(round(song.duration))  # Gives length of songs as seconds
@@ -76,7 +76,7 @@ def move_file(file_name:str, current_dir:str, target_dir:str):
     if file_name not in os.listdir(path=target_dir):
         shutil.move(current_dir, target_dir)
     else:
-        tk.messagebox.showwarning("Clashing file found in Songs. Keeping in Temp Downloads folder.")
+        tk.messagebox.showwarning("Clashing File Names", "Clashing file found in Songs. Keeping in Temp Downloads folder.")
         return -1
     return 0
 
@@ -114,30 +114,31 @@ def create_download_config():
         # Configures the file format of the video downloaded
         'format': settings['format'],  # If needed you can create an easy bug here
         # Configures the file name of the output
-        'outtmpl': {'default': f'{dir}%(title)s.%(ext)s'},  # Allow user configure
+        'outtmpl': {'default': f'{dir}%(title)s.%(ext)s',
+                    'pl_thumbnail': ''},  # Allow user configure
         # Used so invalid file name not created.
         "restrictfilenames": True,
         "windowsfilenames": True,
         # Used for thumbnails
-        'writethumbnail': settings['write_thumbnail'],
+        'writethumbnail': settings['format'],
         # Used for creating error logs
         'logger': logging.getLogger(__name__),
         # Does embedding stuff
-        'postprocessors': [
-           # Embeds Thumbnail
-           {'already_have_thumbnail': False,
-            'key': 'EmbedThumbnail'},
-           # Embeds Metadata
-           {'add_chapters': True,
-            'add_infojson': 'if_exists',
-            'add_metadata': True,
-            'key': 'FFmpegMetadata'},
+        'postprocessors': [  # Create a bug here by swapping the order of Embdeds thumbnail and embeds metadata
+            # Embeds Metadata
+            {'add_chapters': True,
+             'add_infojson': 'if_exists',
+             'add_metadata': True,
+             'key': 'FFmpegMetadata'},
+            # Embeds Thumbnail
+            {'already_have_thumbnail': False,
+             'key': 'EmbedThumbnail'},
         ],
         # Module needs to be frequently updated to ensure function
         "warn_when_outdated": True,
         # Any errors will always be logged
         'ignoreerrors': False,
-        # Needed by yt-dlp for full Youtube Support
+        # Needed by yt-dlp for full YouTube Support
         'js_runtimes': {'deno': {'path': settings['deno_path']}}, # User needs to set
         # Dependancy location Required for any embedding
         'ffmpeg_location': settings['ffmpeg_path'],  # Alternatively, you can also create an easy bug here.
