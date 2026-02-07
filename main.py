@@ -35,11 +35,12 @@ class Home(ctk.CTkFrame): # Inheriting CTk class
 
 
 class Tracks(ctk.CTkFrame): # Inheriting CTk class
-    def __init__(self, master, font: ctk.CTkFont):
+    def __init__(self, master, font: ctk.CTkFont, player_callback):
         self.master = master
         self.font = font
         self.widgets = []
         self.prompt = None
+        self.player_callback= player_callback
 
         super().__init__(self.master, fg_color="transparent")  # Calls parent class
 
@@ -69,7 +70,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
         self.widgets.append(self.topbar)
 
-        self.track_list = SongFrame(self, song_ids=self.song_ids, font=self.font)
+        self.track_list = SongFrame(self, song_ids=self.song_ids, font=self.font, player_callback = self.player_callback)
         self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
         self.widgets.append(self.track_list)
 
@@ -237,7 +238,7 @@ class MusicFinder(ctk.CTkFrame):
         self.search_frame.grid(row = 0, column = 0, sticky = "new", padx=(10, 10), pady=(10, 10))
 
 class Player(ctk.CTkFrame):
-    def __init__(self, master, songID: int):
+    def __init__(self, master, songID: int = 0):
         super().__init__(master)
 
         self.grid_rowconfigure((0,1), weight=0)
@@ -259,7 +260,6 @@ class Player(ctk.CTkFrame):
         self.songID=songID
         try:
             self.song_details = self.retrieve_song()
-            print(self.song_details)
             self.song_name = self.song_details[2]
             self.artist = self.song_details[4]
             self.duration = tk.IntVar(value=self.song_details[3])
@@ -275,8 +275,10 @@ class Player(ctk.CTkFrame):
         except:
             self.thumbnail_img = None
 
-        self.player = pyglet.media.Player()
-        self.init_queue()
+        self.player = None
+        if self.songID != 0:
+            self.player = pyglet.media.Player()
+            self.init_queue()
 
         # Thumbnail Rendering
         if self.thumbnail_img == None:
@@ -317,10 +319,43 @@ class Player(ctk.CTkFrame):
         self.playbar.grid(row=1, column=1, padx=(5, 5), pady=(5, 5), sticky="sew")
         self.playbar.set(0)
 
-        self.volume_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.volume_adjust, width=200)
+        self.volume_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.volume_adjust, width=100)
         self.volume_slider.grid(row=0, column=2, rowspan=2, padx=(5, 5), pady=(5, 5), sticky="e")
 
         self.update_progress()
+
+    def load_song(self, songID: int):
+        if self.player:
+            self.player.delete()
+
+        self.songID = songID
+        self.song_details = self.retrieve_song()
+
+        self.song_name = self.song_details[2]
+        self.artist = self.song_details[4]
+        self.duration.set(self.song_details[3])
+        self.filepath = self.song_details[1]
+        try:
+            self.thumbnail_img = Image.open(io.BytesIO(tt.TinyTag.get(self.filepath, image=True).images.any.data))
+        except:
+            self.thumbnail_img = None
+
+        self.player = pyglet.media.Player()
+        self.init_queue()
+        self.player.play()
+
+        if self.thumbnail_img == None:
+            self.thumbnail = ctk.CTkImage(light_image=Image.open("Images/No-album-art.png"),
+                                          dark_image=Image.open("Images/No-album-art.png"),
+                                          size=(75, 75))
+        else:
+            self.thumbnail = ctk.CTkImage(light_image=self.thumbnail_img,
+                                          dark_image=self.thumbnail_img,
+                                          size=(75, 75))
+        self.song_thumbnail.configure(image=self.thumbnail)
+        self.song_name_label.configure(text=self.song_name)
+        self.artist_name_label.configure(text=self.artist)
+        self.playbar.configure(to=self.duration.get())
 
     def retrieve_song(self):
         self.db = downloader.init_database()
@@ -332,7 +367,7 @@ class Player(ctk.CTkFrame):
         return song_details
 
     def update_progress(self):
-        if self.player.playing and not self.seeking:
+        if self.songID != 0 and self.player.playing and not self.seeking:
             self.playbar.set(self.player.time)
         self.seeking = False
         self.after(100, self.update_progress)
@@ -393,12 +428,13 @@ class Player(ctk.CTkFrame):
         print("Previous Song")
 
 class MyTabView(ctk.CTkTabview):
-    def __init__(self, master, font: ctk.CTkFont):
+    def __init__(self, master, font: ctk.CTkFont, player_callback):
         super().__init__(master, anchor="s")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.configure(fg_color="gray10")
 
+        self.player_callback=player_callback
         TABS = ["Home", "Tracks", "Playlists", "Music Finder"]
 
         for current_tab in TABS:
@@ -409,7 +445,7 @@ class MyTabView(ctk.CTkTabview):
         self.home = Home(master=self.tab("Home"), font=font)
         self.home.grid(row=0, column=0, sticky="nsew")
 
-        self.tracks = Tracks(master=self.tab("Tracks"), font=font)
+        self.tracks = Tracks(master=self.tab("Tracks"), font=font, player_callback=self.player_callback)
         self.tracks.grid(row=0, column=0, sticky="nsew")
 
         self.playlists = Playlists(master=self.tab("Playlists"), font=font)
@@ -428,13 +464,15 @@ class App(ctk.CTk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        self.tab_view = MyTabView(self, DEFAULT_FONT)
+        self.player = Player(self)
+        self.player.grid(row=1, column=0, padx=(10, 10), pady=(5, 5), sticky="ew")
+
+        self.tab_view = MyTabView(self, DEFAULT_FONT, self.player.load_song)
         self.tab_view.grid(row=0, column=0, padx=(10,10), pady=(5,5), sticky="nsew")
         self.tab_view.grid_columnconfigure(0, weight=1)
         self.tab_view.grid_rowconfigure(0, weight=1)
 
-        self.player = Player(self, 29)
-        self.player.grid(row=1, column=0, padx=(10, 10), pady=(5,5), sticky="ew")
+
 
 def destroy_widgets(widgets):
     for widget in widgets:

@@ -284,12 +284,14 @@ class SongLabel(ctk.CTkFrame):
     def __init__(self,
                  master,
                  songID,
-                 font: ctk.CTkFont):
+                 font: ctk.CTkFont,
+                 player_callback):
         super().__init__(master)
 
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
+        self.player_callback = player_callback
         self.songID = songID
         self.song_details = self.retrieve_song()
         self.song_filepath = self.song_details[1]
@@ -330,7 +332,7 @@ class SongLabel(ctk.CTkFrame):
             self.menu.grab_release()
 
     def play_song(self, event):
-        print("Play Song")
+        self.player_callback(self.songID)
 
     def retrieve_song(self):
         self.db = downloader.init_database()

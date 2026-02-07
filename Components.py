@@ -351,8 +351,10 @@ class AddToPlaylist(ctk.CTkToplevel):
 
 
 class SongFrame(ctk.CTkFrame):
-    def __init__(self, master, song_ids, font: ctk.CTkFont, is_scrollable=True):
+    def __init__(self, master, song_ids, font: ctk.CTkFont, player_callback, is_scrollable=True):
         super().__init__(master)
+
+        self.player_callback=player_callback
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -374,7 +376,8 @@ class SongFrame(ctk.CTkFrame):
             try:
                 self.song_label = SongLabel(self.container,
                                             songID=songID,
-                                            font=font)
+                                            font=font,
+                                            player_callback=self.player_callback)
                 self.song_label.grid(row=i, column=0, padx=(10,10), pady=1, sticky="ew")
                 self.labels.append(self.song_label)
                 i+=1
