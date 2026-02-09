@@ -3,6 +3,8 @@ from customtkinter import CTkFrame
 import tkinter as tk
 import sqlite3
 import downloader
+import json
+import threading
 
 """
 TODO: 
@@ -354,8 +356,25 @@ class SongLabel(ctk.CTkFrame):
         db.commit()
         db.close()
 
+    def load_queue(self):
+        with open("Databases\\queue.json", "r") as f:
+            queue_settings = json.load(f)
+            f.close()
+        return queue_settings
+
     def add_to_queue(self):
-        print("Add To Queue")
+        self.queue_settings = self.load_queue()
+        self.queue = self.queue_settings['queue']
+        self.current_index = self.queue_settings['current_index']
+        self.queue.append(self.songID)
+
+        queue_config = {
+            "current_index": self.current_index,
+            "queue": self.queue,
+        }
+        with open("Databases\\queue.json", "w") as f:
+            json.dump(queue_config, f, indent=0)
+            f.close()
 
 class PlaylistLabel(ctk.CTkFrame):
     """

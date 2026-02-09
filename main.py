@@ -6,8 +6,9 @@ from Components import *
 from PIL import Image  # Used for thumbnails
 import pyglet  # Used for audio
 import tinytag as tt
-from mutagen.mp4 import MP4
 import io
+import json
+import threading # Used so app doesnt freeze when doing longer processes
 
 class Home(ctk.CTkFrame): # Inheriting CTk class
     def __init__(self, master, font: ctk.CTkFont):
@@ -202,7 +203,7 @@ class Playlists(ctk.CTkFrame):
                                   title_fg_color="transparent",
                                   is_horizontal=True,
                                   title_sticky="w",
-                                  button_sticky="ew",
+                                  button_sticky="e",
                                   font=self.font)
         self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
         self.widgets.append(self.topbar)
@@ -257,7 +258,11 @@ class Player(ctk.CTkFrame):
                              ["🔁", self.toggle_loop],
                              ["↻", self.skip_foward]]
 
-        self.songID=songID
+        self.queue_settings = self.load_queue()
+        self.current_index = self.queue_settings['current_index']
+        self.queue = self.queue_settings['queue']
+        self.songID=self.queue[self.current_index]
+
         try:
             self.song_details = self.retrieve_song()
             self.song_name = self.song_details[2]
@@ -277,11 +282,10 @@ class Player(ctk.CTkFrame):
 
         self.player = None
         if self.songID != 0:
-            self.player = pyglet.media.Player()
-            self.init_queue()
+            self.boot_player()
 
         # Thumbnail Rendering
-        if self.thumbnail_img == None:
+        if self.thumbnail_img is None:
             self.thumbnail = ctk.CTkImage(light_image=Image.open("Images/No-album-art.png"),
                                           dark_image=Image.open("Images/No-album-art.png"),
                                           size = (75,75))
@@ -321,15 +325,47 @@ class Player(ctk.CTkFrame):
 
         self.volume_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.volume_adjust, width=100)
         self.volume_slider.grid(row=0, column=2, rowspan=2, padx=(5, 5), pady=(5, 5), sticky="e")
+        self.player.volume = 0.5
+
+        if self.song_details == None:
+            self.song_end()
 
         self.update_progress()
 
+    def song_end(self):
+        self.queue_settings = self.load_queue()
+        self.current_index = self.queue_settings['current_index'] +1
+        self.queue = self.queue_settings['queue']
+
+        if self.current_index >= len(self.queue):
+            self.current_index = 0
+        queue_config = {
+            "current_index": self.current_index,
+            "queue": self.queue,
+        }
+        with open("Databases\\queue.json", "w") as f:
+            json.dump(queue_config, f, indent=0)
+            f.close()
+        if len(self.queue) != 0:
+            self.load_song(self.queue[self.current_index])
+
+    def load_queue(self):
+        with open("Databases\\queue.json", "r") as f:
+            queue_settings = json.load(f)
+            f.close()
+        return queue_settings
+
     def load_song(self, songID: int):
+        print("hai")
         if self.player:
             self.player.delete()
 
         self.songID = songID
         self.song_details = self.retrieve_song()
+
+        if self.song_details == None:
+            self.queue.remove(self.songID)
+            self.song_end()
 
         self.song_name = self.song_details[2]
         self.artist = self.song_details[4]
@@ -340,9 +376,12 @@ class Player(ctk.CTkFrame):
         except:
             self.thumbnail_img = None
 
-        self.player = pyglet.media.Player()
-        self.init_queue()
-        self.player.play()
+        try:
+            self.boot_player()
+            self.player.play()
+            self.player.volume = 0.5
+        except:
+            self.song_end()
 
         if self.thumbnail_img == None:
             self.thumbnail = ctk.CTkImage(light_image=Image.open("Images/No-album-art.png"),
@@ -357,6 +396,10 @@ class Player(ctk.CTkFrame):
         self.artist_name_label.configure(text=self.artist)
         self.playbar.configure(to=self.duration.get())
 
+    def boot_player(self):
+        self.player = pyglet.media.Player()
+        self.init_queue()
+
     def retrieve_song(self):
         self.db = downloader.init_database()
         cursor = self.db.cursor()
@@ -369,6 +412,8 @@ class Player(ctk.CTkFrame):
     def update_progress(self):
         if self.songID != 0 and self.player.playing and not self.seeking:
             self.playbar.set(self.player.time)
+        if int(round(self.player.time)) == self.duration.get():
+            self.song_end()
         self.seeking = False
         self.after(100, self.update_progress)
 
@@ -414,8 +459,7 @@ class Player(ctk.CTkFrame):
         self.player.seek(self.player.time+10)
 
     def skip_song(self, event=None):
-        self.player.next_source()
-        print("Skipped Song")
+        self.song_end()
 
     def toggle_loop(self, event=None):
         if self.player.loop == False:
@@ -464,10 +508,11 @@ class App(ctk.CTk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        # Needs to be created first to pass player_callback down the chain
         self.player = Player(self)
         self.player.grid(row=1, column=0, padx=(10, 10), pady=(5, 5), sticky="ew")
 
-        self.tab_view = MyTabView(self, DEFAULT_FONT, self.player.load_song)
+        self.tab_view = MyTabView(self, font=DEFAULT_FONT, player_callback=self.player.load_song)
         self.tab_view.grid(row=0, column=0, padx=(10,10), pady=(5,5), sticky="nsew")
         self.tab_view.grid_columnconfigure(0, weight=1)
         self.tab_view.grid_rowconfigure(0, weight=1)

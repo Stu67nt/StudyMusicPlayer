@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Added support for loading up and playing a song.">
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Basic Unmodifiable queue system exists.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/Components.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
@@ -37,6 +37,10 @@
     &quot;accountId&quot;: &quot;ec6c48b7-3a32-4a34-b685-dbecc5786cb1&quot;
   }
 }</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -49,12 +53,14 @@
   "keyToString": {
     "Python.Components.executor": "Run",
     "Python.Snake.executor": "Run",
+    "Python.com.executor": "Run",
     "Python.downloader.executor": "Run",
     "Python.main.executor": "Run",
     "Python.music_app.executor": "Run",
     "Python.test.executor": "Run",
     "Python.tkintertest.executor": "Run",
-    "Python.widgets.executor": "Run",
+    "Python.widgets.executor": "Debug",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -369,7 +375,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770479511232</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="Can now select a song from tracks to play">
+      <option name="closed" value="true" />
+      <created>1770484378930</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1770484378930</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -390,7 +404,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added playlist menu" />
     <MESSAGE value="not much" />
     <MESSAGE value="Added Musci Finder GUI" />
     <MESSAGE value="Fixed Music Finder search results scaling issue." />
@@ -415,7 +428,8 @@
     <MESSAGE value="Removed placeholder song frame. Deprecated song search." />
     <MESSAGE value="Fixed embedding thumbnails" />
     <MESSAGE value="Added support for loading up and playing a song." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added support for loading up and playing a song." />
+    <MESSAGE value="Can now select a song from tracks to play" />
+    <option name="LAST_COMMIT_MESSAGE" value="Can now select a song from tracks to play" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
