@@ -298,7 +298,7 @@ class SongLabel(ctk.CTkFrame):
         self.song_details = self.retrieve_song()
         self.song_filepath = self.song_details[1]
         self.song_name = self.song_details[2]
-        self.duration = self.song_details[3]
+        self.mins, self.secs = self.convert_time(self.song_details[3])
         self.artist = self.song_details[4]
 
         self.name_label = ctk.CTkLabel(self, text = self.song_name, font = font)
@@ -307,7 +307,7 @@ class SongLabel(ctk.CTkFrame):
         self.artist_label = ctk.CTkLabel(self, text = self.artist, font = font)
         self.artist_label.grid(column=1, row=1, padx=(10, 10), sticky="nw")
 
-        self.duration_label = ctk.CTkLabel(self, text=self.duration, font = font)
+        self.duration_label = ctk.CTkLabel(self, text=f"{self.mins}:{self.secs}", font = font)
         self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
         self.options_button_font = ctk.CTkFont(family="Arial", size=30, weight="bold")
@@ -375,6 +375,11 @@ class SongLabel(ctk.CTkFrame):
         with open("Databases\\queue.json", "w") as f:
             json.dump(queue_config, f, indent=0)
             f.close()
+
+    def convert_time(self, secs):
+        mins = int(secs // 60)
+        secs = int(secs % 60)
+        return mins, secs
 
 class PlaylistLabel(ctk.CTkFrame):
     """
