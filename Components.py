@@ -7,6 +7,7 @@ import sqlite3
 import json
 import os
 import threading
+import pyglet
 
 class ToDoList(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
@@ -126,6 +127,7 @@ class ToDoList(ctk.CTkFrame):
         self.db.commit()
         # Reloading task frame because of update
         self.load_tasks()
+        self.input.delete(0, "end")
 
     def delete_tasks(self):
         """
