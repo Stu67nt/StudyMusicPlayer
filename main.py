@@ -433,7 +433,7 @@ class Player(ctk.CTkFrame):
         current_queue = [self.filepath]
         for song_fp in current_queue:
             try:
-                song_obj = pyglet.media.load(song_fp, streaming=False)
+                song_obj = pyglet.media.load(song_fp, streaming=True)  # Turn freaming to false for Lots of bugs
                 self.player.queue(song_obj)
             except Exception as err:
                 tk.messagebox.showwarning("Can't play song", "Song cannot be played removing song from database.")
