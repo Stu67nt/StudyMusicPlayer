@@ -6,6 +6,7 @@ import tkinter as tk
 import sqlite3
 import json
 import os
+import threading
 
 class ToDoList(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
@@ -433,7 +434,8 @@ class SearchFrame(ctk.CTkFrame):
         super().__init__(master)
 
         self.grid_columnconfigure(0, weight=1)
-        self.BUTTONS = [["Download Video" ,self.search],["Download Settings", self.download_settings]]
+        self.BUTTONS = [["Download Video", self.search],
+                        ["Download Settings", self.download_settings]]
         self.font = font
         self.settings_screen = None
 
@@ -453,7 +455,9 @@ class SearchFrame(ctk.CTkFrame):
         inp = self.entry.get()
         print(f"Downloading the url {inp}")
         try:
-            downloader.download(inp, downloader.create_download_config())
+            threading.Thread(target = downloader.download,
+                             args = (inp, downloader.create_download_config()),
+                             daemon = False).start()
         except Exception as err:
             tk.messagebox.showerror("Download Error", err)
             print("Complete!")

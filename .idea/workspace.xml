@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Basic Unmodifiable queue system exists.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/Components.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -383,7 +380,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770484378930</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="Basic Unmodifiable queue system exists.">
+      <option name="closed" value="true" />
+      <created>1770670489921</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1770670489921</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -404,7 +409,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="not much" />
     <MESSAGE value="Added Musci Finder GUI" />
     <MESSAGE value="Fixed Music Finder search results scaling issue." />
     <MESSAGE value="Added multi select framework and add to playlist framework." />
@@ -429,7 +433,8 @@
     <MESSAGE value="Fixed embedding thumbnails" />
     <MESSAGE value="Added support for loading up and playing a song." />
     <MESSAGE value="Can now select a song from tracks to play" />
-    <option name="LAST_COMMIT_MESSAGE" value="Can now select a song from tracks to play" />
+    <MESSAGE value="Basic Unmodifiable queue system exists." />
+    <option name="LAST_COMMIT_MESSAGE" value="Basic Unmodifiable queue system exists." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
