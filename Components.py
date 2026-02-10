@@ -156,7 +156,7 @@ class TimerCreate(ctk.CTkFrame):
         self.hours_label.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="w")
 
         self.hours_spinbox = tk.Spinbox(self, from_=0, to=23, repeatdelay=500, repeatinterval=100,
-                     font=("Arial", 20))
+                     font=("Cascadia Mono", 20))
         self.hours_spinbox.grid(row=1, column=1, padx=10, pady=(10, 10), sticky="e")
 
 
@@ -164,7 +164,7 @@ class TimerCreate(ctk.CTkFrame):
         self.mins_label.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="w")
 
         self.mins_spinbox = tk.Spinbox(self, from_=0, to=59, repeatdelay=500, repeatinterval=100,
-                     font=("Arial", 20))
+                     font=("Cascadia Mono", 20))
         self.mins_spinbox.grid(row=2, column=1, padx=10, pady=(10, 10), sticky="e")
 
 
@@ -172,7 +172,7 @@ class TimerCreate(ctk.CTkFrame):
         self.secs_label.grid(row=3, column=0, padx=10, pady=(10, 10), sticky="w")
 
         self.secs_spinbox = tk.Spinbox(self, from_=0, to=59, repeatdelay=500, repeatinterval=100,
-                     font=("Arial", 20))
+                     font=("Cascadia Mono", 20))
         self.secs_spinbox.grid(row=3, column=1, padx=10, pady=(10, 10), sticky="e")
 
 
@@ -486,7 +486,7 @@ class DownloadSettings(ctk.CTkToplevel):
         self.options = json.load(self.f)
         self.f.close()
 
-        self.TEXT_FONT = ctk.CTkFont(family="Arial", size=18)
+        self.TEXT_FONT = ctk.CTkFont(family="Cascadia Mono", size=18)
 
         self.label = ctk.CTkLabel(self,
                                   text="Download Settings",

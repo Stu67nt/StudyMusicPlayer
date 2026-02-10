@@ -310,7 +310,7 @@ class SongLabel(ctk.CTkFrame):
         self.duration_label = ctk.CTkLabel(self, text=f"{self.mins}:{self.secs}", font = font)
         self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        self.options_button_font = ctk.CTkFont(family="Arial", size=30, weight="bold")
+        self.options_button_font = ctk.CTkFont(family="Cascadia Mono", size=30, weight="bold")
         self.options_button = ctk.CTkLabel(self, text = "⋮", font = self.options_button_font)
         self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
@@ -407,7 +407,7 @@ class PlaylistLabel(ctk.CTkFrame):
         self.duration_label = ctk.CTkLabel(self, text=duration, font = font)
         self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        self.options_button_font = ctk.CTkFont(family="Arial", size=30, weight="bold")
+        self.options_button_font = ctk.CTkFont(family="Cascadia Mono", size=30, weight="bold")
         self.options_button = ctk.CTkLabel(self, text = "⋮", font = self.options_button_font)
         self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
