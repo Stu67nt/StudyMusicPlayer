@@ -19,14 +19,16 @@ def createConsoleLog():
     print("Created Console Log")
     return str(filePath)
 
-def progressHook(d):
+def progressHook(d, progress_bar):
     """
     Used to track what percent of the downloads are complete.
     """
     if d['status'] == 'finished':
         pass
+        progress_bar['value'] = float(0)
     elif d['status'] == 'downloading':
         print(d["_percent_str"])
+        progress_bar['value'] = float((d["_percent_str"]).replace(" ", "").replace("%", ""))
 
 def init_database():
     """
@@ -85,6 +87,7 @@ def download(url: list, config: dict):
     Downloads all urls in given list and adds them to songs.db
     :param url:
     :param config:
+    :param progress_bar:
     :return:
     """
     file_path = createConsoleLog()
@@ -103,7 +106,7 @@ def download(url: list, config: dict):
                 print(f"{file} is not an audio file")  # Means file is not an audio file
                 print(err)
 
-def create_download_config():
+def create_download_config(progress_bar):
     dir = str(os.path.abspath(os.getcwd())) + r"\\Temp Downloads\\"
     f = open("Databases\\config.json")
     settings = json.load(f)
@@ -143,7 +146,7 @@ def create_download_config():
         # Dependancy location Required for any embedding
         'ffmpeg_location': settings['ffmpeg_path'],  # Alternatively, you can also create an easy bug here.
         # Used for tracking download progress
-        'progress_hooks': [progressHook],
+        'progress_hooks': [lambda d: progressHook(d, progress_bar=progress_bar)],
     }
     return download_config
 

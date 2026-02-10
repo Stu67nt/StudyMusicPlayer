@@ -435,7 +435,7 @@ class PlaylistFrame(ctk.CTkFrame):
 
 
 class SearchFrame(ctk.CTkFrame):
-    def __init__(self, master, font=ctk.CTkFont):
+    def __init__(self, master, font=ctk.CTkFont, progress_bar_callback=None):
         super().__init__(master)
 
         self.grid_columnconfigure(0, weight=1)
@@ -443,6 +443,7 @@ class SearchFrame(ctk.CTkFrame):
                         ["Download Settings", self.download_settings]]
         self.font = font
         self.settings_screen = None
+        self.progress_bar_callback = progress_bar_callback
 
         self.title = ctk.CTkLabel(self,
                                   text = "Download a song from YouTube",
@@ -461,7 +462,7 @@ class SearchFrame(ctk.CTkFrame):
         print(f"Downloading the url {inp}")
         try:
             threading.Thread(target = downloader.download,
-                             args = (inp, downloader.create_download_config()),
+                             args = (inp, downloader.create_download_config(self.progress_bar_callback)),
                              daemon = False).start()
         except Exception as err:
             tk.messagebox.showerror("Download Error", err)
@@ -469,7 +470,7 @@ class SearchFrame(ctk.CTkFrame):
 
 
     def download_settings(self, event = None):
-        if (self.settings_screen is None or not self.settings_screen.winfo_exists()):
+        if self.settings_screen is None or not self.settings_screen.winfo_exists():
             self.settings_screen = DownloadSettings(self)
         if self.settings_screen is not None and self.settings_screen.winfo_exists():
             self.settings_screen.focus()  # if window exists focus it

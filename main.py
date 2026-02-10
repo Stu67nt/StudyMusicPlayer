@@ -235,8 +235,13 @@ class MusicFinder(ctk.CTkFrame):
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight = 1)
 
-        self.search_frame = SearchFrame(self, font=font)
+        self.progress_bar = tk.ttk.Progressbar(self,maximum=100)
+        self.progress_bar.grid(row=1, column=0, sticky="new", padx=(10,10), pady=(10,10))
+
+        self.search_frame = SearchFrame(self, font=font, progress_bar_callback=self.progress_bar)
         self.search_frame.grid(row = 0, column = 0, sticky = "new", padx=(10, 10), pady=(10, 10))
+
+
 
 class Player(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont, songID: int = 0):
