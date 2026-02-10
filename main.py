@@ -243,11 +243,11 @@ class Player(ctk.CTkFrame):
         super().__init__(master)
 
         self.grid_rowconfigure((0,1), weight=0)
-        self.grid_columnconfigure((0,2), weight=1)
-        self.grid_columnconfigure(1, weight=2)
+        self.grid_columnconfigure((0,2), weight=0)
+        self.grid_columnconfigure(1, weight=10)
 
-        self.song_name_font = ctk.CTkFont(family="Arial", size = 20)
-        self.song_artist_font = ctk.CTkFont(family="Arial", size = 16)
+        self.song_name_font = ctk.CTkFont(family="Cascadia Mono", size = 16)
+        self.song_artist_font = ctk.CTkFont(family="Cascadia Mono", size = 14)
         self.icons_font = ctk.CTkFont(family="Arial", size=22)
 
         self.button_icons = [["↺", self.rewind],
@@ -275,6 +275,12 @@ class Player(ctk.CTkFrame):
             self.duration = tk.IntVar(value=100)
             self.filepath = None
 
+        if len(self.song_name) > 30:
+            self.song_name = self.song_name[:27]+"..."
+        elif len(self.song_name) <= 30:
+            while len(self.song_name) < 30:
+                self.song_name += " "
+
         try:
             self.thumbnail_img = Image.open(io.BytesIO(tt.TinyTag.get(self.filepath, image=True).images.any.data))
         except:
@@ -295,16 +301,16 @@ class Player(ctk.CTkFrame):
                          size=(75, 75))
 
         self.song_details_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.song_details_frame.grid(row=0, column=0, rowspan=2, padx=(5, 5), pady=(5, 5), sticky="nsw")
+        self.song_details_frame.grid(row=0, column=0, rowspan=2, pady=(5, 5), sticky="ew")
 
         self.song_thumbnail = ctk.CTkLabel(self.song_details_frame, image=self.thumbnail, text="")
         self.song_thumbnail.grid(row=0, column=0, rowspan=2, padx=(10, 10), pady=(5, 5), sticky="w")
 
         self.song_name_label = ctk.CTkLabel(self.song_details_frame, text=self.song_name, font=self.song_name_font)
-        self.song_name_label.grid(row=0, column=1, padx=(10,10), pady=(5,5), sticky="w")
+        self.song_name_label.grid(row=0, column=1, pady=(5,5), sticky="w")
 
         self.artist_name_label = ctk.CTkLabel(self.song_details_frame, text=self.artist, font=self.song_artist_font)
-        self.artist_name_label.grid(row=1, column=1, padx=(10, 10), pady=(5, 5), sticky="w")
+        self.artist_name_label.grid(row=1, column=1, pady=(5, 5), sticky="w")
 
         self.playbar_buttons = LabelFrame(self,
                                           values=self.button_icons,
@@ -332,13 +338,18 @@ class Player(ctk.CTkFrame):
 
         self.update_progress()
 
-    def song_end(self):
+    def song_end(self, load_previous: bool = False):
         self.queue_settings = self.load_queue()
-        self.current_index = self.queue_settings['current_index'] +1
         self.queue = self.queue_settings['queue']
+        if load_previous:
+            self.current_index = self.queue_settings['current_index'] - 1
+        else:
+            self.current_index = self.queue_settings['current_index'] + 1
 
         if self.current_index >= len(self.queue):
             self.current_index = 0
+        elif self.current_index < 0:
+            self.current_index = len(self.queue)-1
         queue_config = {
             "current_index": self.current_index,
             "queue": self.queue,
@@ -363,7 +374,7 @@ class Player(ctk.CTkFrame):
         self.songID = songID
         self.song_details = self.retrieve_song()
 
-        if self.song_details == None:
+        if self.song_details is None:
             self.queue.remove(self.songID)
             self.song_end()
 
@@ -371,6 +382,13 @@ class Player(ctk.CTkFrame):
         self.artist = self.song_details[4]
         self.duration.set(self.song_details[3])
         self.filepath = self.song_details[1]
+
+        if len(self.song_name) > 30:
+            self.song_name = self.song_name[:27] + "..."
+        elif len(self.song_name) <= 30:
+            while len(self.song_name) < 30:
+                self.song_name += " "
+
         try:
             self.thumbnail_img = Image.open(io.BytesIO(tt.TinyTag.get(self.filepath, image=True).images.any.data))
         except:
@@ -469,7 +487,7 @@ class Player(ctk.CTkFrame):
         print(self.player.loop)
 
     def previous_song(self, event=None):
-        print("Previous Song")
+        self.song_end(load_previous=True)
 
 class MyTabView(ctk.CTkTabview):
     def __init__(self, master, font: ctk.CTkFont, player_callback):
@@ -479,29 +497,29 @@ class MyTabView(ctk.CTkTabview):
         self.configure(fg_color="gray10")
 
         self.player_callback=player_callback
-        TABS = ["Home", "Tracks", "Playlists", "Music Finder"]
+        TABS = ["    Home    ", "   Tracks   ", "  Playlist  ", "Music Finder"]
 
         for current_tab in TABS:
             self.add(current_tab)
             self.tab(current_tab).grid_columnconfigure(0, weight=1)
             self.tab(current_tab).grid_rowconfigure(0, weight=1)
 
-        self.home = Home(master=self.tab("Home"), font=font)
+        self.home = Home(master=self.tab(TABS[0]), font=font)
         self.home.grid(row=0, column=0, sticky="nsew")
 
-        self.tracks = Tracks(master=self.tab("Tracks"), font=font, player_callback=self.player_callback)
+        self.tracks = Tracks(master=self.tab(TABS[1]), font=font, player_callback=self.player_callback)
         self.tracks.grid(row=0, column=0, sticky="nsew")
 
-        self.playlists = Playlists(master=self.tab("Playlists"), font=font)
+        self.playlists = Playlists(master=self.tab(TABS[2]), font=font)
         self.playlists.grid(row=0, column=0, sticky="nsew")
 
-        self.finder = MusicFinder(master=self.tab("Music Finder"), font=font)
+        self.finder = MusicFinder(master=self.tab(TABS[3]), font=font)
         self.finder.grid(row=0, column=0, sticky="nsew")
 
 class App(ctk.CTk):
     def __init__(self, title="My App"):
         super().__init__()
-        DEFAULT_FONT = ctk.CTkFont(family="Arial", size=18)
+        DEFAULT_FONT = ctk.CTkFont(family="Cascadia Mono", size=18)
         # Initialising Window
         self.title(title)
         ctk.set_appearance_mode("dark")  # light/dark/system (system is not functional on linux)
