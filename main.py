@@ -239,13 +239,15 @@ class MusicFinder(ctk.CTkFrame):
         self.search_frame.grid(row = 0, column = 0, sticky = "new", padx=(10, 10), pady=(10, 10))
 
 class Player(ctk.CTkFrame):
-    def __init__(self, master, songID: int = 0):
+    def __init__(self, master, font: ctk.CTkFont, songID: int = 0):
         super().__init__(master)
 
         self.grid_rowconfigure((0,1), weight=0)
         self.grid_columnconfigure((0,2), weight=0)
         self.grid_columnconfigure(1, weight=10)
 
+        self.queue_window = None
+        self.font = font
         self.song_name_font = ctk.CTkFont(family="Cascadia Mono", size = 16)
         self.song_artist_font = ctk.CTkFont(family="Cascadia Mono", size = 14)
         self.icons_font = ctk.CTkFont(family="Arial", size=22)
@@ -275,11 +277,13 @@ class Player(ctk.CTkFrame):
             self.duration = tk.IntVar(value=100)
             self.filepath = None
 
-        if len(self.song_name) > 30:
-            self.song_name = self.song_name[:27]+"..."
-        elif len(self.song_name) <= 30:
-            while len(self.song_name) < 30:
-                self.song_name += " "
+        self.printable_song_name = self.song_name
+        if len(self.printable_song_name) > 30:
+            self.printable_song_name = self.printable_song_name[:27]+"..."
+        elif len(self.printable_song_name) <= 30:
+            self.printable_song_name = self.printable_song_name
+            while len(self.printable_song_name) < 30:
+                self.printable_song_name += " "
 
         try:
             self.thumbnail_img = Image.open(io.BytesIO(tt.TinyTag.get(self.filepath, image=True).images.any.data))
@@ -306,7 +310,7 @@ class Player(ctk.CTkFrame):
         self.song_thumbnail = ctk.CTkLabel(self.song_details_frame, image=self.thumbnail, text="")
         self.song_thumbnail.grid(row=0, column=0, rowspan=2, padx=(10, 10), pady=(5, 5), sticky="w")
 
-        self.song_name_label = ctk.CTkLabel(self.song_details_frame, text=self.song_name, font=self.song_name_font)
+        self.song_name_label = ctk.CTkLabel(self.song_details_frame, text=self.printable_song_name, font=self.song_name_font)
         self.song_name_label.grid(row=0, column=1, pady=(5,5), sticky="w")
 
         self.artist_name_label = ctk.CTkLabel(self.song_details_frame, text=self.artist, font=self.song_artist_font)
@@ -329,14 +333,23 @@ class Player(ctk.CTkFrame):
         self.playbar.grid(row=1, column=1, padx=(5, 5), pady=(5, 5), sticky="sew")
         self.playbar.set(0)
 
-        self.volume_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.volume_adjust, width=100)
-        self.volume_slider.grid(row=0, column=2, rowspan=2, padx=(5, 5), pady=(5, 5), sticky="e")
+        self.queue_button_label = ctk.CTkLabel(self, text="≡", font=self.icons_font)
+        self.queue_button_label.grid(row=0, column=2, rowspan=2, padx=(10, 10), pady=(5, 5), sticky="e")
+        self.queue_button_label.bind("<Button-1>", self.queue_trigger)
+
+        self.volume_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.volume_adjust, width=200)
+        self.volume_slider.grid(row=0, column=3, rowspan=2, padx=(10, 10), pady=(5, 5), sticky="e")
         self.player.volume = 0.5
 
         if self.song_details == None:
             self.song_end()
 
         self.update_progress()
+
+    def queue_trigger(self, event):
+        if self.queue_window is None or not self.queue_window.winfo_exists():
+            self.queue_window = QueueViewer(event, font= self.font)
+        self.queue_window.focus()
 
     def song_end(self, load_previous: bool = False):
         self.queue_settings = self.load_queue()
@@ -484,7 +497,6 @@ class Player(ctk.CTkFrame):
             self.player.loop = True
         elif self.player.loop == True:
             self.player.loop = False
-        print(self.player.loop)
 
     def previous_song(self, event=None):
         self.song_end(load_previous=True)
@@ -527,7 +539,7 @@ class App(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
 
         # Needs to be created first to pass player_callback down the chain
-        self.player = Player(self)
+        self.player = Player(self, font=DEFAULT_FONT)
         self.player.grid(row=1, column=0, padx=(10, 10), pady=(5, 5), sticky="ew")
 
         self.tab_view = MyTabView(self, font=DEFAULT_FONT, player_callback=self.player.load_song)

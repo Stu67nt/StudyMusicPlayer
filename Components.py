@@ -8,6 +8,9 @@ import json
 import os
 import threading
 import pyglet
+from PIL import Image
+import io
+import tinytag as tt
 
 class ToDoList(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
@@ -563,3 +566,72 @@ class DownloadSettings(ctk.CTkToplevel):
             json.dump(self.options, f, indent=4)
             f.close()
         self.destroy()
+
+class QueueViewer(ctk.CTkToplevel):
+    def __init__(self, event, font: ctk.CTkFont, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(0, weight=1)
+
+        self.title("Queue")
+        self.geometry("500x700")
+        self.font = font
+        self.queue = []
+        self.old_index = -1
+
+        self.label = ctk.CTkLabel(self,
+                                  text="Queue",
+                                  font=self.font)
+        self.label.grid(row=0, column=0, padx=(10, 10), pady=(10, 10), sticky="ew")
+
+        self.queue_frame = ctk.CTkScrollableFrame(self, fg_color="transparent")
+        self.queue_frame.grid(row=1, column=0,pady=(10, 10), sticky="nsew")
+        self.queue_frame.grid_columnconfigure(0, weight=1)
+
+        self.update_queue(event)
+
+    def load_queue(self):
+        with open("Databases\\queue.json", "r") as f:
+            queue_settings = json.load(f)
+            f.close()
+        return queue_settings
+
+    def update_queue(self, event):
+        self.queue_settings = self.load_queue()
+        current_index = self.queue_settings["current_index"]
+        if self.queue != self.queue_settings["queue"] or self.old_index != current_index:
+            self.old_index = self.queue_settings["current_index"]
+            for widget in self.queue_frame.winfo_children():
+                widget.destroy()
+            self.queue = self.queue_settings["queue"]
+            i = 0
+            for songID in self.queue:
+                self.song_details = self.retrieve_song(songID)
+                self.song_name = self.song_details[2]
+                self.artist = self.song_details[4]
+
+                self.song_label_frame = ctk.CTkFrame(self.queue_frame, corner_radius=0)
+                self.song_label_frame.grid(column=0, row=i, sticky="ew", padx=(10, 10))
+
+                if songID == event.widget.master.master.songID:
+                    self.song_label_frame.configure(fg_color="grey10")
+
+                self.song_name_label = ctk.CTkLabel(self.song_label_frame, text=self.song_name,
+                                                    font=self.font)
+                self.song_name_label.grid(row=0, column=1, padx=(5,5), pady=(5, 5), sticky="w")
+
+                self.artist_name_label = ctk.CTkLabel(self.song_label_frame, text=self.artist,
+                                                      font=self.font)
+                self.artist_name_label.grid(row=1, column=1, padx=(5,5), pady=(5, 5), sticky="w")
+                i += 1
+
+        self.after(200, lambda: self.update_queue(event))
+
+    def retrieve_song(self, songID):
+        self.db = downloader.init_database()
+        cursor = self.db.cursor()
+        query = "SELECT * FROM songs WHERE songID = ?"
+        cursor.execute(query, (songID,))
+        song_details = cursor.fetchone()
+        self.db.close()
+        return song_details
