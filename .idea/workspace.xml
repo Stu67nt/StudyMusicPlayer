@@ -4,11 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Queue Viewer implemented. Current Playing song is highlighted.">
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Added progress bar for downloading">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/Components.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Databases Backup/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/Databases Backup/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Databases/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/Databases/config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/downloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/downloader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -477,7 +479,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770754451247</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="Added progress bar for downloading">
+      <option name="closed" value="true" />
+      <created>1770756903143</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1770756903143</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -498,7 +508,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="TODO list now tied to DB and fully functional" />
     <MESSAGE value="Timer functional with a few bugs. Commit to use as a reference point" />
     <MESSAGE value="I forgor to add this asset" />
     <MESSAGE value="Fixxed spam pausing causing faster timer tickdown bug and second de increment whilst paused." />
@@ -523,15 +532,21 @@
     <MESSAGE value="Changed main font to cascadia mono" />
     <MESSAGE value="Added time conversions for song labels, made todo list clear input on task creation, playbar does not move when chnaging song anymore" />
     <MESSAGE value="Queue Viewer implemented. Current Playing song is highlighted." />
-    <option name="LAST_COMMIT_MESSAGE" value="Queue Viewer implemented. Current Playing song is highlighted." />
+    <MESSAGE value="Added progress bar for downloading" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added progress bar for downloading" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/downloader.py</url>
-          <line>148</line>
-          <option name="timeStamp" value="4" />
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>277</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>272</line>
+          <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

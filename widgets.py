@@ -314,7 +314,9 @@ class SongLabel(ctk.CTkFrame):
         self.options_button = ctk.CTkLabel(self, text = "⋮", font = self.options_button_font)
         self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        MENU_OPTIONS = [["Add to Playlist", self.add_to_playlist], ["Delete Song", self.delete_song], ["Add to Queue", self.add_to_queue]]
+        MENU_OPTIONS = [#["Add to Playlist", self.add_to_playlist],
+                        ["Delete Song", self.delete_song],
+                        ["Add to Queue", self.add_to_queue]]
 
         self.menu = tk.Menu(self, tearoff=0)
         for option in MENU_OPTIONS:

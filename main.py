@@ -42,6 +42,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         self.widgets = []
         self.prompt = None
         self.player_callback= player_callback
+        self.song_ids = None
 
         super().__init__(self.master, fg_color="transparent")  # Calls parent class
 
@@ -49,37 +50,41 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         self.grid_rowconfigure(2, weight=1)
 
         self.main_topbar_buttons = [["Select Multiple", lambda: self.select_multiple()]]
-        self.song_ids = self.retrieve_songs()
         self.playlists = [["Playlist 1", "1"],
                           ["Playlist 2", "2"],
                           ["Playlist 3", "3"],
                           ["Playlist 4", "4"]]
 
+        destroy_widgets(self.widgets)
+
         self.font = font
         self.main_view()
 
-    def main_view(self):
-        destroy_widgets(self.widgets)
-        self.topbar = ButtonFrame(self,
-                                  button_values=self.main_topbar_buttons,
-                                  title=f"{len(self.song_ids)} Songs",
-                                  title_fg_color="transparent",
-                                  is_horizontal=True,
-                                  title_sticky="w",
-                                  button_sticky="e",
-                                  font=self.font)
-        self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
-        self.widgets.append(self.topbar)
-
-        self.track_list = SongFrame(self, song_ids=self.song_ids, font=self.font, player_callback = self.player_callback)
-        self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
-        self.widgets.append(self.track_list)
+    def main_view(self, force = False):
+        current_song_ids = self.retrieve_songs()
+        if current_song_ids != self.song_ids or force:
+            self.song_ids = current_song_ids
+            destroy_widgets(self.widgets)
+            self.topbar = ButtonFrame(self,
+                                      button_values=self.main_topbar_buttons,
+                                      title=f"{len(self.song_ids)} Songs",
+                                      title_fg_color="transparent",
+                                      is_horizontal=True,
+                                      title_sticky="w",
+                                      button_sticky="e",
+                                      font=self.font)
+            self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
+            # self.widgets.append(self.topbar)
+            self.track_list = SongFrame(self, song_ids=self.song_ids, font=self.font, player_callback = self.player_callback)
+            self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
+            self.widgets.append(self.track_list)
+        self.after(100, self.main_view)
 
     def select_multiple(self):
         destroy_widgets(self.widgets)
         self.select_mult_topbar_buttons = [
-            ["Exit Select", lambda: self.main_view()],
-            ["Add to Playlist", self.add_to_playlist],
+            ["Exit Select", lambda: self.main_view(force=True)],
+            #["Add to Playlist", self.add_to_playlist],
             ["Delete Songs", self.delete_songs]]
         self.song_names = self.retrieve_song_names()
         self.songs = []
@@ -296,8 +301,9 @@ class Player(ctk.CTkFrame):
             self.thumbnail_img = None
 
         self.player = None
-        if self.songID != 0:
+        if self.songID != -1:
             self.boot_player()
+            self.player.volume = 0.5
 
         # Thumbnail Rendering
         if self.thumbnail_img is None:
@@ -344,9 +350,8 @@ class Player(ctk.CTkFrame):
 
         self.volume_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.volume_adjust, width=200)
         self.volume_slider.grid(row=0, column=3, rowspan=2, padx=(10, 10), pady=(5, 5), sticky="e")
-        self.player.volume = 0.5
 
-        if self.song_details == None:
+        if self.song_details == None and self.songID != -1:
             self.song_end()
 
         self.update_progress()
@@ -382,10 +387,11 @@ class Player(ctk.CTkFrame):
         with open("Databases\\queue.json", "r") as f:
             queue_settings = json.load(f)
             f.close()
+        if -1 in queue_settings["queue"] and (len(queue_settings["queue"]) >= 2):
+            queue_settings["queue"].remove(-1)
         return queue_settings
 
     def load_song(self, songID: int):
-        print("hai")
         if self.player:
             self.player.delete()
 
@@ -393,9 +399,11 @@ class Player(ctk.CTkFrame):
         self.song_details = self.retrieve_song()
 
         if self.song_details is None:
-            self.queue.remove(self.songID)
-            self.song_end()
-
+            if self.songID != -1:
+                self.queue.remove(self.songID)
+                self.song_end()
+            else:
+                pass
         self.song_name = self.song_details[2]
         self.artist = self.song_details[4]
         self.duration.set(self.song_details[3])
@@ -412,12 +420,13 @@ class Player(ctk.CTkFrame):
         except:
             self.thumbnail_img = None
 
-        try:
-            self.boot_player()
-            self.player.play()
-            self.player.volume = 0.5
-        except:
-            self.song_end()
+        if self.songID != -1:
+            try:
+                self.boot_player()
+                self.player.play()
+                self.player.volume = 0.5
+            except:
+                self.song_end()
 
         if self.thumbnail_img == None:
             self.thumbnail = ctk.CTkImage(light_image=Image.open("Images/No-album-art.png"),
@@ -446,11 +455,12 @@ class Player(ctk.CTkFrame):
         return song_details
 
     def update_progress(self):
-        if self.songID != 0 and self.player.playing and not self.seeking:
-            self.playbar.set(self.player.time)
-        if int(round(self.player.time)) == self.duration.get():
-            self.song_end()
-        self.seeking = False
+        if self.songID != -1:
+            if self.player.playing and not self.seeking:
+                self.playbar.set(self.player.time)
+            if int(round(self.player.time)) == self.duration.get():
+                self.song_end()
+            self.seeking = False
         self.after(100, self.update_progress)
 
     def delete_song(self):
@@ -514,7 +524,10 @@ class MyTabView(ctk.CTkTabview):
         self.configure(fg_color="gray10")
 
         self.player_callback=player_callback
-        TABS = ["    Home    ", "   Tracks   ", "  Playlist  ", "Music Finder"]
+        TABS = ["    Home    ",
+                "   Tracks   ",
+                #"  Playlist  ",
+                "Music Finder"]
 
         for current_tab in TABS:
             self.add(current_tab)
@@ -527,10 +540,10 @@ class MyTabView(ctk.CTkTabview):
         self.tracks = Tracks(master=self.tab(TABS[1]), font=font, player_callback=self.player_callback)
         self.tracks.grid(row=0, column=0, sticky="nsew")
 
-        self.playlists = Playlists(master=self.tab(TABS[2]), font=font)
-        self.playlists.grid(row=0, column=0, sticky="nsew")
+        #self.playlists = Playlists(master=self.tab(TABS[2]), font=font)
+        #self.playlists.grid(row=0, column=0, sticky="nsew")
 
-        self.finder = MusicFinder(master=self.tab(TABS[3]), font=font)
+        self.finder = MusicFinder(master=self.tab(TABS[2]), font=font)
         self.finder.grid(row=0, column=0, sticky="nsew")
 
 class App(ctk.CTk):

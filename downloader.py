@@ -93,7 +93,10 @@ def download(url: list, config: dict):
     file_path = createConsoleLog()
     logging.basicConfig(level=logging.NOTSET, filename=file_path)
     with yt_dlp.YoutubeDL(config) as ydl:
-        ydl.download(url)
+        try:
+            ydl.download(url)
+        except Exception as err:
+            tk.messagebox.showwarning("Error", err)
         db = init_database()
         for file in os.listdir("Temp Downloads"):
             # Try except for catching valid files
