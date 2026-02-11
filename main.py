@@ -49,7 +49,8 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(2, weight=1)
 
-        self.main_topbar_buttons = [["Select Multiple", lambda: self.select_multiple()]]
+        self.main_topbar_buttons = [["Refresh Tracks", lambda: self.refresh_tracks()],
+                                    ["Select Multiple", lambda: self.select_multiple()]]
         self.playlists = [["Playlist 1", "1"],
                           ["Playlist 2", "2"],
                           ["Playlist 3", "3"],
@@ -74,7 +75,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
                                       button_sticky="e",
                                       font=self.font)
             self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
-            # self.widgets.append(self.topbar)
+            self.widgets.append(self.topbar)
             self.track_list = SongFrame(self, song_ids=self.song_ids, font=self.font, player_callback = self.player_callback)
             self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
             self.widgets.append(self.track_list)
@@ -110,7 +111,46 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
         self.widgets.append(self.track_list)
 
+    def refresh_tracks(self):
+        filepath = str(os.path.abspath(os.getcwd()))+"\\Songs"
+        db = downloader.init_database()
+        cursor = db.cursor()
+        cursor.execute("SELECT file_path FROM songs")
+        all_filepaths = cursor.fetchall()
+        i=0
+        for file in os.listdir(filepath):
+            if all_filepaths == [] or filepath+"\\"+file not in all_filepaths[i]:
+                try:
+                    tt.TinyTag.get(f"Songs\\{file}")
+                    print(f"{file} is an valid file")
+                    self.add_song(db, file)
+                except Exception as err:
+                    print(f"{file} is not an audio file")  # Means file is not an audio file
+                    print(err)
+            i+=1
+        db.close()
 
+    def add_song(self, db, song_file_name):
+        filepath = str(os.path.abspath(os.getcwd())) + "\\Songs\\" + song_file_name
+        song = tt.TinyTag.get(filepath)  # Extracting the metadata
+        # Gives title of song if held in metadata otherise we use file name
+        song_name = song.title if song.title != None else song_file_name
+        song_duration = int(round(song.duration))  # Gives length of songs as seconds
+        artist = song.artist if song.artist != None else "Unknown"  # Gives artist name
+        publish_date = song.year if song.artist != None else "Unknown"  # song.year givees the exact date
+        cursor = db.cursor()
+        cursor.execute(
+            "INSERT INTO "
+            "songs("
+            "file_path,"
+            "song_name,"
+            "song_duration,"
+            "artist,"
+            "publish_date"
+            ") "
+            "VALUES (?, ?, ?, ?, ?)",
+            (filepath, song_name, song_duration, artist, publish_date))
+        db.commit()
 
     def create_playlist(self):
         dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist", font = self.font)
@@ -158,6 +198,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
             song_names.append([name[0], name[1], name[2]])
         return song_names
 
+
 class Playlists(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
         super().__init__(master, fg_color="transparent")  # Calls parent class
@@ -168,10 +209,9 @@ class Playlists(ctk.CTkFrame):
         self.widgets = []
         self.font=font
         self.main_topbar_buttons = [["Create Playlist", self.create_playlist], ["Select Multiple", self.select_multiple]]
-        self.playlists = [["Playlist 1", "1", "123", lambda: self.retrieve_playlist(1)],
-                          ["Playlist 2", "2", "246", lambda: self.retrieve_playlist(2)],
-                          ["Playlist 3", "3", "369", lambda: self.retrieve_playlist(3)],
-                          ["Playlist 4", "4", "492", lambda: self.retrieve_playlist(4)]]
+        self.playlist_list_db = self.init_playlist_list_database()
+        self.playlist_db = self.init_playlist_database()
+        self.playlists = self.retrieve_playlists()
 
         self.main_view()
 
@@ -228,9 +268,48 @@ class Playlists(ctk.CTkFrame):
     def delete_playlist(self):
         print("Delete Playlist")
 
-    def retrieve_playlist(self, param):
-        pass
+    def init_playlist_list_database(self):
+        """
+        Initialises music_ops.db and songs table or creates them if they don't exist.
+        :return: SQLite3 db object
+        """
+        db = sqlite3.connect(r"Databases\music_ops.db")
+        cursor = db.cursor()
+        query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
+                 "Playlist_List("
+                 "PlaylistID INTEGER,"
+                 "Name TEXT"
+                 ")")
+        cursor.execute(query)
+        db.commit()  # Committing the query
+        return db
 
+    def init_playlist_database(self):
+        """
+        Initialises music_ops.db and songs table or creates them if they don't exist.
+        :return: SQLite3 db object
+        """
+        db = sqlite3.connect(r"Databases\music_ops.db")
+        cursor = db.cursor()
+        query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
+                 "Playlist("
+                 "PlaylistID INTEGER,"
+                 "songID INTEGER"
+                 ")")
+        cursor.execute(query)
+        db.commit()  # Committing the query
+        return db
+
+    def retrieve_playlists(self):
+        cursor = self.playlist_list_db.cursor()
+        query = ("SELECT * FROM Playlist_List")
+        cursor.execute(query)
+        playlists = cursor.fetchall()
+        configured_playlists = []
+        if playlists != []:
+            for playlist in playlists:
+                pass
+        return playlists
 
 class MusicFinder(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
@@ -245,7 +324,6 @@ class MusicFinder(ctk.CTkFrame):
 
         self.search_frame = SearchFrame(self, font=font, progress_bar_callback=self.progress_bar)
         self.search_frame.grid(row = 0, column = 0, sticky = "new", padx=(10, 10), pady=(10, 10))
-
 
 
 class Player(ctk.CTkFrame):
@@ -520,6 +598,7 @@ class Player(ctk.CTkFrame):
     def previous_song(self, event=None):
         self.song_end(load_previous=True)
 
+
 class MyTabView(ctk.CTkTabview):
     def __init__(self, master, font: ctk.CTkFont, player_callback):
         super().__init__(master, anchor="s")
@@ -530,7 +609,7 @@ class MyTabView(ctk.CTkTabview):
         self.player_callback=player_callback
         TABS = ["    Home    ",
                 "   Tracks   ",
-                #"  Playlist  ",
+                "  Playlist  ",
                 "Music Finder"]
 
         for current_tab in TABS:
@@ -544,10 +623,10 @@ class MyTabView(ctk.CTkTabview):
         self.tracks = Tracks(master=self.tab(TABS[1]), font=font, player_callback=self.player_callback)
         self.tracks.grid(row=0, column=0, sticky="nsew")
 
-        #self.playlists = Playlists(master=self.tab(TABS[2]), font=font)
-        #self.playlists.grid(row=0, column=0, sticky="nsew")
+        self.playlists = Playlists(master=self.tab(TABS[2]), font=font)
+        self.playlists.grid(row=0, column=0, sticky="nsew")
 
-        self.finder = MusicFinder(master=self.tab(TABS[2]), font=font)
+        self.finder = MusicFinder(master=self.tab(TABS[3]), font=font)
         self.finder.grid(row=0, column=0, sticky="nsew")
 
 class App(ctk.CTk):

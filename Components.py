@@ -141,6 +141,7 @@ class ToDoList(ctk.CTkFrame):
         self.db.commit()
         self.load_tasks()
 
+
 class TimerCreate(ctk.CTkFrame):
     def __init__(self, master, font: ctk.CTkFont):
         super().__init__(master)
@@ -400,6 +401,7 @@ class SongFrame(ctk.CTkFrame):
                 except:
                     pass
 
+
 class PlaylistFrame(ctk.CTkFrame):
     def __init__(self, master, playlist_list, font: ctk.CTkFont, is_scrollable=True):
         super().__init__(master)
@@ -432,6 +434,8 @@ class PlaylistFrame(ctk.CTkFrame):
             self.playlist_label.grid(row=i, column=0, padx=(10,10), pady=1, sticky="ew")
             self.labels.append(self.playlist_label)
             i+=1
+
+
 
 
 class SearchFrame(ctk.CTkFrame):
@@ -505,7 +509,7 @@ class DownloadSettings(ctk.CTkToplevel):
         self.prefered_format_label = ctk.CTkLabel(self.settings_frame, text="Preferred Format:", font = self.TEXT_FONT)
         self.prefered_format_label.grid(row=1, column=0, padx=(10,10), sticky = "w")
         self.prefered_format_select = ctk.CTkOptionMenu(self.settings_frame,
-                                                        values=['mp3', 'flac', 'm4a'],
+                                                        values=['m4a', 'mp3', 'flac'],
                                                         font=self.TEXT_FONT,
                                                         )
         self.prefered_format_select.grid(row=1, column=1, padx=(10, 10), pady=(10, 10), sticky="e")
@@ -543,6 +547,7 @@ class DownloadSettings(ctk.CTkToplevel):
             json.dump(self.options, f, indent=4)
             f.close()
         self.destroy()
+
 
 class QueueViewer(ctk.CTkToplevel):
     def __init__(self, event, font: ctk.CTkFont, *args, **kwargs):
