@@ -28,6 +28,4 @@ Extract folder.
 Run main.exe
 
 ## AI Usage
-AI was used for some portions of the GUI and debugging and my IDE had inline code suggestion.
-like when converting Greyscale to ASCII, the del keyword to free up memory, and doing basic debugging with 
-mismatched variable names.
+Used for assistance with debugging, assisting with some GUI stuff and in line code suggestions. 
