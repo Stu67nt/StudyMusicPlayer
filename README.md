@@ -1,2 +1,33 @@
-The project is a Music Player app with an ability to download the audio of videos from YouTube with yt-dlp.
-Zoravar was here.
+# Study Music Player
+
+A Python music player with some study features such as a to do list and a timer. As well as the ability to download songs from Youtube! 
+
+---
+
+## Features
+
+- To do list to track your tasks.
+- Timer up to 24 hours.
+- Inifnite Queue system.
+- Downloading songs from YouTube.
+
+## Usage Tutorial
+Download and Extract zip.  
+Run main.exe  
+Go to Music Finder 
+Paste in the URL of a Youtube Video
+Click Download Video
+Once downloaded, go to tracks and click on a song.
+To add song to queue click on 3 dots of a song and select Add to Queue. 
+  
+## Build & Run
+This program has only been compiled for Windows 11.
+#### Windows
+Download the main.zip in the latest release.  
+Extract folder.  
+Run main.exe
+
+## AI Usage
+AI was used for some portions of the GUI and debugging and my IDE had inline code suggestion.
+like when converting Greyscale to ASCII, the del keyword to free up memory, and doing basic debugging with 
+mismatched variable names.
