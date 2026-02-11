@@ -147,7 +147,7 @@ def create_download_config(progress_bar):
         # Needed by yt-dlp for full YouTube Support
         'js_runtimes': {'deno': {'path': settings['deno_path']}}, # User needs to set
         # Dependancy location Required for any embedding
-        'ffmpeg_location': settings['ffmpeg_path'],  # Alternatively, you can also create an easy bug here.
+        'ffmpeg_location': 'ffmpeg.exe',  # Alternatively, you can also create an easy bug here.
         # Used for tracking download progress
         'progress_hooks': [lambda d: progressHook(d, progress_bar=progress_bar)],
     }

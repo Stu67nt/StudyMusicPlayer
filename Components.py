@@ -163,7 +163,7 @@ class TimerCreate(ctk.CTkFrame):
         self.hours_spinbox.grid(row=1, column=1, padx=10, pady=(10, 10), sticky="e")
 
 
-        self.mins_label = ctk.CTkLabel(self, text="Enter Miniutes: ", fg_color="transparent", corner_radius=6, font=font)
+        self.mins_label = ctk.CTkLabel(self, text="Enter Minutes: ", fg_color="transparent", corner_radius=6, font=font)
         self.mins_label.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="w")
 
         self.mins_spinbox = tk.Spinbox(self, from_=0, to=59, repeatdelay=500, repeatinterval=100,
@@ -439,7 +439,7 @@ class SearchFrame(ctk.CTkFrame):
         super().__init__(master)
 
         self.grid_columnconfigure(0, weight=1)
-        self.BUTTONS = [["Download Video", self.search],
+        self.BUTTONS = [["Download Song", self.search],
                         ["Download Settings", self.download_settings]]
         self.font = font
         self.settings_screen = None
@@ -502,7 +502,7 @@ class DownloadSettings(ctk.CTkToplevel):
         self.settings_frame.grid(row=1, column=0, padx=(10,10), pady=(10,10), sticky = "nsew")
         self.settings_frame.grid_columnconfigure(0, weight=1)
 
-        self.prefered_format_label = ctk.CTkLabel(self.settings_frame, text="Prefered Format:", font = self.TEXT_FONT)
+        self.prefered_format_label = ctk.CTkLabel(self.settings_frame, text="Preferred Format:", font = self.TEXT_FONT)
         self.prefered_format_label.grid(row=1, column=0, padx=(10,10), sticky = "w")
         self.prefered_format_select = ctk.CTkOptionMenu(self.settings_frame,
                                                         values=['mp3', 'flac', 'm4a'],
@@ -512,28 +512,12 @@ class DownloadSettings(ctk.CTkToplevel):
 
         self.add_thumbnail_select = RadioButtonFrame(self.settings_frame,
                                               values=["Yes", "No"],
-                                              title="Embded Thumbnails:",
+                                              title="Embed Thumbnails:",
                                               font=self.TEXT_FONT,
                                               is_horizontal=True,
                                               button_sticky="e",
                                               )
         self.add_thumbnail_select.grid(row=2, column=0, padx=(10, 10), pady=(10, 10), sticky="ew", columnspan=2)
-
-        self.deno_path_label = ctk.CTkLabel(self.settings_frame, text="Deno Path:", font=self.TEXT_FONT)
-        self.deno_path_label.grid(row=3, column=0, padx=(10, 10), sticky="w")
-        self.deno_path_entry = ctk.CTkEntry(self.settings_frame,
-                                                   font=self.TEXT_FONT,
-                                                   placeholder_text="Deno Path",
-                                                   )
-        self.deno_path_entry.grid(row=3, column=1, padx=(10, 10), pady=(10, 10), sticky="ew")
-
-        self.ffmpeg_path_label = ctk.CTkLabel(self.settings_frame, text="FFmpeg Path:", font=self.TEXT_FONT)
-        self.ffmpeg_path_label.grid(row=4, column=0, padx=(10, 10), sticky="w")
-        self.ffmpeg_path_entry = ctk.CTkEntry(self.settings_frame,
-                                            font=self.TEXT_FONT,
-                                            placeholder_text="FFmpeg Path",
-                                            )
-        self.ffmpeg_path_entry.grid(row=4, column=1, padx=(10, 10), pady=(10, 10), sticky="ew")
 
         self.confirm_button = ctk.CTkButton(self, text="Confirm", command=self.write_config)
         self.confirm_button.grid(row=6, column=0, padx=(10, 10), pady=(10, 10))
@@ -541,8 +525,6 @@ class DownloadSettings(ctk.CTkToplevel):
     def write_config(self):
         prefered_format = self.prefered_format_select.get()
         add_thumbnail = self.add_thumbnail_select.get_radio_val()
-        deno_path = self.deno_path_entry.get()
-        ffmpeg_path = self.ffmpeg_path_entry.get()
 
 
         if prefered_format == "mp3":
@@ -556,12 +538,6 @@ class DownloadSettings(ctk.CTkToplevel):
             self.options["write_thumbnail"] = True
         elif add_thumbnail == "No":
             self.options["write_thumbnail"] = False
-
-        if os.path.isfile(deno_path) and os.path.basename(deno_path).lower() == "deno.exe":
-            self.options['deno_path'] = deno_path
-
-        if os.path.isfile(ffmpeg_path) and os.path.basename(ffmpeg_path).lower() == "ffmpeg.exe":
-            self.options['ffmpeg_path'] = ffmpeg_path
 
         with open("Databases\\config.json", "w") as f:
             json.dump(self.options, f, indent=4)

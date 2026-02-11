@@ -263,11 +263,9 @@ class Player(ctk.CTkFrame):
         self.icons_font = ctk.CTkFont(family="Arial", size=22)
 
         self.button_icons = [["↺", self.rewind],
-                             ["🔀", self.shuffle],
                              ["⏮", self.previous_song],
                              ["⏯", self.toggle_pause],
                              ["⏭", self.skip_song],
-                             ["🔁", self.toggle_loop],
                              ["↻", self.skip_foward]]
 
         self.queue_settings = self.load_queue()
@@ -348,8 +346,14 @@ class Player(ctk.CTkFrame):
         self.queue_button_label.grid(row=0, column=2, rowspan=2, padx=(10, 10), pady=(5, 5), sticky="e")
         self.queue_button_label.bind("<Button-1>", self.queue_trigger)
 
+        self.volume_icon = ctk.CTkLabel(self, text="🔈", font=self.icons_font)
+        self.volume_icon.grid(row=0, column=3, rowspan=2, padx=(2, 2), pady=(5, 5), sticky="e")
+
         self.volume_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.volume_adjust, width=200)
-        self.volume_slider.grid(row=0, column=3, rowspan=2, padx=(10, 10), pady=(5, 5), sticky="e")
+        self.volume_slider.grid(row=0, column=4, rowspan=2, padx=(2, 2), pady=(5, 5), sticky="e")
+
+        self.volume_icon = ctk.CTkLabel(self, text="🔊", font=self.icons_font)
+        self.volume_icon.grid(row=0, column=5, rowspan=2, padx=(2, 2), pady=(5, 5), sticky="e")
 
         if self.song_details == None and self.songID != -1:
             self.song_end()
@@ -572,6 +576,6 @@ def destroy_widgets(widgets):
         widget.destroy()
 
 
-app = App("Balls")
+app = App("Study Music Player")
 
 app.mainloop()

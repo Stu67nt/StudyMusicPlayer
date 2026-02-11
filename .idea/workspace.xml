@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Added progress bar for downloading">
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Functions on first run properly">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Databases Backup/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/Databases Backup/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Databases/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/Databases/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/downloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/downloader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,30 +47,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Components.executor": "Run",
-    "Python.Snake.executor": "Run",
-    "Python.com.executor": "Run",
-    "Python.downloader.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.music_app.executor": "Run",
-    "Python.test.executor": "Run",
-    "Python.tkintertest.executor": "Run",
-    "Python.widgets.executor": "Debug",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/PycharmProjects/TerminalVideoPlayer",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
-    "to.speed.mode.migration.done": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Components.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Snake.executor&quot;: &quot;Run&quot;,
+    &quot;Python.com.executor&quot;: &quot;Run&quot;,
+    &quot;Python.downloader.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.music_app.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.tkintertest.executor&quot;: &quot;Run&quot;,
+    &quot;Python.widgets.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/PycharmProjects/TerminalVideoPlayer&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings module-name="StudyMusicPlayer" is-module-sdk="true">
@@ -88,36 +84,6 @@
       <recent name="C:\PycharmProjects\StudyMusicPlayer\Databases" />
       <recent name="C:\PycharmProjects\StudyMusicPlayer\Images" />
     </key>
-  </component>
-  <component name="RunManager">
-    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="StudyMusicPlayer" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/utils" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="RUN_TOOL" value="" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/utils/test.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.test" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -487,7 +453,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770756903143</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="Functions on first run properly">
+      <option name="closed" value="true" />
+      <created>1770764469563</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1770764469563</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -508,7 +482,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Timer functional with a few bugs. Commit to use as a reference point" />
     <MESSAGE value="I forgor to add this asset" />
     <MESSAGE value="Fixxed spam pausing causing faster timer tickdown bug and second de increment whilst paused." />
     <MESSAGE value="Added some comments and documentation" />
@@ -533,7 +506,8 @@
     <MESSAGE value="Added time conversions for song labels, made todo list clear input on task creation, playbar does not move when chnaging song anymore" />
     <MESSAGE value="Queue Viewer implemented. Current Playing song is highlighted." />
     <MESSAGE value="Added progress bar for downloading" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added progress bar for downloading" />
+    <MESSAGE value="Functions on first run properly" />
+    <option name="LAST_COMMIT_MESSAGE" value="Functions on first run properly" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
