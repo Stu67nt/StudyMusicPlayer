@@ -293,7 +293,10 @@ class SongLabel(ctk.CTkFrame):
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
+        self.font = font
+        self.prompt = None
         self.player_callback = player_callback
+
         self.songID = songID
         self.song_details = self.retrieve_song()
         self.song_filepath = self.song_details[1]
@@ -301,22 +304,22 @@ class SongLabel(ctk.CTkFrame):
         self.mins, self.secs = self.convert_time(self.song_details[3])
         self.artist = self.song_details[4]
 
-        self.name_label = ctk.CTkLabel(self, text = self.song_name, font = font)
+        self.name_label = ctk.CTkLabel(self, text = self.song_name, font = self.font)
         self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
 
-        self.artist_label = ctk.CTkLabel(self, text = self.artist, font = font)
+        self.artist_label = ctk.CTkLabel(self, text = self.artist, font = self.font)
         self.artist_label.grid(column=1, row=1, padx=(10, 10), sticky="nw")
 
-        self.duration_label = ctk.CTkLabel(self, text=f"{self.mins}:{self.secs}", font = font)
+        self.duration_label = ctk.CTkLabel(self, text=f"{self.mins}:{self.secs}", font = self.font)
         self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
         self.options_button_font = ctk.CTkFont(family="Cascadia Mono", size=30, weight="bold")
         self.options_button = ctk.CTkLabel(self, text = "⋮", font = self.options_button_font)
         self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        MENU_OPTIONS = [#["Add to Playlist", self.add_to_playlist],
-                        ["Delete Song", self.delete_song],
-                        ["Add to Queue", self.add_to_queue]]
+        MENU_OPTIONS = [["Add to Queue", self.add_to_queue],
+                        ["Add to Playlist", self.add_to_playlist],
+                        ["Delete Song", self.delete_song]]
 
         self.menu = tk.Menu(self, tearoff=0)
         for option in MENU_OPTIONS:
@@ -348,7 +351,12 @@ class SongLabel(ctk.CTkFrame):
         return song_details
 
     def add_to_playlist(self):
-        print("Add to playlist")
+        import Components  # Import needs to be done here as otherwise program does not run
+
+        songID = [self.songID]  # needs to be in a list so add to playlist can properly process the id
+        if self.prompt is None or not self.prompt.winfo_exists():
+            self.prompt = Components.AddToPlaylist(songIDs=songID, font=self.font)
+        self.prompt.focus()
 
     def delete_song(self):
         db = downloader.init_database()
@@ -357,6 +365,7 @@ class SongLabel(ctk.CTkFrame):
         cursor.execute(query, (self.songID,))
         db.commit()
         db.close()
+
 
     def load_queue(self):
         with open("Databases\\queue.json", "r") as f:
@@ -391,23 +400,20 @@ class PlaylistLabel(ctk.CTkFrame):
     """
     def __init__(self,
                  master,
+                 playlistID: int,
                  playlist_name,
-                 song_count,
-                 duration,
-                 font: ctk.CTkFont):
+                 font: ctk.CTkFont,
+                 open_playlist_callback):
         super().__init__(master)
 
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
+        self.playlist_name = playlist_name
+        self.playlistID = playlistID
+
         self.name_label = ctk.CTkLabel(self, text = playlist_name, font = font)
         self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
-
-        self.song_count_label = ctk.CTkLabel(self, text = song_count, font = font)
-        self.song_count_label.grid(column=1, row=1, padx=(10, 10), sticky="nw")
-
-        self.duration_label = ctk.CTkLabel(self, text=duration, font = font)
-        self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
         self.options_button_font = ctk.CTkFont(family="Cascadia Mono", size=30, weight="bold")
         self.options_button = ctk.CTkLabel(self, text = "⋮", font = self.options_button_font)
@@ -420,6 +426,7 @@ class PlaylistLabel(ctk.CTkFrame):
             self.menu.add_command(label=name)
 
         self.options_button.bind("<Button-1>", self.menu_trigger)
+        self.bind("<Button-1>", lambda event=None: open_playlist_callback(event = event))
 
     def menu_trigger(self, event):
         try:

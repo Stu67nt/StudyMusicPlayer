@@ -318,7 +318,7 @@ class Timer(ctk.CTkToplevel):
 
 
 class AddToPlaylist(ctk.CTkToplevel):
-    def __init__(self, playlists, font: ctk.CTkFont, *args, **kwargs):
+    def __init__(self, songIDs: list, font: ctk.CTkFont, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.geometry('450x450')
@@ -327,11 +327,12 @@ class AddToPlaylist(ctk.CTkToplevel):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
+        self.songIDs = songIDs
         self.font = font
-        self.playlists = playlists
+        self.playlists = self.retrieve_playlist_details()
         self.playlist_names = []
         for playlist in self.playlists:
-            playlist_name = playlist[0]
+            playlist_name = f"{playlist[0]} - {playlist[1]}"
             self.playlist_names.append(playlist_name)
 
         self.frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -353,8 +354,70 @@ class AddToPlaylist(ctk.CTkToplevel):
         self.submit.grid(row=1, column=0, padx=(10,10), pady=(10,10), sticky = "ew")
 
     def submit_playlists(self):
-        print(self.playlists_checkbox.get_checkboxes())
+        checked = self.playlists_checkbox.get_checkboxes()
+        print(checked)
+        for playlist in checked:
+            playlistID = int(playlist.split(" ")[0])
+            for songID in self.songIDs:
+                self.add_song_to_playlist(songID, playlistID)
+
         self.destroy()
+
+    def add_song_to_playlist(self, songID, playlistID):
+        db = self.init_playlist_database()
+        cursor = db.cursor()
+        query = ("INSERT INTO "
+                 "Playlist("
+                 "PlaylistID,"
+                 "songID"
+                 ")"
+                 "VALUES (?, ?)")
+        cursor.execute(query, (playlistID, songID))
+        db.commit()
+        db.close()
+
+    def init_playlist_database(self):
+        """
+        Initialises music_ops.db and songs table or creates them if they don't exist.
+        :return: SQLite3 db object
+        """
+        db = sqlite3.connect(r"Databases\music_ops.db")
+        cursor = db.cursor()
+        query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
+                 "Playlist("
+                 "PlaylistID INTEGER,"
+                 "songID INTEGER"
+                 ")")
+        cursor.execute(query)
+        db.commit()  # Committing the query
+        return db
+
+    def init_playlist_list_database(self):
+        """
+        Initialises music_ops.db and Playlist_List table or creates them if they don't exist.
+        :return: SQLite3 db object
+        """
+        db = sqlite3.connect(r"Databases\music_ops.db")
+        cursor = db.cursor()
+        query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
+                 "Playlist_List("
+                 "PlaylistID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                 "Name TEXT"
+                 ")")
+        cursor.execute(query)
+        db.commit()  # Committing the query
+        return db
+
+    def retrieve_playlist_details(self):
+        cursor = self.init_playlist_list_database().cursor()
+        query = ("SELECT * FROM Playlist_List")
+        cursor.execute(query)
+        playlist_details = cursor.fetchall()
+        configured_playlist_details = []
+        for playlist in playlist_details:
+            configured_playlist_details.append([playlist[0],playlist[1]])
+        return configured_playlist_details
+
 
 
 class SongFrame(ctk.CTkFrame):
@@ -403,8 +466,20 @@ class SongFrame(ctk.CTkFrame):
 
 
 class PlaylistFrame(ctk.CTkFrame):
-    def __init__(self, master, playlist_list, font: ctk.CTkFont, is_scrollable=True):
+    def __init__(self,
+                 master,
+                 playlistIDs,
+                 font: ctk.CTkFont,
+                 player_callback,
+                 open_playlist_callback,
+                 is_scrollable=True):
         super().__init__(master)
+
+        self.player_callback = player_callback
+        self.song_ids = []
+        self.font = font
+        self.playlistIDs = playlistIDs
+        self.widgets = []
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -419,24 +494,43 @@ class PlaylistFrame(ctk.CTkFrame):
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
 
-        self.playlist_list = playlist_list
-        self.labels = []
         i=0
-        for playlist_info in self.playlist_list:
-            playlist_name = playlist_info[0]
-            playlist_song_count = playlist_info[1]
-            playlist_duration = playlist_info[2]
+        for playlistID in self.playlistIDs:
+            playlist_info = self.retrieve_playlist(playlistID)
+            playlistID = playlist_info[0]
+            playlist_name = playlist_info[1]
             self.playlist_label = PlaylistLabel(self.container,
+                                                playlistID=playlistID,
                                                 playlist_name=playlist_name,
-                                                song_count=playlist_song_count,
-                                                duration=playlist_duration,
-                                                font=font)
+                                                font=self.font,
+                                                open_playlist_callback=open_playlist_callback)
             self.playlist_label.grid(row=i, column=0, padx=(10,10), pady=1, sticky="ew")
-            self.labels.append(self.playlist_label)
+            self.widgets.append(self.playlist_label)
             i+=1
 
+    def init_playlist_list_database(self):
+        """
+        Initialises music_ops.db and Playlist_List table or creates them if they don't exist.
+        :return: SQLite3 db object
+        """
+        db = sqlite3.connect(r"Databases\music_ops.db")
+        cursor = db.cursor()
+        query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
+                 "Playlist_List("
+                 "PlaylistID INTEGER,"
+                 "Name TEXT"
+                 ")")
+        cursor.execute(query)
+        db.commit()  # Committing the query
+        return db
 
-
+    def retrieve_playlist(self, playlistID):
+        db = self.init_playlist_list_database()
+        cursor = db.cursor()
+        query = "SELECT * FROM Playlist_List WHERE PlaylistID = ?"
+        cursor.execute(query, (playlistID,))
+        playlist = cursor.fetchone()
+        return playlist
 
 class SearchFrame(ctk.CTkFrame):
     def __init__(self, master, font=ctk.CTkFont, progress_bar_callback=None):
@@ -617,3 +711,9 @@ class QueueViewer(ctk.CTkToplevel):
         song_details = cursor.fetchone()
         self.db.close()
         return song_details
+
+def destroy_widgets(widgets):
+    for widget in widgets:
+        widget.destroy()
+        widgets.remove(widget)
+    return widgets
