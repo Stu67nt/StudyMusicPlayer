@@ -1,5 +1,6 @@
 import downloader
 from widgets import *
+from utils import *
 import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
@@ -364,7 +365,7 @@ class AddToPlaylist(ctk.CTkToplevel):
         self.destroy()
 
     def add_song_to_playlist(self, songID, playlistID):
-        db = self.init_playlist_database()
+        db = init_playlist_database()
         cursor = db.cursor()
         query = ("INSERT INTO "
                  "Playlist("
@@ -376,40 +377,8 @@ class AddToPlaylist(ctk.CTkToplevel):
         db.commit()
         db.close()
 
-    def init_playlist_database(self):
-        """
-        Initialises music_ops.db and songs table or creates them if they don't exist.
-        :return: SQLite3 db object
-        """
-        db = sqlite3.connect(r"Databases\music_ops.db")
-        cursor = db.cursor()
-        query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
-                 "Playlist("
-                 "PlaylistID INTEGER,"
-                 "songID INTEGER"
-                 ")")
-        cursor.execute(query)
-        db.commit()  # Committing the query
-        return db
-
-    def init_playlist_list_database(self):
-        """
-        Initialises music_ops.db and Playlist_List table or creates them if they don't exist.
-        :return: SQLite3 db object
-        """
-        db = sqlite3.connect(r"Databases\music_ops.db")
-        cursor = db.cursor()
-        query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
-                 "Playlist_List("
-                 "PlaylistID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                 "Name TEXT"
-                 ")")
-        cursor.execute(query)
-        db.commit()  # Committing the query
-        return db
-
     def retrieve_playlist_details(self):
-        cursor = self.init_playlist_list_database().cursor()
+        cursor = init_playlist_list_database().cursor()
         query = ("SELECT * FROM Playlist_List")
         cursor.execute(query)
         playlist_details = cursor.fetchall()
@@ -451,15 +420,9 @@ class SongFrame(ctk.CTkFrame):
                 self.song_label.grid(row=i, column=0, padx=(10,10), pady=1, sticky="ew")
                 self.labels.append(self.song_label)
                 i+=1
-            except:
+            except Exception as err:
                 try:
-                    tk.messagebox.showerror("Missing song", "Song ID not found. Removing entry from DB.")
-                    db = downloader.init_database()
-                    cursor = db.cursor()
-                    query = "DELETE FROM music_ops WHERE songID = ?"
-                    cursor.execute(query, (songID, ))
-                    db.commit()
-                    db.close()
+                    tk.messagebox.showerror("Missing song", err)
                     self.track_list.remove(songID)
                 except:
                     pass
@@ -503,29 +466,14 @@ class PlaylistFrame(ctk.CTkFrame):
                                                 playlistID=playlistID,
                                                 playlist_name=playlist_name,
                                                 font=self.font,
-                                                open_playlist_callback=open_playlist_callback)
+                                                open_playlist_callback=open_playlist_callback,
+                                                player_callback=player_callback)
             self.playlist_label.grid(row=i, column=0, padx=(10,10), pady=1, sticky="ew")
             self.widgets.append(self.playlist_label)
             i+=1
 
-    def init_playlist_list_database(self):
-        """
-        Initialises music_ops.db and Playlist_List table or creates them if they don't exist.
-        :return: SQLite3 db object
-        """
-        db = sqlite3.connect(r"Databases\music_ops.db")
-        cursor = db.cursor()
-        query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
-                 "Playlist_List("
-                 "PlaylistID INTEGER,"
-                 "Name TEXT"
-                 ")")
-        cursor.execute(query)
-        db.commit()  # Committing the query
-        return db
-
     def retrieve_playlist(self, playlistID):
-        db = self.init_playlist_list_database()
+        db = init_playlist_list_database()
         cursor = db.cursor()
         query = "SELECT * FROM Playlist_List WHERE PlaylistID = ?"
         cursor.execute(query, (playlistID,))
@@ -683,23 +631,24 @@ class QueueViewer(ctk.CTkToplevel):
             i = 0
             for songID in self.queue:
                 self.song_details = self.retrieve_song(songID)
-                self.song_name = self.song_details[2]
-                self.artist = self.song_details[4]
+                if self.song_details != None:
+                    self.song_name = self.song_details[2]
+                    self.artist = self.song_details[4]
 
-                self.song_label_frame = ctk.CTkFrame(self.queue_frame, corner_radius=0)
-                self.song_label_frame.grid(column=0, row=i, sticky="ew", padx=(10, 10))
+                    self.song_label_frame = ctk.CTkFrame(self.queue_frame, corner_radius=0)
+                    self.song_label_frame.grid(column=0, row=i, sticky="ew", padx=(10, 10))
 
-                if songID == event.widget.master.master.songID:
-                    self.song_label_frame.configure(fg_color="grey10")
+                    if songID == event.widget.master.master.songID:
+                        self.song_label_frame.configure(fg_color="grey10")
 
-                self.song_name_label = ctk.CTkLabel(self.song_label_frame, text=self.song_name,
-                                                    font=self.font)
-                self.song_name_label.grid(row=0, column=1, padx=(5,5), pady=(5, 5), sticky="w")
+                    self.song_name_label = ctk.CTkLabel(self.song_label_frame, text=self.song_name,
+                                                        font=self.font)
+                    self.song_name_label.grid(row=0, column=1, padx=(5,5), pady=(5, 5), sticky="w")
 
-                self.artist_name_label = ctk.CTkLabel(self.song_label_frame, text=self.artist,
-                                                      font=self.font)
-                self.artist_name_label.grid(row=1, column=1, padx=(5,5), pady=(5, 5), sticky="w")
-                i += 1
+                    self.artist_name_label = ctk.CTkLabel(self.song_label_frame, text=self.artist,
+                                                          font=self.font)
+                    self.artist_name_label.grid(row=1, column=1, padx=(5,5), pady=(5, 5), sticky="w")
+                    i += 1
 
         self.after(200, lambda: self.update_queue(event))
 

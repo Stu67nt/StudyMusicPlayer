@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Semi functioning playlists now included">
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Fixed bug where song _volume woudl reset on song change.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/Components.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Databases/queue.json" beforeDir="false" afterPath="$PROJECT_DIR$/Databases/queue.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -486,7 +488,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770935284781</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="Fixed bug where song _volume woudl reset on song change.">
+      <option name="closed" value="true" />
+      <created>1771001909791</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1771001909791</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -507,7 +517,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed flickering, memory leak and timing issues." />
     <MESSAGE value="Changed file structure" />
     <MESSAGE value="Made downloader functional" />
     <MESSAGE value="Fixed syntax error" />
@@ -532,7 +541,8 @@
     <MESSAGE value="Fixed some typos and make volume slider clearer" />
     <MESSAGE value="Added way of refreshing tracks if a new song is added to songs" />
     <MESSAGE value="Semi functioning playlists now included" />
-    <option name="LAST_COMMIT_MESSAGE" value="Semi functioning playlists now included" />
+    <MESSAGE value="Fixed bug where song _volume woudl reset on song change." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed bug where song _volume woudl reset on song change." />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

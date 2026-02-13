@@ -3,6 +3,7 @@ import tkinter as tk
 import downloader
 from widgets import *
 from Components import *
+from utils import *
 from PIL import Image  # Used for thumbnails
 import pyglet  # Used for audio
 import tinytag as tt
@@ -174,6 +175,9 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
             cursor.execute(query, (song_id,))
         db.commit()
         db.close()
+
+
+
         self.select_multiple()
 
     def retrieve_songs(self):
@@ -214,15 +218,16 @@ class Playlists(ctk.CTkFrame):
         self.font=font
         self.main_topbar_buttons = [["Create Playlist", self.create_playlist],
                                     ["Select Multiple", self.select_multiple]]
-        self.select_mult_topbar_buttons = [["Delete Playlists", self.delete_playlist],
-                                           ["Exit Select", lambda :self.main_view(force=True)]]
+        self.select_mult_topbar_buttons = [
+            ["Delete Playlists", lambda: self.delete_playlists(self.get_checked_ids(self.checkbox_playlist_list))],
+            ["Exit Select", lambda :self.main_view(force=True)]]
         self.specific_playlist_topbar_buttons = [["Overwrite Queue", lambda: self.overwrite_queue(self.song_ids)],
                                                  ["Add to Queue", lambda: self.add_to_queue(self.song_ids)],
                                                  ["Select Multiple", self.specific_playlist_select_multiple],
                                                  ["Exit Playlist", lambda: self.main_view(force=True)]]
 
-        self.playlist_list_db = self.init_playlist_list_database()
-        self.playlist_db = self.init_playlist_database()
+        self.playlist_list_db = init_playlist_list_database()
+        self.playlist_db = init_playlist_database()
         self.old_playlistIDs = None
 
         self.main_view()
@@ -251,7 +256,10 @@ class Playlists(ctk.CTkFrame):
 
     def select_multiple(self):
         destroy_widgets(self.widgets)
-        self.playlist_names = self.retrieve_playlist_names()
+        playlist_details = self.retrieve_playlist_details()
+        self.playlist_names = []
+        for playlist in playlist_details:
+            self.playlist_names.append(f"{playlist[0]} - {playlist[1]}")
 
         self.topbar = ButtonFrame(self,
                                   button_values=self.select_mult_topbar_buttons,
@@ -264,11 +272,11 @@ class Playlists(ctk.CTkFrame):
         self.topbar.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="ew")
         self.widgets.append(self.topbar)
 
-        self.playlist_list = CheckboxFrame(master=self,
+        self.checkbox_playlist_list = CheckboxFrame(master=self,
                                         values=self.playlist_names,
                                         font=self.font,
                                         is_scrollable=True)
-        self.playlist_list.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
+        self.checkbox_playlist_list.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
         self.widgets.append(self.topbar)
 
     def open_playlist(self, event=None):
@@ -311,9 +319,10 @@ class Playlists(ctk.CTkFrame):
         for song_details in all_song_details:
             song_names.append(f"{song_details[2]} - {song_details[0]} - {song_details[1]}")
 
-        self.mult_specific_playlist_buttons = [["Delete Playlists", self.delete_playlist],
-                                               ["Add to Queue", lambda: self.add_to_queue(self.get_checked_ids())],
-                                               ["Exit Select", lambda: self.main_view(force=True)]]
+        self.mult_specific_playlist_buttons = [
+            ["Remove from Playlist", lambda: self.remove_from_playlist(self.get_checked_ids(obj=self.song_list), self.playlistID)],
+            ["Add to Queue", lambda: self.add_to_queue(self.get_checked_ids(obj=self.song_list))],
+            ["Exit Select", lambda: self.main_view(force=True)]]
 
         self.topbar = ButtonFrame(self,
                                   button_values=self.mult_specific_playlist_buttons,
@@ -362,14 +371,14 @@ class Playlists(ctk.CTkFrame):
         with open("Databases\\queue.json", "w") as f:
             json.dump(queue_config, f, indent=0)
             f.close()
+        self.player_callback.load_song(song_ids[0])
 
-    def get_checked_ids(self):
-        checked = self.song_list.get_checkboxes()
+    def get_checked_ids(self, obj):
+        checked = obj.get_checkboxes()
         songIDs = []
         for song in checked:
             songIDs.append(int(song.split(" ")[0]))
         return songIDs
-
 
     def retrieve_song_names(self, songIDs):
         raw_song_names = []
@@ -390,7 +399,7 @@ class Playlists(ctk.CTkFrame):
         dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
         name = dialog.get_input().strip()
         if name != "" and name != None:
-            db = self.init_playlist_list_database()
+            db = init_playlist_list_database()
             cursor = db.cursor()
             cursor.execute(
                 "INSERT INTO "
@@ -402,43 +411,34 @@ class Playlists(ctk.CTkFrame):
             db.commit()
             self.playlist_list_db = db
 
-    def delete_playlist(self):
-        print("Delete Playlist")
-
-    def init_playlist_list_database(self):
-        """
-        Initialises music_ops.db and Playlist_List table or creates them if they don't exist.
-        :return: SQLite3 db object
-        """
-        db = sqlite3.connect(r"Databases\music_ops.db")
+    def remove_from_playlist(self, song_ids:list, playlistID):
+        db = init_playlist_database()
         cursor = db.cursor()
-        query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
-                 "Playlist_List("
-                 "PlaylistID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                 "Name TEXT"
-                 ")")
-        cursor.execute(query)
-        db.commit()  # Committing the query
-        return db
+        query = "DELETE FROM Playlist WHERE songID = (?) AND playlistID = (?)"
+        for song_id in song_ids:
+            cursor.execute(query, (int(song_id), int(playlistID)))
+        db.commit()
+        db.close()
 
-    def init_playlist_database(self):
-        """
-        Initialises music_ops.db and songs table or creates them if they don't exist.
-        :return: SQLite3 db object
-        """
-        db = sqlite3.connect(r"Databases\music_ops.db")
+    def delete_playlists(self, playlistIDs):
+        db = init_playlist_database()
         cursor = db.cursor()
-        query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
-                 "Playlist("
-                 "PlaylistID INTEGER,"
-                 "songID INTEGER"
-                 ")")
-        cursor.execute(query)
-        db.commit()  # Committing the query
-        return db
+        query = "DELETE FROM Playlist WHERE playlistID = (?)"
+        for playlistID in playlistIDs:
+            cursor.execute(query, (int(playlistID),))
+        db.commit()
+        db.close()
+
+        db = init_playlist_list_database()
+        cursor = db.cursor()
+        query = "DELETE FROM Playlist_List WHERE playlistID = (?)"
+        for playlistID in playlistIDs:
+            cursor.execute(query, (int(playlistID),))
+        db.commit()
+        db.close()
 
     def retrieve_playlist_songIDs(self, playlistID):
-        db = self.init_playlist_database()
+        db = init_playlist_database()
         cursor = db.cursor()
         query = "SELECT songID FROM Playlist WHERE playlistID = ?"
         cursor.execute(query, (playlistID,))
@@ -719,6 +719,13 @@ class Player(ctk.CTkFrame):
         db.commit()
         db.close()
 
+        db = init_playlist_database()
+        cursor = db.cursor()
+        query = "DELETE FROM Playlist WHERE songID = ?"
+        cursor.execute(query, (self.songID,))
+        db.commit()
+        db.close()
+
     def seek(self, time):
         self.seeking=True
         self.player.seek(float(time))
@@ -809,7 +816,7 @@ class App(ctk.CTk):
         self.player = Player(self, font=DEFAULT_FONT)
         self.player.grid(row=1, column=0, padx=(10, 10), pady=(5, 5), sticky="ew")
 
-        self.tab_view = MyTabView(self, font=DEFAULT_FONT, player_callback=self.player.load_song)
+        self.tab_view = MyTabView(self, font=DEFAULT_FONT, player_callback=self.player)
         self.tab_view.grid(row=0, column=0, padx=(10,10), pady=(5,5), sticky="nsew")
         self.tab_view.grid_columnconfigure(0, weight=1)
         self.tab_view.grid_rowconfigure(0, weight=1)

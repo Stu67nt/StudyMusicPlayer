@@ -5,6 +5,7 @@ import sqlite3
 import downloader
 import json
 import threading
+from utils import *
 
 """
 TODO: 
@@ -339,7 +340,7 @@ class SongLabel(ctk.CTkFrame):
             self.menu.grab_release()
 
     def play_song(self, event):
-        self.player_callback(self.songID)
+        self.player_callback.load_song(self.songID)
 
     def retrieve_song(self):
         self.db = downloader.init_database()
@@ -362,6 +363,13 @@ class SongLabel(ctk.CTkFrame):
         db = downloader.init_database()
         cursor = db.cursor()
         query = "DELETE FROM songs WHERE songID = ?"
+        cursor.execute(query, (self.songID,))
+        db.commit()
+        db.close()
+
+        db = init_playlist_database()
+        cursor = db.cursor()
+        query = "DELETE FROM Playlist WHERE songID = ?"
         cursor.execute(query, (self.songID,))
         db.commit()
         db.close()
@@ -403,7 +411,8 @@ class PlaylistLabel(ctk.CTkFrame):
                  playlistID: int,
                  playlist_name,
                  font: ctk.CTkFont,
-                 open_playlist_callback):
+                 open_playlist_callback,
+                 player_callback):
         super().__init__(master)
 
         self.grid_rowconfigure(1, weight=1)
@@ -411,6 +420,7 @@ class PlaylistLabel(ctk.CTkFrame):
 
         self.playlist_name = playlist_name
         self.playlistID = playlistID
+        self.player_callback = player_callback
 
         self.name_label = ctk.CTkLabel(self, text = playlist_name, font = font)
         self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
@@ -419,11 +429,16 @@ class PlaylistLabel(ctk.CTkFrame):
         self.options_button = ctk.CTkLabel(self, text = "⋮", font = self.options_button_font)
         self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
-        MENU_OPTIONS = ["Delete Playlist", "Add to Queue", "Rename Playlist", "Overwrite Queue"]
+        MENU_OPTIONS = [["Delete Playlist", self.delete_playlist],
+                        ["Add to Queue", self.add_to_queue],
+                        ["Rename Playlist", self.rename_playlist],
+                        ["Overwrite Queue", self.overwrite_queue]]
 
         self.menu = tk.Menu(self, tearoff=0)
-        for name in MENU_OPTIONS:
-            self.menu.add_command(label=name)
+        for option in MENU_OPTIONS:
+            name = option[0]
+            func = option[1]
+            self.menu.add_command(label=name, command=func)
 
         self.options_button.bind("<Button-1>", self.menu_trigger)
         self.bind("<Button-1>", lambda event=None: open_playlist_callback(event = event))
@@ -433,3 +448,77 @@ class PlaylistLabel(ctk.CTkFrame):
             self.menu.tk_popup(event.x_root, event.y_root)
         finally:
             self.menu.grab_release()
+
+    def temp(self):
+        print("temp")
+
+    def delete_playlist(self):
+        db = init_playlist_database()
+        cursor = db.cursor()
+        query = "DELETE FROM Playlist WHERE playlistID = (?)"
+        cursor.execute(query, (self.playlistID,))
+        db.commit()
+        db.close()
+
+        db = init_playlist_list_database()
+        cursor = db.cursor()
+        query = "DELETE FROM Playlist_List WHERE playlistID = (?)"
+        cursor.execute(query, (self.playlistID,))
+        db.commit()
+        db.close()
+
+    def add_to_queue(self):
+        queue_settings = self.player_callback.load_queue()
+        queue = queue_settings['queue']
+        current_index = queue_settings['current_index']
+        song_ids = self.retrieve_playlist_songIDs(self.playlistID)
+        for song_id in song_ids:
+            queue.append(song_id)
+
+        queue_config = {
+            "current_index": current_index,
+            "queue": queue,
+        }
+        with open("Databases\\queue.json", "w") as f:
+            json.dump(queue_config, f, indent=0)
+            f.close()
+
+    def overwrite_queue(self):
+        queue_settings = self.player_callback.load_queue()
+        queue = self.retrieve_playlist_songIDs(self.playlistID)
+        current_index = 0
+
+        queue_config = {
+            "current_index": current_index,
+            "queue": queue,
+        }
+        with open("Databases\\queue.json", "w") as f:
+            json.dump(queue_config, f, indent=0)
+            f.close()
+        self.player_callback.load_song(queue[current_index])
+
+    def rename_playlist(self, event=None):
+        dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
+        name = dialog.get_input().strip()
+        if name != "" and name != None:
+            db = init_playlist_list_database()
+            cursor = db.cursor()
+            cursor.execute(
+                "UPDATE Playlist_List "
+                "SET Name = ? "
+                "WHERE playlistID = ?",
+                (name, self.playlistID,))
+            db.commit()
+            db.close()
+
+    def retrieve_playlist_songIDs(self, playlistID):
+        db = init_playlist_database()
+        cursor = db.cursor()
+        query = "SELECT songID FROM Playlist WHERE playlistID = ?"
+        cursor.execute(query, (playlistID,))
+        songs_unfiltered = cursor.fetchall()
+
+        song_ids = []
+        for songID in songs_unfiltered:
+            song_ids.append(songID[0])
+        return song_ids
