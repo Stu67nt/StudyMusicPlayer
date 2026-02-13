@@ -171,12 +171,10 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
         cursor = db.cursor()
         query = "DELETE FROM songs WHERE songID = ?"
         for song in checked:
-            song_id = song.split(" ")[-1]
+            song_id = song.split(" ")[0]
             cursor.execute(query, (song_id,))
         db.commit()
         db.close()
-
-
 
         self.select_multiple()
 
@@ -228,14 +226,15 @@ class Playlists(ctk.CTkFrame):
 
         self.playlist_list_db = init_playlist_list_database()
         self.playlist_db = init_playlist_database()
-        self.old_playlistIDs = None
+        self.old_playlist_names = None
 
         self.main_view()
 
     def main_view(self, force = False):
-        self.playlistIDs = self.retrieve_playlistIDs()
-        if self.playlistIDs != self.old_playlistIDs or force == True:
-            self.old_playlistIDs = self.playlistIDs
+        current_playlist_names = self.retrieve_playlist_names()
+        if current_playlist_names != self.old_playlist_names or force:
+            self.playlistIDs = self.retrieve_playlistIDs()
+            self.old_playlist_names = current_playlist_names
             destroy_widgets(self.widgets)
             self.topbar = ButtonFrame(self,
                                       button_values=self.main_topbar_buttons,
@@ -409,7 +408,8 @@ class Playlists(ctk.CTkFrame):
                 "VALUES (?)",
                 (name,))
             db.commit()
-            self.playlist_list_db = db
+            db.close()
+            self.main_view(force=True)
 
     def remove_from_playlist(self, song_ids:list, playlistID):
         db = init_playlist_database()
