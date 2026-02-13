@@ -9,7 +9,7 @@ def init_playlist_database():
 	cursor = db.cursor()
 	query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
 			 "Playlist("
-			 "PlaylistID INTEGER,"
+			 "PlaylistID INTEGER ,"
 			 "songID INTEGER"
 			 ")")
 	cursor.execute(query)
@@ -23,12 +23,11 @@ def init_playlist_list_database():
 	"""
 	db = sqlite3.connect(r"Databases\music_ops.db")
 	cursor = db.cursor()
-	querydsfdsfds = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
+	query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
              "Playlist_List(" 
-             "PlaylistID INTEGER ,"
+             "PlaylistID INTEGER PRIMARY KEY AUTOINCREMENT,"
 			 "Name TEXT"
              ")")
-	query = "DELETE FROM Playlist WHERE songID = 2"
 	cursor.execute(query)
 	db.commit()  # Committing the query
 	return db
