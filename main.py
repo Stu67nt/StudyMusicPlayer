@@ -216,7 +216,7 @@ class Playlists(ctk.CTkFrame):
                                     ["Select Multiple", self.select_multiple]]
         self.select_mult_topbar_buttons = [["Delete Playlists", self.delete_playlist],
                                            ["Exit Select", lambda :self.main_view(force=True)]]
-        self.specific_playlist_topbar_buttons = [["Overwrite Queue", self.overwrite_queue],
+        self.specific_playlist_topbar_buttons = [["Overwrite Queue", lambda: self.overwrite_queue(self.song_ids)],
                                                  ["Add to Queue", lambda: self.add_to_queue(self.song_ids)],
                                                  ["Select Multiple", self.specific_playlist_select_multiple],
                                                  ["Exit Playlist", lambda: self.main_view(force=True)]]
@@ -672,7 +672,7 @@ class Player(ctk.CTkFrame):
             try:
                 self.boot_player()
                 self.player.play()
-                self.player.volume = 0.5
+                self.player.volume = self.volume_slider.get()/100   # Change this to 0.5 to recreate a bug where volume woudl reset upon song change
             except:
                 self.song_end()
 
