@@ -606,7 +606,7 @@ class Player(ctk.CTkFrame):
 
     def queue_trigger(self, event):
         if self.queue_window is None or not self.queue_window.winfo_exists():
-            self.queue_window = QueueViewer(event, font= self.font)
+            self.queue_window = QueueViewer(event, font= self.font, player_callback=self)
         self.queue_window.focus()
 
     def song_end(self, load_previous: bool = False):
@@ -650,12 +650,16 @@ class Player(ctk.CTkFrame):
             if self.songID != -1:
                 self.queue.remove(self.songID)
                 self.song_end()
-            else:
-                pass
-        self.song_name = self.song_details[2]
-        self.artist = self.song_details[4]
-        self.duration.set(self.song_details[3])
-        self.filepath = self.song_details[1]
+
+            self.song_name = "No Song"
+            self.artist = "Frank Ocean"
+            self.duration = tk.IntVar(value=100)
+            self.filepath = None
+        else:
+            self.song_name = self.song_details[2]
+            self.artist = self.song_details[4]
+            self.duration.set(self.song_details[3])
+            self.filepath = self.song_details[1]
 
         if len(self.song_name) > 30:
             self.song_name = self.song_name[:27] + "..."

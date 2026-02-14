@@ -242,7 +242,8 @@ class Timer(ctk.CTkToplevel):
                                         fg_color="transparent")
         self.timer_frame.grid(row=1, column=0)
 
-        self.time_text = ctk.StringVar(value=f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}")
+        self.time_text_str = "%02d:%02d:%02d" % (self.hours_remaining.get(), self.mins_remaining.get(), self.secs_remaining.get())
+        self.time_text = ctk.StringVar(value=f"{self.time_text_str}")
         self.time_remaining_label = ctk.CTkLabel(self.timer_frame,
                                                  textvariable=self.time_text,
                                                  font=self.TIMER_FONT)
@@ -297,7 +298,8 @@ class Timer(ctk.CTkToplevel):
         """
         # Displaying updated time
         self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
-        self.time_text.set(f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}")
+        self.time_text_str = "%02d:%02d:%02d" % (self.hours_remaining.get(), self.mins_remaining.get(), self.secs_remaining.get())
+        self.time_text.set(self.time_text_str)
         pass
 
     def convert_time(self, secs):
@@ -315,7 +317,8 @@ class Timer(ctk.CTkToplevel):
             self.toggle_pause()
             return 0  # Needed so timer does not de icnrement once reset
         self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
-        self.time_text.set(f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}")
+        self.time_text_str = "%02d:%02d:%02d" % (self.hours_remaining.get(), self.mins_remaining.get(), self.secs_remaining.get())
+        self.time_text.set(self.time_text_str)
 
 
 class AddToPlaylist(ctk.CTkToplevel):
@@ -592,7 +595,7 @@ class DownloadSettings(ctk.CTkToplevel):
 
 
 class QueueViewer(ctk.CTkToplevel):
-    def __init__(self, event, font: ctk.CTkFont, *args, **kwargs):
+    def __init__(self, event, font: ctk.CTkFont, player_callback, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
@@ -602,14 +605,21 @@ class QueueViewer(ctk.CTkToplevel):
         self.font = font
         self.queue = []
         self.old_index = -1
+        self.player_callback = player_callback
 
         self.label = ctk.CTkLabel(self,
                                   text="Queue",
                                   font=self.font)
         self.label.grid(row=0, column=0, padx=(10, 10), pady=(10, 10), sticky="ew")
 
+        self.label = ctk.CTkButton(self,
+                                  text="Clear Queue",
+                                  font=self.font,
+                                  command = self.queue_clear)
+        self.label.grid(row=0, column=1, padx=(10, 10), pady=(10, 10), sticky="ew")
+
         self.queue_frame = ctk.CTkScrollableFrame(self, fg_color="transparent")
-        self.queue_frame.grid(row=1, column=0,pady=(10, 10), sticky="nsew")
+        self.queue_frame.grid(row=1, column=0, columnspan=2, pady=(10, 10), sticky="nsew")
         self.queue_frame.grid_columnconfigure(0, weight=1)
 
         self.update_queue(event)
@@ -632,11 +642,13 @@ class QueueViewer(ctk.CTkToplevel):
             for songID in self.queue:
                 self.song_details = self.retrieve_song(songID)
                 if self.song_details != None:
+                    self.songID = songID
                     self.song_name = self.song_details[2]
                     self.artist = self.song_details[4]
 
-                    self.song_label_frame = ctk.CTkFrame(self.queue_frame, corner_radius=0)
+                    self.song_label_frame = ctk.CTkFrame(self.queue_frame, corner_radius=0, border_color="grey10", border_width=1)
                     self.song_label_frame.grid(column=0, row=i, sticky="ew", padx=(10, 10))
+                    self.song_label_frame.grid_columnconfigure((1,2), weight=1)
 
                     if songID == event.widget.master.master.songID:
                         self.song_label_frame.configure(fg_color="grey10")
@@ -648,6 +660,20 @@ class QueueViewer(ctk.CTkToplevel):
                     self.artist_name_label = ctk.CTkLabel(self.song_label_frame, text=self.artist,
                                                           font=self.font)
                     self.artist_name_label.grid(row=1, column=1, padx=(5,5), pady=(5, 5), sticky="w")
+
+                    options_button_font = ctk.CTkFont(family="Cascadia Mono", size=30, weight="bold")
+                    self.remove_button = ctk.CTkLabel(self.song_label_frame, text="X", font=options_button_font)
+                    self.remove_button.grid(column=2, row=0, rowspan=2, padx=(5,5), pady=(5,5), sticky="e")
+
+                    self.song_label_frame.bind("<Button-1>",
+                                             lambda event, sID=songID: self.jump_to_song(event, sID))
+                    self.song_name_label.bind("<Button-1>",
+                                             lambda event, sID=songID: self.jump_to_song(event, sID))
+                    self.artist_name_label.bind("<Button-1>",
+                                             lambda event, sID=songID: self.jump_to_song(event, sID))
+                    self.remove_button.bind("<Button-1>",
+                                             lambda event, sID=songID: self.remove_from_queue(event, sID))
+
                     i += 1
 
         self.after(200, lambda: self.update_queue(event))
@@ -660,6 +686,55 @@ class QueueViewer(ctk.CTkToplevel):
         song_details = cursor.fetchone()
         self.db.close()
         return song_details
+
+    def menu_trigger(self, event):
+        try:
+            self.menu.tk_popup(event.x_root, event.y_root)
+        finally:
+            self.menu.grab_release()
+
+    def jump_to_song(self, event, songID):
+        queue_settings = self.load_queue()
+        queue = queue_settings["queue"]
+        current_index = queue.index(songID)
+        queue_settings = {
+            "current_index": current_index,
+            "queue": queue
+        }
+        with open("Databases\\queue.json", "w") as f:
+            json.dump(queue_settings, f, indent=0)
+            f.close()
+        self.player_callback.load_song(songID)
+
+    def remove_from_queue(self, event, songID):
+        queue_settings = self.load_queue()
+        queue = queue_settings["queue"]
+        current_index = queue_settings["current_index"]
+        if current_index >= queue.index(songID):
+            queue.remove(songID)
+            current_index -= 1
+        else:
+            queue.remove(songID)
+        if len(queue) == 0:  # Queue cannot be left blank
+            queue = [-1]
+            current_index = 0
+        queue_settings = {
+            "current_index": current_index,
+            "queue": queue
+        }
+
+        with open("Databases\\queue.json", "w") as f:
+            json.dump(queue_settings, f, indent=0)
+            f.close()
+
+    def queue_clear(self):
+        queue_settings = {
+            "current_index": 0,
+            "queue": [-1]
+        }
+        with open("Databases\\queue.json", "w") as f:
+            json.dump(queue_settings, f, indent=0)
+            f.close()
 
 def destroy_widgets(widgets):
     for widget in widgets:

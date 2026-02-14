@@ -311,7 +311,8 @@ class SongLabel(ctk.CTkFrame):
         self.artist_label = ctk.CTkLabel(self, text = self.artist, font = self.font)
         self.artist_label.grid(column=1, row=1, padx=(10, 10), sticky="nw")
 
-        self.duration_label = ctk.CTkLabel(self, text=f"{self.mins}:{self.secs}", font = self.font)
+        self.time_text_str = "%d:%02d" % (self.mins, self.secs)
+        self.duration_label = ctk.CTkLabel(self, text=self.time_text_str, font = self.font)
         self.duration_label.grid(column=2, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
         self.options_button_font = ctk.CTkFont(family="Cascadia Mono", size=30, weight="bold")
