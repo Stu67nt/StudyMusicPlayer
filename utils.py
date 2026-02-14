@@ -32,3 +32,8 @@ def init_playlist_list_database():
 	db.commit()  # Committing the query
 	return db
 
+def on_enter(event=None):
+	event.widget.configure(cursor="hand2")
+
+def on_leave(event=None):
+	event.widget.configure(cursor="")
