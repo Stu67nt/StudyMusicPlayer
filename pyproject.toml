@@ -25,9 +25,6 @@ dependencies = [
 [project.scripts]
 studymusicplayer = "studymusicplayer.main:main"
 
-[tool.setuptools.package-data]
-"studymusicplayer" = 
-
 [tool.hatch.build.targets.wheel]
 packages = ["studymusicplayer"]
 include = [
