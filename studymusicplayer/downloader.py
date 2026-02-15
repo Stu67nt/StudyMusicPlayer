@@ -28,10 +28,6 @@ class MyLogger:
                 self.output.yview(tk.END)
             else:
                 self.info(msg)
-                self.output.configure(state='normal')
-                self.output.insert(tk.END, msg + "\n")
-                self.output.configure(state='disabled')
-                self.output.yview(tk.END)
         except:
             self.output.configure(state='disabled')
             self.output.yview(tk.END)
