@@ -105,7 +105,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		self.widgets.append(self.track_list)
 
 	def refresh_tracks(self):
-		filepath = str(os.path.abspath(os.getcwd()))+"\\Songs"
+		filepath = str(os.path.abspath(os.getcwd()))+"/Songs"
 		db = downloader.init_database()
 		cursor = db.cursor()
 		cursor.execute("SELECT file_path FROM songs")
@@ -114,9 +114,9 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		for current_filepath in all_filepaths_raw:
 			all_filepaths.append(current_filepath[0])
 		for file in os.listdir(filepath):
-			if all_filepaths == [] or (filepath+"\\"+file not in all_filepaths):
+			if all_filepaths == [] or (filepath+"/"+file not in all_filepaths):
 				try:
-					tt.TinyTag.get(f"Songs\\{file}")
+					tt.TinyTag.get(f"Songs/{file}")
 					print(f"{file} is an valid file")
 					self.add_song(db, file)
 				except Exception as err:
@@ -125,7 +125,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		db.close()
 
 	def add_song(self, db, song_file_name):
-		filepath = str(os.path.abspath(os.getcwd())) + "\\Songs\\" + song_file_name
+		filepath = str(os.path.abspath(os.getcwd())) + "/Songs/" + song_file_name
 		song = tt.TinyTag.get(filepath)  # Extracting the metadata
 		# Gives title of song if held in metadata otherise we use file name
 		song_name = song.title if song.title != None else song_file_name
@@ -337,7 +337,7 @@ class Playlists(ctk.CTkFrame):
 		self.widgets.append(self.topbar)
 
 	def load_queue(self):
-		with open("Databases\\queue.json", "r") as f:
+		with open("Databases/queue.json", "r") as f:
 			queue_settings = json.load(f)
 			f.close()
 		return queue_settings
@@ -353,7 +353,7 @@ class Playlists(ctk.CTkFrame):
 			"current_index": self.current_index,
 			"queue": self.queue,
 		}
-		with open("Databases\\queue.json", "w") as f:
+		with open("Databases/queue.json", "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 
@@ -362,7 +362,7 @@ class Playlists(ctk.CTkFrame):
 			"current_index": 0,
 			"queue": song_ids
 		}
-		with open("Databases\\queue.json", "w") as f:
+		with open("Databases/queue.json", "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 		self.player_callback.load_song(song_ids[0])
@@ -637,14 +637,14 @@ class Player(ctk.CTkFrame):
 			"current_index": self.current_index,
 			"queue": self.queue,
 		}
-		with open("Databases\\queue.json", "w") as f:
+		with open("Databases/queue.json", "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 		if len(self.queue) != 0:
 			self.load_song(self.queue[self.current_index])
 
 	def load_queue(self):
-		with open("Databases\\queue.json", "r") as f:
+		with open("Databases/queue.json", "r") as f:
 			queue_settings = json.load(f)
 			f.close()
 		if -1 in queue_settings["queue"] and (len(queue_settings["queue"]) >= 2):
@@ -769,7 +769,7 @@ class Player(ctk.CTkFrame):
 			"current_index": 0,
 			"queue": [-1]
 		}
-		with open("Databases\\queue.json", "w") as f:
+		with open("Databases/queue.json", "w") as f:
 			json.dump(queue_settings, f, indent=0)
 			f.close()
 

@@ -94,8 +94,8 @@ def init_database():
     return db
 
 def add_song(db, song_file_name):
-    file_path = str(os.path.abspath(os.getcwd())) + "\\Songs\\" + song_file_name
-    song = tt.TinyTag.get(str(os.path.abspath(os.getcwd())) + "\\Temp Downloads\\" + song_file_name)  # Extracting the metadata
+    file_path = str(os.path.abspath(os.getcwd())) + "/Songs/" + song_file_name
+    song = tt.TinyTag.get(str(os.path.abspath(os.getcwd())) + "/Temp Downloads/" + song_file_name)  # Extracting the metadata
     # Gives title of song if held in metadata otherise we use file name
     song_name = song.title if song.title != None else song_file_name
     song_duration = int(round(song.duration))  # Gives length of songs as seconds
@@ -143,17 +143,17 @@ def download(url: list, config: dict):
         for file in os.listdir("Temp Downloads"):
             # Try except for catching valid files
             try:
-                tt.TinyTag.get(fr"Temp Downloads\{file}")
+                tt.TinyTag.get(f"Temp Downloads/{file}")
                 print(f"{file} is an valid file")
                 add_song(db, file)
-                move_file(file, fr"Temp Downloads\{file}", str(os.path.abspath(os.getcwd()))+"\\Songs")
+                move_file(file, f"Temp Downloads/{file}", str(os.path.abspath(os.getcwd()))+"/Songs")
             except Exception as err:
                 print(f"{file} is not an audio file")  # Means file is not an audio file
                 print(err)
 
 def create_download_config(file_name, output=None, progress_bar=None):
-    dir = str(os.path.abspath(os.getcwd())) + r"\\Temp Downloads\\"
-    f = open("Databases\\config.json")
+    dir = str(os.path.abspath(os.getcwd())) + "/Temp Downloads/"
+    f = open("Databases/config.json")
     settings = json.load(f)
     f.close()
     download_config = {
@@ -199,7 +199,7 @@ if __name__ == "__main__":
     file_path = createConsoleLog()
     download_config = create_download_config(file_path)
     download("https://www.youtube.com/playlist?list=PLETosy7ETA_uKsH9Zi8WazVPMtHuri4gQ", download_config)
-    print(str(os.path.abspath(os.getcwd()))+"\\Songs")
+    print(str(os.path.abspath(os.getcwd()))+"/Songs")
 
 """
 TEST CASE:

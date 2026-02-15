@@ -5,7 +5,7 @@ def init_playlist_database():
 	Initialises music_ops.db and songs table or creates them if they don't exist.
 	:return: SQLite3 db object
 	"""
-	db = sqlite3.connect(r"Databases\music_ops.db")
+	db = sqlite3.connect(r"Databases/music_ops.db")
 	cursor = db.cursor()
 	query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
 			 "Playlist("
@@ -21,7 +21,7 @@ def init_playlist_list_database():
     Initialises music_ops.db and songs table or creates them if they don't exist.
     :return: SQLite3 db object
 	"""
-	db = sqlite3.connect(r"Databases\music_ops.db")
+	db = sqlite3.connect("Databases/music_ops.db")
 	cursor = db.cursor()
 	query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
              "Playlist_List(" 

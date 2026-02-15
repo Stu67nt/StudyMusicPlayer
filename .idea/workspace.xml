@@ -4,12 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Fixed issue where artist name would exceed 30 chars squeezing the playbar, fixed issue where windows would not focus properly upon creation, added hover over effect for label buttons">
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Allowing building from source">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/Components.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Databases/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/Databases/config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/downloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/downloader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,30 +51,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Components.executor": "Run",
-    "Python.Snake.executor": "Run",
-    "Python.com.executor": "Run",
-    "Python.downloader.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.music_app.executor": "Run",
-    "Python.test.executor": "Run",
-    "Python.tkintertest.executor": "Run",
-    "Python.widgets.executor": "Run",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/PycharmProjects/TerminalVideoPlayer",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
-    "to.speed.mode.migration.done": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Components.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Snake.executor&quot;: &quot;Run&quot;,
+    &quot;Python.com.executor&quot;: &quot;Run&quot;,
+    &quot;Python.downloader.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.music_app.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.tkintertest.executor&quot;: &quot;Run&quot;,
+    &quot;Python.widgets.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/PycharmProjects/TerminalVideoPlayer&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings module-name="StudyMusicPlayer" is-module-sdk="true">
@@ -103,14 +104,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762512459658</updated>
-    </task>
-    <task id="LOCAL-00008" summary=".">
-      <option name="closed" value="true" />
-      <created>1767805803258</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1767805803258</updated>
     </task>
     <task id="LOCAL-00009" summary="Fixed A lot of formatting issues and created a slightly more proper track menu.">
       <option name="closed" value="true" />
@@ -496,7 +489,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771106021075</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="Allowing building from source">
+      <option name="closed" value="true" />
+      <created>1771117693598</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1771117693598</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -517,7 +518,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed scaling issue with radio button" />
     <MESSAGE value="Created customisable config to adjust download settings" />
     <MESSAGE value="Removed placeholder song frame. Deprecated song search." />
     <MESSAGE value="Fixed embedding thumbnails" />
@@ -542,7 +542,8 @@
     <MESSAGE value="playlist_list table now generates correctly. Added force refresh for playlists upon renaming" />
     <MESSAGE value="Added queue jump, skip and clear" />
     <MESSAGE value="Fixed issue where artist name would exceed 30 chars squeezing the playbar, fixed issue where windows would not focus properly upon creation, added hover over effect for label buttons" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed issue where artist name would exceed 30 chars squeezing the playbar, fixed issue where windows would not focus properly upon creation, added hover over effect for label buttons" />
+    <MESSAGE value="Allowing building from source" />
+    <option name="LAST_COMMIT_MESSAGE" value="Allowing building from source" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

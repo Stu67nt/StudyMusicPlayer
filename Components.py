@@ -596,7 +596,7 @@ class DownloadSettings(ctk.CTkToplevel):
 		elif add_thumbnail == "No":
 			self.options["write_thumbnail"] = False
 
-		with open("Databases\\config.json", "w") as f:
+		with open("Databases/config.json", "w") as f:
 			json.dump(self.options, f, indent=4)
 			f.close()
 		self.destroy()
@@ -633,7 +633,7 @@ class QueueViewer(ctk.CTkToplevel):
 		self.update_queue(event)
 
 	def load_queue(self):
-		with open("Databases\\queue.json", "r") as f:
+		with open("Databases/queue.json", "r") as f:
 			queue_settings = json.load(f)
 			f.close()
 		return queue_settings
@@ -720,7 +720,7 @@ class QueueViewer(ctk.CTkToplevel):
 			"current_index": current_index,
 			"queue": queue
 		}
-		with open("Databases\\queue.json", "w") as f:
+		with open("Databases/queue.json", "w") as f:
 			json.dump(queue_settings, f, indent=0)
 			f.close()
 		self.player_callback.load_song(songID)
@@ -742,7 +742,7 @@ class QueueViewer(ctk.CTkToplevel):
 			"queue": queue
 		}
 
-		with open("Databases\\queue.json", "w") as f:
+		with open("Databases/queue.json", "w") as f:
 			json.dump(queue_settings, f, indent=0)
 			f.close()
 
@@ -751,7 +751,7 @@ class QueueViewer(ctk.CTkToplevel):
 			"current_index": 0,
 			"queue": [-1]
 		}
-		with open("Databases\\queue.json", "w") as f:
+		with open("Databases/queue.json", "w") as f:
 			json.dump(queue_settings, f, indent=0)
 			f.close()
 

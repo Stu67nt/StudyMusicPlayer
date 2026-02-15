@@ -384,7 +384,7 @@ class SongLabel(ctk.CTkFrame):
 
 
 	def load_queue(self):
-		with open("Databases\\queue.json", "r") as f:
+		with open("Databases/queue.json", "r") as f:
 			queue_settings = json.load(f)
 			f.close()
 		return queue_settings
@@ -399,7 +399,7 @@ class SongLabel(ctk.CTkFrame):
 			"current_index": self.current_index,
 			"queue": self.queue,
 		}
-		with open("Databases\\queue.json", "w") as f:
+		with open("Databases/queue.json", "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 
@@ -492,7 +492,7 @@ class PlaylistLabel(ctk.CTkFrame):
 			"current_index": current_index,
 			"queue": queue,
 		}
-		with open("Databases\\queue.json", "w") as f:
+		with open("Databases/queue.json", "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 
@@ -505,7 +505,7 @@ class PlaylistLabel(ctk.CTkFrame):
 			"current_index": current_index,
 			"queue": queue,
 		}
-		with open("Databases\\queue.json", "w") as f:
+		with open("Databases/queue.json", "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 		self.player_callback.load_song(queue[current_index])
