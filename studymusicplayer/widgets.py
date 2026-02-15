@@ -5,7 +5,7 @@ import sqlite3
 import downloader
 import json
 import threading
-from studymusicplayer.utils import *
+from .utils import *
 from pathlib import Path
 
 """

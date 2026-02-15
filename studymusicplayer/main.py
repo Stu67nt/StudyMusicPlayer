@@ -1,10 +1,10 @@
 import customtkinter as ctk
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
-from studymusicplayer import downloader
-from studymusicplayer.widgets import *
-from studymusicplayer.Components import *
-from studymusicplayer.utils import *
+import downloader
+from .widgets import *
+from .Components import *
+from .utils import *
 from PIL import Image  # Used for thumbnails
 import pyglet  # Used for audio
 import tinytag as tt

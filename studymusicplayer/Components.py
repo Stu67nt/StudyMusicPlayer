@@ -1,6 +1,6 @@
-from studymusicplayer import downloader
-from studymusicplayer.widgets import *
-from studymusicplayer.utils import *
+import downloader
+from .widgets import *
+from .utils import *
 import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
