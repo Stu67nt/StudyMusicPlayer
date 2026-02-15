@@ -2,7 +2,7 @@ import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
 import sqlite3
-import downloader
+from . import downloader
 import json
 import threading
 from .utils import *

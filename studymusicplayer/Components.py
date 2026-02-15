@@ -1,4 +1,4 @@
-import downloader
+from . import downloader
 from .widgets import *
 from .utils import *
 import customtkinter as ctk
