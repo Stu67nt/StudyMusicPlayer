@@ -485,15 +485,19 @@ class PlaylistFrame(ctk.CTkFrame):
 		return playlist
 
 class SearchFrame(ctk.CTkFrame):
-	def __init__(self, master, font=ctk.CTkFont, progress_bar_callback=None):
+	def __init__(self, master, font=ctk.CTkFont, progress_bar_callback=None, download_log_callback=None):
 		super().__init__(master)
 
+		self.grid_rowconfigure(3, weight=1)
 		self.grid_columnconfigure(0, weight=1)
+
+
 		self.BUTTONS = [["Download Song", self.search],
 						["Download Settings", self.download_settings]]
 		self.font = font
 		self.settings_screen = None
 		self.progress_bar_callback = progress_bar_callback
+		self.download_log_callback = download_log_callback
 
 		self.title = ctk.CTkLabel(self,
 								  text = "Download a song from YouTube",
@@ -512,11 +516,13 @@ class SearchFrame(ctk.CTkFrame):
 		print(f"Downloading the url {inp}")
 		try:
 			threading.Thread(target = downloader.download,
-							 args = (inp, downloader.create_download_config(self.progress_bar_callback)),
+							 args = (inp,
+									 downloader.create_download_config(file_name = downloader.createConsoleLog(),
+																	   progress_bar = self.progress_bar_callback,
+																	   output = self.download_log_callback)),
 							 daemon = False).start()
 		except Exception as err:
 			tk.messagebox.showerror("Download Error", err)
-			print("Complete!")
 
 
 	def download_settings(self, event = None):

@@ -8,6 +8,50 @@ import shutil
 import tkinter as tk
 import json
 
+
+class MyLogger:
+    def __init__(self, file_name:str, output):
+        self.file_name = file_name
+        self.output = output
+        self.file = open(f"{file_name}", "w", encoding="utf-8")
+
+    def debug(self, msg):
+        # For compatibility with youtube-dl, both debug and info are passed into debug
+        # You can distinguish them by the prefix '[debug] '
+        if msg.startswith('[debug] '):
+            self.file.write(msg+"\n")
+            self.output.configure(state='normal')
+            self.output.insert(tk.END, msg+"\n")
+            self.output.configure(state='disabled')
+            self.output.yview(tk.END)
+        else:
+            self.info(msg)
+            self.output.configure(state='normal')
+            self.output.insert(tk.END, msg + "\n")
+            self.output.configure(state='disabled')
+            self.output.yview(tk.END)
+
+    def info(self, msg):
+        self.file.write(msg+"\n")
+        self.output.configure(state='normal')
+        self.output.insert(tk.END, msg + "\n")
+        self.output.configure(state='disabled')
+        self.output.yview(tk.END)
+
+    def warning(self, msg):
+        self.file.write(msg+"\n")
+        self.output.configure(state='normal')
+        self.output.insert(tk.END, msg + "\n")
+        self.output.configure(state='disabled')
+        self.output.yview(tk.END)
+
+    def error(self, msg):
+        self.file.write(msg+"\n")
+        self.output.configure(state='normal')
+        self.output.insert(tk.END, msg + "\n")
+        self.output.configure(state='disabled')
+        self.output.yview(tk.END)
+
 def createConsoleLog():
     """
     Creates a file for storing logs of console.
@@ -27,7 +71,6 @@ def progressHook(d, progress_bar):
         pass
         progress_bar['value'] = float(0)
     elif d['status'] == 'downloading':
-        print(d["_percent_str"])
         progress_bar['value'] = float((d["_percent_str"]).replace(" ", "").replace("%", ""))
 
 def init_database():
@@ -90,8 +133,7 @@ def download(url: list, config: dict):
     :param progress_bar:
     :return:
     """
-    file_path = createConsoleLog()
-    logging.basicConfig(level=logging.NOTSET, filename=file_path)
+
     with yt_dlp.YoutubeDL(config) as ydl:
         try:
             ydl.download(url)
@@ -109,7 +151,7 @@ def download(url: list, config: dict):
                 print(f"{file} is not an audio file")  # Means file is not an audio file
                 print(err)
 
-def create_download_config(progress_bar):
+def create_download_config(file_name, output=None, progress_bar=None):
     dir = str(os.path.abspath(os.getcwd())) + r"\\Temp Downloads\\"
     f = open("Databases\\config.json")
     settings = json.load(f)
@@ -128,7 +170,7 @@ def create_download_config(progress_bar):
         # Used for thumbnails
         'writethumbnail': settings['format'],
         # Used for creating error logs
-        'logger': logging.getLogger(__name__),
+        'logger': MyLogger(file_name=file_name, output=output),
         # Does embedding stuff
         'postprocessors': [  # Create a bug here by swapping the order of Embdeds thumbnail and embeds metadata
             # Embeds Metadata
@@ -154,7 +196,8 @@ def create_download_config(progress_bar):
     return download_config
 
 if __name__ == "__main__":
-    download_config = create_download_config()
+    file_path = createConsoleLog()
+    download_config = create_download_config(file_path)
     download("https://www.youtube.com/playlist?list=PLETosy7ETA_uKsH9Zi8WazVPMtHuri4gQ", download_config)
     print(str(os.path.abspath(os.getcwd()))+"\\Songs")
 

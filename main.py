@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
+from tkinter.scrolledtext import ScrolledText
 import downloader
 from widgets import *
 from Components import *
@@ -108,10 +109,12 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		db = downloader.init_database()
 		cursor = db.cursor()
 		cursor.execute("SELECT file_path FROM songs")
-		all_filepaths = cursor.fetchall()
-		i=0
+		all_filepaths_raw = cursor.fetchall()
+		all_filepaths = []
+		for current_filepath in all_filepaths_raw:
+			all_filepaths.append(current_filepath[0])
 		for file in os.listdir(filepath):
-			if all_filepaths == [] or filepath+"\\"+file not in all_filepaths[i]:
+			if all_filepaths == [] or (filepath+"\\"+file not in all_filepaths):
 				try:
 					tt.TinyTag.get(f"Songs\\{file}")
 					print(f"{file} is an valid file")
@@ -119,7 +122,6 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 				except Exception as err:
 					print(f"{file} is not an audio file")  # Means file is not an audio file
 					print(err)
-			i+=1
 		db.close()
 
 	def add_song(self, db, song_file_name):
@@ -474,14 +476,21 @@ class MusicFinder(ctk.CTkFrame):
 	def __init__(self, master, font: ctk.CTkFont):
 		super().__init__(master, fg_color = "transparent")
 
-		self.grid_rowconfigure(0, weight=0)
-		self.grid_rowconfigure(1, weight=1)
+		self.grid_rowconfigure(2, weight=1)
 		self.grid_columnconfigure(0, weight = 1)
 
-		self.progress_bar = tk.ttk.Progressbar(self,maximum=100)
+		self.font = font
+
+		self.progress_bar = tk.ttk.Progressbar(self, maximum=100)
 		self.progress_bar.grid(row=1, column=0, sticky="new", padx=(10,10), pady=(10,10))
 
-		self.search_frame = SearchFrame(self, font=font, progress_bar_callback=self.progress_bar)
+		self.download_output = ScrolledText(self, font=self.font, height=12, state="disabled", bg="gray20", fg="white")
+		self.download_output.grid(row=2, column=0, sticky="nsew", pady=(10, 10), padx=(10, 10))
+
+		self.search_frame = SearchFrame(self,
+										font=self.font,
+										progress_bar_callback=self.progress_bar,
+										download_log_callback=self.download_output)
 		self.search_frame.grid(row = 0, column = 0, sticky = "new", padx=(10, 10), pady=(10, 10))
 
 
@@ -751,9 +760,18 @@ class Player(ctk.CTkFrame):
 				song_obj = pyglet.media.load(song_fp, streaming=True)  # Turn freaming to false for Lots of bugs
 				self.player.queue(song_obj)
 			except Exception as err:
-				tk.messagebox.showwarning("Can't play song", "Song cannot be played removing song from database.")
+				tk.messagebox.showwarning("Can't play song", "Resetting Queue")
 				print(err)
-				self.delete_song()
+				self.queue_clear()
+
+	def queue_clear(self):
+		queue_settings = {
+			"current_index": 0,
+			"queue": [-1]
+		}
+		with open("Databases\\queue.json", "w") as f:
+			json.dump(queue_settings, f, indent=0)
+			f.close()
 
 	def volume_adjust(self, value):
 		self.player.volume = value/100
