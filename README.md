@@ -13,13 +13,19 @@ A Python music player with some study features such as a to do list and a timer.
 
 ## Usage Tutorial
 Download and Extract zip.  
-Run main.exe  
-Go to Music Finder 
-Paste in the URL of a Youtube Video
-Click Download Video
-Once downloaded, go to tracks and click on a song.
-To add song to queue click on 3 dots of a song and select Add to Queue. 
-  
+Open the extracted zip and run main.exe  
+
+EITHER:  
+Go to Music Finder
+Paste in the URL of a Youtube Video  
+Click Download Video  
+Once downloaded, go to tracks and click on a song for it to start playing.
+
+OR:  
+Move in any songs you wish to listen to, into the Songs folder.  
+Inside the program go to Tracks.  
+Hit refresh.  
+
 ## Build & Run
 This program has only been compiled for Windows 11.
 #### Windows
