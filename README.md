@@ -33,6 +33,9 @@ Download the main.zip in the latest release.
 Extract folder.  
 Run main.exe
 
+#### Running from Source Code
+When running from the source code the Music Finder will fail to embed any metadata to the song as it relies on some dependancies to do so. These dependencies being ffmpeg, ffprobe and deno. PLease install these and move them into the same folder as the main.
+
 ## AI Usage
 Used for assistance with debugging, assisting with some GUI stuff and in line code suggestions. 
 
