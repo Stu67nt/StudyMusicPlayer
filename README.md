@@ -41,4 +41,3 @@ Used for assistance with debugging, assisting with some GUI stuff and in line co
 
 ## Extra Notes
 Hack Club People, if you are wondering how i have so much time built up it is because I had to learn a lot of new things for this and this is my first large scale GUI so that came with a lot of it's own headaches.
-Currently, this ship does have a few kinks and left in code such as playlist that need to be ironed out in a future ship but I wanted to get something out there and will be implemented soon.
