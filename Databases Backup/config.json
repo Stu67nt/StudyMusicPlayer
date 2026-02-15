@@ -1,6 +1,0 @@
-{
-    "format": "m4a/mp3/flac/bestaudio",
-    "write_thumbnail": true,
-    "deno_path": "C:\\Users\\Tanzil Chowdhury\\.deno\\bin\\deno.exe",
-    "ffmpeg_path": "utils"
-}

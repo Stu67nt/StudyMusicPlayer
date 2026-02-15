@@ -33,9 +33,11 @@ Download the main.zip in the latest release.
 Extract folder.  
 Run main.exe
 
+#### Running from Source Code
+When running from the source code the Music Finder will fail to embed any metadata to the song as it relies on some dependancies to do so. These dependencies being ffmpeg, ffprobe and deno. PLease install these and move them into the same folder as the main.
+
 ## AI Usage
 Used for assistance with debugging, assisting with some GUI stuff and in line code suggestions. 
 
 ## Extra Notes
 Hack Club People, if you are wondering how i have so much time built up it is because I had to learn a lot of new things for this and this is my first large scale GUI so that came with a lot of it's own headaches.
-Currently, this ship does have a few kinks and left in code such as playlist that need to be ironed out in a future ship but I wanted to get something out there and will be implemented soon.
