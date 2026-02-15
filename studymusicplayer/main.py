@@ -1,7 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
-import downloader
+from . import downloader
 from .widgets import *
 from .Components import *
 from .utils import *

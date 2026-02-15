@@ -4,20 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment=".">
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/Components.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/Console Logs/placeholder.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/Databases/config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/Databases/queue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/Images/No-album-art.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/Songs/placeholder.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/Temp_Downloads/placeholder.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/downloader.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/widgets.py" beforeDir="false" />
-    </list>
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -111,22 +98,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762512459658</updated>
-    </task>
-    <task id="LOCAL-00018" summary="Made todo list functional">
-      <option name="closed" value="true" />
-      <created>1769813685287</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1769813685287</updated>
-    </task>
-    <task id="LOCAL-00019" summary="TODO list now tied to DB and fully functional">
-      <option name="closed" value="true" />
-      <created>1769895656795</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1769895656799</updated>
     </task>
     <task id="LOCAL-00020" summary="Timer functional with a few bugs. Commit to use as a reference point">
       <option name="closed" value="true" />
@@ -504,7 +475,23 @@
       <option name="project" value="LOCAL" />
       <updated>1771175129850</updated>
     </task>
-    <option name="localTasksCounter" value="67" />
+    <task id="LOCAL-00067" summary=".">
+      <option name="closed" value="true" />
+      <created>1771175814305</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1771175814305</updated>
+    </task>
+    <task id="LOCAL-00068" summary=".">
+      <option name="closed" value="true" />
+      <created>1771175957330</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1771175957330</updated>
+    </task>
+    <option name="localTasksCounter" value="69" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
