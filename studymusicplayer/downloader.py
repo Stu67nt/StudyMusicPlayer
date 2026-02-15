@@ -85,7 +85,10 @@ def progressHook(d, progress_bar):
         pass
         progress_bar['value'] = float(0)
     elif d['status'] == 'downloading':
-        progress_bar['value'] = float((d["_percent_str"]).replace(" ", "").replace("%", ""))
+        try:
+            progress_bar['value'] = float((d["_percent_str"]).replace(" ", "").replace("%", ""))
+        except:
+            pass
 
 def init_database():
     """
