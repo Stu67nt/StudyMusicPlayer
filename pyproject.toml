@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "StudyMusicPlayer"
-version = "0.0.2"
+version = "0.0.3"
 description = "A Music Player."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -25,13 +25,15 @@ dependencies = [
 [project.scripts]
 studymusicplayer = "studymusicplayer.main:main"
 
+[tool.setuptools.package-data]
+"studymusicplayer" = [
+    "Images/**/*",
+    "Songs/**/*",
+    "Console_Logs/**/*",
+    "Temp_Downloads/**/*",
+    "Databases/**/*"
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["studymusicplayer"]
-include = [
-    "studymusicplayer/Images/**/*",
-    "studymusicplayer/Songs/**/*",
-    "studymusicplayer/Console_Logs/**/*",
-    "studymusicplayer/Temp_Downloads/**/*",
-    "studymusicplayer/Databases/**/*"
-]
 
