@@ -7,6 +7,7 @@ import json
 import threading
 from .utils import *
 from pathlib import Path
+from .Components import AddToPlaylist
 
 """
 TODO: 
@@ -362,11 +363,9 @@ class SongLabel(ctk.CTkFrame):
 		return song_details
 
 	def add_to_playlist(self):
-		from .Components import *  # Import needs to be done here as otherwise program does not run
-
 		songID = [self.songID]  # needs to be in a list so add to playlist can properly process the id
 		if self.prompt is None or not self.prompt.winfo_exists():
-			self.prompt = Components.AddToPlaylist(songIDs=songID, font=self.font)
+			self.prompt = AddToPlaylist(songIDs=songID, font=self.font)
 		self.prompt.after(100, self.prompt.lift)
 
 	def delete_song(self):

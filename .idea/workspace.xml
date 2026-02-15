@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="." />
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment=".">
+      <change beforePath="$PROJECT_DIR$/studymusicplayer/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/studymusicplayer/widgets.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -98,22 +100,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762512459658</updated>
-    </task>
-    <task id="LOCAL-00020" summary="Timer functional with a few bugs. Commit to use as a reference point">
-      <option name="closed" value="true" />
-      <created>1769975017063</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1769975017063</updated>
-    </task>
-    <task id="LOCAL-00021" summary="I forgor to add this asset">
-      <option name="closed" value="true" />
-      <created>1769975045111</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1769975045111</updated>
     </task>
     <task id="LOCAL-00022" summary="Fixxed spam pausing causing faster timer tickdown bug and second de increment whilst paused.">
       <option name="closed" value="true" />
@@ -491,7 +477,23 @@
       <option name="project" value="LOCAL" />
       <updated>1771175957330</updated>
     </task>
-    <option name="localTasksCounter" value="69" />
+    <task id="LOCAL-00069" summary=".">
+      <option name="closed" value="true" />
+      <created>1771176036852</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1771176036852</updated>
+    </task>
+    <task id="LOCAL-00070" summary=".">
+      <option name="closed" value="true" />
+      <created>1771176146739</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1771176146739</updated>
+    </task>
+    <option name="localTasksCounter" value="71" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
