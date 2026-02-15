@@ -4,13 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Allowing building from source">
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Hopefully works on linux now">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/Components.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/downloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/downloader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Components.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Console Logs/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Databases/config.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Databases/queue.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Images/No-album-art.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Songs/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Temp Downloads/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/downloader.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/widgets.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,14 +110,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762512459658</updated>
-    </task>
-    <task id="LOCAL-00009" summary="Fixed A lot of formatting issues and created a slightly more proper track menu.">
-      <option name="closed" value="true" />
-      <created>1768602075677</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1768602075677</updated>
     </task>
     <task id="LOCAL-00010" summary="Added playlist menu">
       <option name="closed" value="true" />
@@ -497,7 +495,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771117693598</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="Hopefully works on linux now">
+      <option name="closed" value="true" />
+      <created>1771165410861</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1771165410861</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -518,7 +524,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Created customisable config to adjust download settings" />
     <MESSAGE value="Removed placeholder song frame. Deprecated song search." />
     <MESSAGE value="Fixed embedding thumbnails" />
     <MESSAGE value="Added support for loading up and playing a song." />
@@ -543,7 +548,8 @@
     <MESSAGE value="Added queue jump, skip and clear" />
     <MESSAGE value="Fixed issue where artist name would exceed 30 chars squeezing the playbar, fixed issue where windows would not focus properly upon creation, added hover over effect for label buttons" />
     <MESSAGE value="Allowing building from source" />
-    <option name="LAST_COMMIT_MESSAGE" value="Allowing building from source" />
+    <MESSAGE value="Hopefully works on linux now" />
+    <option name="LAST_COMMIT_MESSAGE" value="Hopefully works on linux now" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
