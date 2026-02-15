@@ -1,6 +1,6 @@
 from . import downloader
-from .widgets import *
-from .utils import *
+from . import widgets
+from . import utils
 import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
@@ -12,6 +12,7 @@ import pyglet
 from PIL import Image
 import io
 import tinytag as tt
+from pathlib import Path
 
 class ToDoList(ctk.CTkFrame):
 	def __init__(self, master, font: ctk.CTkFont):
@@ -36,7 +37,7 @@ class ToDoList(ctk.CTkFrame):
 		self.input = ctk.CTkEntry(self, font=self.font)
 		self.input.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nwe")
 
-		self.buttons = ButtonFrame(self,
+		self.buttons = widgets.ButtonFrame(self,
 								   button_values=[["Create Task",self.create_task],
 									["Delete Tasks", self.delete_tasks]],
 								   is_horizontal = True,
@@ -182,7 +183,7 @@ class TimerCreate(ctk.CTkFrame):
 		self.secs_spinbox.grid(row=3, column=1, padx=10, pady=(10, 10), sticky="e")
 
 
-		self.button = ButtonFrame(self, self.BUTTON, is_horizontal = True, button_sticky = "ew", font=font)
+		self.button = widgets.ButtonFrame(self, self.BUTTON, is_horizontal = True, button_sticky = "ew", font=font)
 		self.button.grid(row=4, column=0, padx=10, pady=(10, 10), sticky="ew", columnspan=2)
 
 
@@ -251,7 +252,7 @@ class Timer(ctk.CTkToplevel):
 												 font=self.TIMER_FONT)
 		self.time_remaining_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
-		self.buttons = ButtonFrame(self,
+		self.buttons = widgets.ButtonFrame(self,
 								   button_values = self.BUTTONS,
 								   is_horizontal=True,
 								   button_frame_color = "transparent",
@@ -346,7 +347,7 @@ class AddToPlaylist(ctk.CTkToplevel):
 		self.frame.rowconfigure(0, weight=1)
 		self.frame.columnconfigure(0, weight=1)
 
-		self.playlists_checkbox = CheckboxFrame(master=self.frame,
+		self.playlists_checkbox = widgets.CheckboxFrame(master=self.frame,
 												values=self.playlist_names,
 												font=self.font,
 												is_scrollable=True,
@@ -370,7 +371,7 @@ class AddToPlaylist(ctk.CTkToplevel):
 		self.destroy()
 
 	def add_song_to_playlist(self, songID, playlistID):
-		db = init_playlist_database()
+		db = utils.init_playlist_database()
 		cursor = db.cursor()
 		query = ("INSERT INTO "
 				 "Playlist("
@@ -383,7 +384,7 @@ class AddToPlaylist(ctk.CTkToplevel):
 		db.close()
 
 	def retrieve_playlist_details(self):
-		cursor = init_playlist_list_database().cursor()
+		cursor = utils.init_playlist_list_database().cursor()
 		query = ("SELECT * FROM Playlist_List")
 		cursor.execute(query)
 		playlist_details = cursor.fetchall()
@@ -418,7 +419,7 @@ class SongFrame(ctk.CTkFrame):
 		i=0
 		for songID in self.track_list:
 			try:
-				self.song_label = SongLabel(self.container,
+				self.song_label = widgets.SongLabel(self.container,
 											songID=songID,
 											font=font,
 											player_callback=self.player_callback)
@@ -467,7 +468,7 @@ class PlaylistFrame(ctk.CTkFrame):
 			playlist_info = self.retrieve_playlist(playlistID)
 			playlistID = playlist_info[0]
 			playlist_name = playlist_info[1]
-			self.playlist_label = PlaylistLabel(self.container,
+			self.playlist_label = widgets.PlaylistLabel(self.container,
 												playlistID=playlistID,
 												playlist_name=playlist_name,
 												font=self.font,
@@ -478,7 +479,7 @@ class PlaylistFrame(ctk.CTkFrame):
 			i+=1
 
 	def retrieve_playlist(self, playlistID):
-		db = init_playlist_list_database()
+		db = utils.init_playlist_list_database()
 		cursor = db.cursor()
 		query = "SELECT * FROM Playlist_List WHERE PlaylistID = ?"
 		cursor.execute(query, (playlistID,))
@@ -509,7 +510,7 @@ class SearchFrame(ctk.CTkFrame):
 		self.entry = ctk.CTkEntry(self, placeholder_text="Enter YouTube URL", font=self.font)
 		self.entry.grid(row=1, column=0, sticky = "new", padx=(10,10), pady=(10,10))
 
-		self.buttons = ButtonFrame(self, button_values=self.BUTTONS, is_horizontal=True, font=self.font)
+		self.buttons = widgets.ButtonFrame(self, button_values=self.BUTTONS, is_horizontal=True, font=self.font)
 		self.buttons.grid(row=2, column = 0, sticky = "ew", padx=(10,10), pady=(10,10))
 
 	def search(self, event = None):
@@ -569,7 +570,7 @@ class DownloadSettings(ctk.CTkToplevel):
 														)
 		self.prefered_format_select.grid(row=1, column=1, padx=(10, 10), pady=(10, 10), sticky="e")
 
-		self.add_thumbnail_select = RadioButtonFrame(self.settings_frame,
+		self.add_thumbnail_select = widgets.RadioButtonFrame(self.settings_frame,
 											  values=["Yes", "No"],
 											  title="Embed Thumbnails:",
 											  font=self.TEXT_FONT,
@@ -678,23 +679,23 @@ class QueueViewer(ctk.CTkToplevel):
 
 					self.song_label_frame.bind("<Button-1>",
 											 lambda event, sID=songID: self.jump_to_song(event, sID))
-					self.song_label_frame.bind("<Enter>", lambda e: on_enter(e))
-					self.song_label_frame.bind("<Leave>", lambda e: on_leave(e))
+					self.song_label_frame.bind("<Enter>", lambda e: utils.on_enter(e))
+					self.song_label_frame.bind("<Leave>", lambda e: utils.on_leave(e))
 
 					self.song_name_label.bind("<Button-1>",
 											 lambda event, sID=songID: self.jump_to_song(event, sID))
-					self.song_name_label.bind("<Enter>", lambda e: on_enter(e))
-					self.song_name_label.bind("<Leave>", lambda e: on_leave(e))
+					self.song_name_label.bind("<Enter>", lambda e: utils.on_enter(e))
+					self.song_name_label.bind("<Leave>", lambda e: utils.on_leave(e))
 
 					self.artist_name_label.bind("<Button-1>",
 											 lambda event, sID=songID: self.jump_to_song(event, sID))
-					self.artist_name_label.bind("<Enter>", lambda e:on_enter(e))
-					self.artist_name_label.bind("<Leave>", lambda e:on_leave(e))
+					self.artist_name_label.bind("<Enter>", lambda e:utils.on_enter(e))
+					self.artist_name_label.bind("<Leave>", lambda e:utils.on_leave(e))
 
 					self.remove_button.bind("<Button-1>",
 											 lambda event, sID=songID: self.remove_from_queue(event, sID))
-					self.remove_button.bind("<Enter>", lambda e: on_enter(e))
-					self.remove_button.bind("<Leave>", lambda e: on_leave(e))
+					self.remove_button.bind("<Enter>", lambda e: utils.on_enter(e))
+					self.remove_button.bind("<Leave>", lambda e: utils.on_leave(e))
 
 					i += 1
 

@@ -5,7 +5,7 @@ import sqlite3
 from . import downloader
 import json
 import threading
-from .utils import *
+from . import utils
 from pathlib import Path
 from .Components import AddToPlaylist
 
@@ -283,8 +283,8 @@ class LabelFrame(ctk.CTkFrame):
 		# Binds each label to it's relevant function
 		for i in range(len(self.labels)):
 			self.labels[i].bind("<Button-1>", self.values[i][1])
-			self.labels[i].bind("<Enter>", lambda e:on_enter(e))
-			self.labels[i].bind("<Leave>", lambda e:on_leave(e))
+			self.labels[i].bind("<Enter>", lambda e:utils.on_enter(e))
+			self.labels[i].bind("<Leave>", lambda e:utils.on_leave(e))
 
 
 class SongLabel(ctk.CTkFrame):
@@ -335,12 +335,12 @@ class SongLabel(ctk.CTkFrame):
 			self.menu.add_command(label=name, command=func)
 
 		self.options_button.bind("<Button-1>", self.menu_trigger)
-		self.options_button.bind("<Enter>", lambda e: on_enter(e))
-		self.options_button.bind("<Leave>", lambda e: on_leave(e))
+		self.options_button.bind("<Enter>", lambda e: utils.on_enter(e))
+		self.options_button.bind("<Leave>", lambda e: utils.on_leave(e))
 
 		self.bind("<Button-1>", self.play_song)
-		self.bind("<Enter>", lambda e: on_enter(e))
-		self.bind("<Leave>", lambda e: on_leave(e))
+		self.bind("<Enter>", lambda e: utils.on_enter(e))
+		self.bind("<Leave>", lambda e: utils.on_leave(e))
 
 
 	# ChatGPT Slop - Change it
@@ -376,7 +376,7 @@ class SongLabel(ctk.CTkFrame):
 		db.commit()
 		db.close()
 
-		db = init_playlist_database()
+		db = utils.init_playlist_database()
 		cursor = db.cursor()
 		query = "DELETE FROM Playlist WHERE songID = ?"
 		cursor.execute(query, (self.songID,))
@@ -451,12 +451,12 @@ class PlaylistLabel(ctk.CTkFrame):
 			self.menu.add_command(label=name, command=func)
 
 		self.options_button.bind("<Button-1>", self.menu_trigger)
-		self.options_button.bind("<Enter>", lambda e: on_enter(e))
-		self.options_button.bind("<Leave>", lambda e: on_leave(e))
+		self.options_button.bind("<Enter>", lambda e: utils.on_enter(e))
+		self.options_button.bind("<Leave>", lambda e: utils.on_leave(e))
 
 		self.bind("<Button-1>", lambda event=None: open_playlist_callback(event = event))
-		self.bind("<Enter>", lambda e: on_enter(e))
-		self.bind("<Leave>", lambda e: on_leave(e))
+		self.bind("<Enter>", lambda e: utils.on_enter(e))
+		self.bind("<Leave>", lambda e: utils.on_leave(e))
 
 	def menu_trigger(self, event):
 		try:
@@ -468,14 +468,14 @@ class PlaylistLabel(ctk.CTkFrame):
 		print("temp")
 
 	def delete_playlist(self):
-		db = init_playlist_database()
+		db = utils.init_playlist_database()
 		cursor = db.cursor()
 		query = "DELETE FROM Playlist WHERE playlistID = (?)"
 		cursor.execute(query, (self.playlistID,))
 		db.commit()
 		db.close()
 
-		db = init_playlist_list_database()
+		db = utils.init_playlist_list_database()
 		cursor = db.cursor()
 		query = "DELETE FROM Playlist_List WHERE playlistID = (?)"
 		cursor.execute(query, (self.playlistID,))
@@ -516,7 +516,7 @@ class PlaylistLabel(ctk.CTkFrame):
 		dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
 		name = dialog.get_input().strip()
 		if name != "" and name != None:
-			db = init_playlist_list_database()
+			db = utils.init_playlist_list_database()
 			cursor = db.cursor()
 			cursor.execute(
 				"UPDATE Playlist_List "
@@ -527,7 +527,7 @@ class PlaylistLabel(ctk.CTkFrame):
 			db.close()
 
 	def retrieve_playlist_songIDs(self, playlistID):
-		db = init_playlist_database()
+		db = utils.init_playlist_database()
 		cursor = db.cursor()
 		query = "SELECT songID FROM Playlist WHERE playlistID = ?"
 		cursor.execute(query, (playlistID,))

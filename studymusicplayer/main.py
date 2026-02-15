@@ -2,9 +2,9 @@ import customtkinter as ctk
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 from . import downloader
-from .widgets import *
-from .Components import *
-from .utils import *
+from . import widgets
+from . import Components
+from . import utils
 from PIL import Image  # Used for thumbnails
 import pyglet  # Used for audio
 import tinytag as tt
@@ -12,6 +12,7 @@ import io
 import json
 import threading # Used so app doesnt freeze when doing longer processes
 from pathlib import Path
+import os
 
 
 class Home(ctk.CTkFrame): # Inheriting CTk class
@@ -22,12 +23,12 @@ class Home(ctk.CTkFrame): # Inheriting CTk class
 		self.grid_rowconfigure(1, weight=1)
 
 		# Creating To Do List
-		self.todo = ToDoList(self, font=font)
+		self.todo = Components.ToDoList(self, font=font)
 		self.todo.grid(row=1, column=0, padx=(10,10), pady=(10,10), sticky="nswe", rowspan = 2)
 		self.widgets.append(self.todo)
 
 		# Creating timer
-		self.timer = TimerCreate(self, font=font)
+		self.timer = Components.TimerCreate(self, font=font)
 		self.timer.grid(row=1, column=1, padx=(10,10), pady=(10,10), sticky = "nwse")
 		self.widgets.append(self.timer)
 
@@ -60,7 +61,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		if current_song_ids != self.song_ids or force:
 			self.song_ids = current_song_ids
 			destroy_widgets(self.widgets)
-			self.topbar = ButtonFrame(self,
+			self.topbar = widgets.ButtonFrame(self,
 									  button_values=self.main_topbar_buttons,
 									  title=f"{len(self.song_ids)} Songs",
 									  title_fg_color="transparent",
@@ -71,7 +72,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 			self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
 			self.widgets.append(self.topbar)
 
-			self.track_list = SongFrame(self, song_ids=self.song_ids, font=self.font, player_callback = self.player_callback)
+			self.track_list = Components.SongFrame(self, song_ids=self.song_ids, font=self.font, player_callback = self.player_callback)
 			self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
 
 			self.widgets.append(self.track_list)
@@ -89,7 +90,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		for song in self.song_names:
 			self.songs.append(f"{song[2]} - {song[0]} - {song[1]}")
 
-		self.topbar = ButtonFrame(self,
+		self.topbar = widgets.ButtonFrame(self,
 								  button_values=self.select_mult_topbar_buttons,
 								  title=f"{len(self.song_names)} Songs",
 								  title_fg_color="transparent",
@@ -100,7 +101,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
 		self.widgets.append(self.topbar)
 
-		self.track_list = CheckboxFrame(master=self,
+		self.track_list = widgets.CheckboxFrame(master=self,
 										values=self.songs,
 										font=self.font,
 										is_scrollable=True)
@@ -159,7 +160,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		for song in checked:
 			songIDs.append(song.split(" ")[0])
 		if self.prompt is None or not self.prompt.winfo_exists():
-			self.prompt = AddToPlaylist(songIDs = songIDs, font= self.font)
+			self.prompt = Components.AddToPlaylist(songIDs = songIDs, font= self.font)
 		self.prompt.focus()
 
 	def delete_songs(self):
@@ -222,8 +223,8 @@ class Playlists(ctk.CTkFrame):
 												 ["Select Multiple", self.specific_playlist_select_multiple],
 												 ["Exit Playlist", lambda: self.main_view(force=True)]]
 
-		self.playlist_list_db = init_playlist_list_database()
-		self.playlist_db = init_playlist_database()
+		self.playlist_list_db = utils.init_playlist_list_database()
+		self.playlist_db = utils.init_playlist_database()
 		self.old_playlist_names = None
 		self.BASE_DIR = Path(__file__).parent
 
@@ -235,7 +236,7 @@ class Playlists(ctk.CTkFrame):
 			self.playlistIDs = self.retrieve_playlistIDs()
 			self.old_playlist_names = current_playlist_names
 			destroy_widgets(self.widgets)
-			self.topbar = ButtonFrame(self,
+			self.topbar = Components.ButtonFrame(self,
 									  button_values=self.main_topbar_buttons,
 									  title=f"{len(self.playlistIDs)} Playlists",
 									  title_fg_color="transparent",
@@ -246,7 +247,7 @@ class Playlists(ctk.CTkFrame):
 			self.topbar.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="ew")
 			self.widgets.append(self.topbar)
 
-			self.playlist_list = PlaylistFrame(self, self.playlistIDs, font=self.font, player_callback=self.player_callback,
+			self.playlist_list = Components.PlaylistFrame(self, self.playlistIDs, font=self.font, player_callback=self.player_callback,
 											open_playlist_callback=self.open_playlist)
 			self.playlist_list.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
 			self.widgets.append(self.playlist_list)
@@ -259,7 +260,7 @@ class Playlists(ctk.CTkFrame):
 		for playlist in playlist_details:
 			self.playlist_names.append(f"{playlist[0]} - {playlist[1]}")
 
-		self.topbar = ButtonFrame(self,
+		self.topbar = widgets.ButtonFrame(self,
 								  button_values=self.select_mult_topbar_buttons,
 								  title=f"{len(self.playlist_names)} Songs",
 								  title_fg_color="transparent",
@@ -270,7 +271,7 @@ class Playlists(ctk.CTkFrame):
 		self.topbar.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="ew")
 		self.widgets.append(self.topbar)
 
-		self.checkbox_playlist_list = CheckboxFrame(master=self,
+		self.checkbox_playlist_list = widgets.CheckboxFrame(master=self,
 										values=self.playlist_names,
 										font=self.font,
 										is_scrollable=True)
@@ -291,7 +292,7 @@ class Playlists(ctk.CTkFrame):
 			self.song_ids = current_song_ids
 			destroy_widgets(self.widgets)
 
-			self.topbar = ButtonFrame(self,
+			self.topbar = widgets.ButtonFrame(self,
 									  button_values=self.specific_playlist_topbar_buttons,
 									  title=f"{len(self.song_ids)} Songs",
 									  title_fg_color="transparent",
@@ -302,7 +303,7 @@ class Playlists(ctk.CTkFrame):
 			self.topbar.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="ew")
 			self.widgets.append(self.topbar)
 
-			self.track_list = SongFrame(self, song_ids=self.song_ids, font=self.font,
+			self.track_list = widgets.SongFrame(self, song_ids=self.song_ids, font=self.font,
 										player_callback=self.player_callback)
 			self.track_list.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
 			self.widgets.append(self.track_list)
@@ -322,7 +323,7 @@ class Playlists(ctk.CTkFrame):
 			["Add to Queue", lambda: self.add_to_queue(self.get_checked_ids(obj=self.song_list))],
 			["Exit Select", lambda: self.main_view(force=True)]]
 
-		self.topbar = ButtonFrame(self,
+		self.topbar = widgets.ButtonFrame(self,
 								  button_values=self.mult_specific_playlist_buttons,
 								  title=f"{len(songIDs)} Songs",
 								  title_fg_color="transparent",
@@ -333,7 +334,7 @@ class Playlists(ctk.CTkFrame):
 		self.topbar.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="ew")
 		self.widgets.append(self.topbar)
 
-		self.song_list = CheckboxFrame(master=self,
+		self.song_list = widgets.CheckboxFrame(master=self,
 										   values=song_names,
 										   font=self.font,
 										   is_scrollable=True)
@@ -397,7 +398,7 @@ class Playlists(ctk.CTkFrame):
 		dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
 		name = dialog.get_input().strip()
 		if name != "" and name != None:
-			db = init_playlist_list_database()
+			db = utils.init_playlist_list_database()
 			cursor = db.cursor()
 			cursor.execute(
 				"INSERT INTO "
@@ -411,7 +412,7 @@ class Playlists(ctk.CTkFrame):
 			self.main_view(force=True)
 
 	def remove_from_playlist(self, song_ids:list, playlistID):
-		db = init_playlist_database()
+		db = utils.init_playlist_database()
 		cursor = db.cursor()
 		query = "DELETE FROM Playlist WHERE songID = (?) AND playlistID = (?)"
 		for song_id in song_ids:
@@ -420,7 +421,7 @@ class Playlists(ctk.CTkFrame):
 		db.close()
 
 	def delete_playlists(self, playlistIDs):
-		db = init_playlist_database()
+		db = utils.init_playlist_database()
 		cursor = db.cursor()
 		query = "DELETE FROM Playlist WHERE playlistID = (?)"
 		for playlistID in playlistIDs:
@@ -428,7 +429,7 @@ class Playlists(ctk.CTkFrame):
 		db.commit()
 		db.close()
 
-		db = init_playlist_list_database()
+		db = utils.init_playlist_list_database()
 		cursor = db.cursor()
 		query = "DELETE FROM Playlist_List WHERE playlistID = (?)"
 		for playlistID in playlistIDs:
@@ -437,7 +438,7 @@ class Playlists(ctk.CTkFrame):
 		db.close()
 
 	def retrieve_playlist_songIDs(self, playlistID):
-		db = init_playlist_database()
+		db = utils.init_playlist_database()
 		cursor = db.cursor()
 		query = "SELECT songID FROM Playlist WHERE playlistID = ?"
 		cursor.execute(query, (playlistID,))
@@ -491,7 +492,7 @@ class MusicFinder(ctk.CTkFrame):
 		self.download_output = ScrolledText(self, font=self.font, height=12, state="disabled", bg="gray20", fg="white")
 		self.download_output.grid(row=2, column=0, sticky="nsew", pady=(10, 10), padx=(10, 10))
 
-		self.search_frame = SearchFrame(self,
+		self.search_frame = Components.SearchFrame(self,
 										font=self.font,
 										progress_bar_callback=self.progress_bar,
 										download_log_callback=self.download_output)
@@ -585,7 +586,7 @@ class Player(ctk.CTkFrame):
 		self.artist_name_label = ctk.CTkLabel(self.song_details_frame, text=self.printable_artist, font=self.song_artist_font)
 		self.artist_name_label.grid(row=1, column=1, pady=(5, 5), sticky="w")
 
-		self.playbar_buttons = LabelFrame(self,
+		self.playbar_buttons = Components.LabelFrame(self,
 										  values=self.button_icons,
 										  font=self.icons_font,
 										  is_horizontal=True,
@@ -605,8 +606,8 @@ class Player(ctk.CTkFrame):
 		self.queue_button_label = ctk.CTkLabel(self, text="≡", font=self.icons_font)
 		self.queue_button_label.grid(row=0, column=2, rowspan=2, padx=(10, 10), pady=(5, 5), sticky="e")
 		self.queue_button_label.bind("<Button-1>", self.queue_trigger)
-		self.queue_button_label.bind("<Enter>", lambda e:on_enter(e))
-		self.queue_button_label.bind("<Leave>", lambda e:on_leave(e))
+		self.queue_button_label.bind("<Enter>", lambda e:utils.on_enter(e))
+		self.queue_button_label.bind("<Leave>", lambda e:utils.on_leave(e))
 
 		self.volume_icon = ctk.CTkLabel(self, text="🔈", font=self.icons_font)
 		self.volume_icon.grid(row=0, column=3, rowspan=2, padx=(2, 2), pady=(5, 5), sticky="e")
@@ -624,7 +625,7 @@ class Player(ctk.CTkFrame):
 
 	def queue_trigger(self, event):
 		if self.queue_window is None or not self.queue_window.winfo_exists():
-			self.queue_window = QueueViewer(event, font= self.font, player_callback=self)
+			self.queue_window = Components.QueueViewer(event, font= self.font, player_callback=self)
 		self.queue_window.after(100, self.queue_window.lift)
 
 	def song_end(self, load_previous: bool = False):
@@ -748,7 +749,7 @@ class Player(ctk.CTkFrame):
 		db.commit()
 		db.close()
 
-		db = init_playlist_database()
+		db = utils.init_playlist_database()
 		cursor = db.cursor()
 		query = "DELETE FROM Playlist WHERE songID = ?"
 		cursor.execute(query, (self.songID,))
