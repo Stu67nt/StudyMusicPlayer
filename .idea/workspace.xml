@@ -6,18 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment=".">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Console Logs/placeholder.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Databases/config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Databases/queue.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/No-album-art.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Songs/placeholder.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Temp Downloads/placeholder.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/downloader.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/widgets.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/studymusicplayer/Components.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/studymusicplayer/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/studymusicplayer/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/studymusicplayer/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,14 +103,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762512459658</updated>
-    </task>
-    <task id="LOCAL-00014" summary="Added multi select framework and add to playlist framework.">
-      <option name="closed" value="true" />
-      <created>1769721057074</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1769721057074</updated>
     </task>
     <task id="LOCAL-00015" summary="Added player framework">
       <option name="closed" value="true" />
@@ -505,7 +488,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771168862997</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary=".">
+      <option name="closed" value="true" />
+      <created>1771174032864</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1771174032864</updated>
+    </task>
+    <option name="localTasksCounter" value="64" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

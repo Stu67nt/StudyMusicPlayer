@@ -5,7 +5,7 @@ import sqlite3
 import downloader
 import json
 import threading
-from utils import *
+from studymusicplayer.utils import *
 from pathlib import Path
 
 """
@@ -362,7 +362,7 @@ class SongLabel(ctk.CTkFrame):
 		return song_details
 
 	def add_to_playlist(self):
-		import Components  # Import needs to be done here as otherwise program does not run
+		from studymusicplayer.Components import *  # Import needs to be done here as otherwise program does not run
 
 		songID = [self.songID]  # needs to be in a list so add to playlist can properly process the id
 		if self.prompt is None or not self.prompt.winfo_exists():
