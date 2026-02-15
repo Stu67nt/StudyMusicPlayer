@@ -11,6 +11,8 @@ import tinytag as tt
 import io
 import json
 import threading # Used so app doesnt freeze when doing longer processes
+from pathlib import Path
+
 
 class Home(ctk.CTkFrame): # Inheriting CTk class
 	def __init__(self, master, font: ctk.CTkFont):
@@ -38,6 +40,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		self.prompt = None
 		self.player_callback= player_callback
 		self.song_ids = None
+		self.BASE_DIR = Path(__file__).parent
 
 		super().__init__(self.master, fg_color="transparent")  # Calls parent class
 
@@ -105,7 +108,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		self.widgets.append(self.track_list)
 
 	def refresh_tracks(self):
-		filepath = str(os.path.abspath(os.getcwd()))+"/Songs"
+		filepath = str(self.BASE_DIR / "Songs")
 		db = downloader.init_database()
 		cursor = db.cursor()
 		cursor.execute("SELECT file_path FROM songs")
@@ -114,9 +117,9 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		for current_filepath in all_filepaths_raw:
 			all_filepaths.append(current_filepath[0])
 		for file in os.listdir(filepath):
-			if all_filepaths == [] or (filepath+"/"+file not in all_filepaths):
+			if all_filepaths == [] or (str(self.BASE_DIR/filepath/file) not in all_filepaths):
 				try:
-					tt.TinyTag.get(f"Songs/{file}")
+					tt.TinyTag.get(str(self.BASE_DIR / "Songs" / file))
 					print(f"{file} is an valid file")
 					self.add_song(db, file)
 				except Exception as err:
@@ -125,7 +128,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		db.close()
 
 	def add_song(self, db, song_file_name):
-		filepath = str(os.path.abspath(os.getcwd())) + "/Songs/" + song_file_name
+		filepath = str(self.BASE_DIR / "Songs" / song_file_name)
 		song = tt.TinyTag.get(filepath)  # Extracting the metadata
 		# Gives title of song if held in metadata otherise we use file name
 		song_name = song.title if song.title != None else song_file_name
@@ -222,6 +225,7 @@ class Playlists(ctk.CTkFrame):
 		self.playlist_list_db = init_playlist_list_database()
 		self.playlist_db = init_playlist_database()
 		self.old_playlist_names = None
+		self.BASE_DIR = Path(__file__).parent
 
 		self.main_view()
 
@@ -337,7 +341,7 @@ class Playlists(ctk.CTkFrame):
 		self.widgets.append(self.topbar)
 
 	def load_queue(self):
-		with open("Databases/queue.json", "r") as f:
+		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "r") as f:
 			queue_settings = json.load(f)
 			f.close()
 		return queue_settings
@@ -353,7 +357,7 @@ class Playlists(ctk.CTkFrame):
 			"current_index": self.current_index,
 			"queue": self.queue,
 		}
-		with open("Databases/queue.json", "w") as f:
+		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 
@@ -362,7 +366,7 @@ class Playlists(ctk.CTkFrame):
 			"current_index": 0,
 			"queue": song_ids
 		}
-		with open("Databases/queue.json", "w") as f:
+		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 		self.player_callback.load_song(song_ids[0])
@@ -502,6 +506,7 @@ class Player(ctk.CTkFrame):
 		self.grid_columnconfigure((0,2), weight=0)
 		self.grid_columnconfigure(1, weight=10)
 
+		self.BASE_DIR = Path(__file__).parent
 		self.queue_window = None
 		self.font = font
 		self.song_name_font = ctk.CTkFont(family="Cascadia Mono", size = 16)
@@ -526,6 +531,7 @@ class Player(ctk.CTkFrame):
 			self.duration = tk.IntVar(value=self.song_details[3])
 			self.filepath = self.song_details[1]
 		except:
+			self.song_details = None
 			self.song_name = "No Song"
 			self.artist = "Frank Ocean"
 			self.duration = tk.IntVar(value=100)
@@ -559,8 +565,8 @@ class Player(ctk.CTkFrame):
 
 		# Thumbnail Rendering
 		if self.thumbnail_img is None:
-			self.thumbnail = ctk.CTkImage(light_image=Image.open("Images/No-album-art.png"),
-										  dark_image=Image.open("Images/No-album-art.png"),
+			self.thumbnail = ctk.CTkImage(light_image=Image.open(str(self.BASE_DIR/"Images"/"No-album-art.png")),
+										  dark_image=Image.open(str(self.BASE_DIR/"Images"/"No-album-art.png")),
 										  size = (75,75))
 		else:
 			self.thumbnail = ctk.CTkImage(light_image=self.thumbnail_img,
@@ -637,14 +643,14 @@ class Player(ctk.CTkFrame):
 			"current_index": self.current_index,
 			"queue": self.queue,
 		}
-		with open("Databases/queue.json", "w") as f:
+		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 		if len(self.queue) != 0:
 			self.load_song(self.queue[self.current_index])
 
 	def load_queue(self):
-		with open("Databases/queue.json", "r") as f:
+		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "r") as f:
 			queue_settings = json.load(f)
 			f.close()
 		if -1 in queue_settings["queue"] and (len(queue_settings["queue"]) >= 2):
@@ -700,8 +706,8 @@ class Player(ctk.CTkFrame):
 				self.song_end()
 
 		if self.thumbnail_img == None:
-			self.thumbnail = ctk.CTkImage(light_image=Image.open("Images/No-album-art.png"),
-										  dark_image=Image.open("Images/No-album-art.png"),
+			self.thumbnail = ctk.CTkImage(light_image=Image.open(str(self.BASE_DIR/"Images"/"No-album-art.png")),
+										  dark_image=Image.open(str(self.BASE_DIR/"Images"/"No-album-art.png")),
 										  size=(75, 75))
 		else:
 			self.thumbnail = ctk.CTkImage(light_image=self.thumbnail_img,
@@ -862,3 +868,4 @@ def destroy_widgets(widgets):
 def main():
 	app = App("Study Music Player")
 	app.mainloop()
+main()

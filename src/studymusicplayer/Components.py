@@ -18,6 +18,7 @@ class ToDoList(ctk.CTkFrame):
 		super().__init__(master)
 
 		# Initialising database & font
+		self.BASE_DIR = Path(__file__).parent
 		self.db = self.init_database()
 		self.font = font
 
@@ -51,7 +52,7 @@ class ToDoList(ctk.CTkFrame):
 		Initialises todo.db or creates it if does not exists.
 		:return: SQLite3 db object
 		"""
-		db = sqlite3.connect("Databases/todo.db")
+		db = sqlite3.connect(str(self.BASE_DIR/"Databases"/"todo.db"))
 		cursor = db.cursor()
 		query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise of the table is lost the program will not boot
 				 "todo(" 
@@ -543,7 +544,8 @@ class DownloadSettings(ctk.CTkToplevel):
 		self.rowconfigure(1, weight=1)
 		self.columnconfigure(0, weight=1)
 
-		self.f = open("Databases/config.json")
+		self.BASE_DIR = Path(__file__).parent
+		self.f = open(str(self.BASE_DIR/"Databases"/"config.json"))
 		self.options = json.load(self.f)
 		self.f.close()
 
@@ -596,7 +598,7 @@ class DownloadSettings(ctk.CTkToplevel):
 		elif add_thumbnail == "No":
 			self.options["write_thumbnail"] = False
 
-		with open("Databases/config.json", "w") as f:
+		with open(str(self.BASE_DIR/"Databases"/"config.json"), "w") as f:
 			json.dump(self.options, f, indent=4)
 			f.close()
 		self.destroy()
@@ -614,6 +616,7 @@ class QueueViewer(ctk.CTkToplevel):
 		self.queue = []
 		self.old_index = -1
 		self.player_callback = player_callback
+		self.BASE_DIR = Path(__file__).parent
 
 		self.label = ctk.CTkLabel(self,
 								  text="Queue",
@@ -633,7 +636,7 @@ class QueueViewer(ctk.CTkToplevel):
 		self.update_queue(event)
 
 	def load_queue(self):
-		with open("Databases/queue.json", "r") as f:
+		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "r") as f:
 			queue_settings = json.load(f)
 			f.close()
 		return queue_settings
@@ -720,7 +723,7 @@ class QueueViewer(ctk.CTkToplevel):
 			"current_index": current_index,
 			"queue": queue
 		}
-		with open("Databases/queue.json", "w") as f:
+		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
 			json.dump(queue_settings, f, indent=0)
 			f.close()
 		self.player_callback.load_song(songID)
@@ -742,7 +745,7 @@ class QueueViewer(ctk.CTkToplevel):
 			"queue": queue
 		}
 
-		with open("Databases/queue.json", "w") as f:
+		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
 			json.dump(queue_settings, f, indent=0)
 			f.close()
 
@@ -751,7 +754,7 @@ class QueueViewer(ctk.CTkToplevel):
 			"current_index": 0,
 			"queue": [-1]
 		}
-		with open("Databases/queue.json", "w") as f:
+		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
 			json.dump(queue_settings, f, indent=0)
 			f.close()
 

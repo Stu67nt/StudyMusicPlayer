@@ -1,11 +1,13 @@
 import sqlite3
+from pathlib import Path
 
 def init_playlist_database():
 	"""
 	Initialises music_ops.db and songs table or creates them if they don't exist.
 	:return: SQLite3 db object
 	"""
-	db = sqlite3.connect(r"Databases/music_ops.db")
+	BASE_DIR = Path(__file__).parent
+	db = sqlite3.connect(str(BASE_DIR/"Databases"/"music_ops.db"))
 	cursor = db.cursor()
 	query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
 			 "Playlist("
@@ -21,7 +23,8 @@ def init_playlist_list_database():
     Initialises music_ops.db and songs table or creates them if they don't exist.
     :return: SQLite3 db object
 	"""
-	db = sqlite3.connect("Databases/music_ops.db")
+	BASE_DIR = Path(__file__).parent
+	db = sqlite3.connect(str(BASE_DIR/"Databases"/"music_ops.db"))
 	cursor = db.cursor()
 	query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
              "Playlist_List(" 
@@ -37,3 +40,5 @@ def on_enter(event=None):
 
 def on_leave(event=None):
 	event.widget.configure(cursor="")
+
+print(Path(__file__).parent)

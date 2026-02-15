@@ -7,6 +7,7 @@ import tinytag as tt
 import shutil
 import tkinter as tk
 import json
+from pathlib import Path
 
 
 class MyLogger:
@@ -57,9 +58,10 @@ def createConsoleLog():
     Creates a file for storing logs of console.
     :returns: file path of the created txt file
     """
+    BASE_DIR = Path(__file__).parent
     print("Creating Console Log")
     timestr = time.strftime("%Y.%m.%d-%H%M%S")
-    filePath = os.path.join("Console Logs/", timestr + ".txt")
+    filePath = os.path.join(str(BASE_DIR/"Console Logs"), timestr + ".txt")
     print("Created Console Log")
     return str(filePath)
 
@@ -78,7 +80,8 @@ def init_database():
     Initialises music_ops.db and songs table or creates them if they don't exist.
     :return: SQLite3 db object
     """
-    db = sqlite3.connect("Databases/music_ops.db")
+    BASE_DIR = Path(__file__).parent
+    db = sqlite3.connect(str(BASE_DIR/"Databases"/"music_ops.db"))
     cursor = db.cursor()
     query = ("CREATE TABLE IF NOT EXISTS "  # Needed as otherwise if the table is lost the program will not boot
              "songs(" 
@@ -94,8 +97,9 @@ def init_database():
     return db
 
 def add_song(db, song_file_name):
-    file_path = str(os.path.abspath(os.getcwd())) + "/Songs/" + song_file_name
-    song = tt.TinyTag.get(str(os.path.abspath(os.getcwd())) + "/Temp Downloads/" + song_file_name)  # Extracting the metadata
+    BASE_DIR = Path(__file__).parent
+    file_path = str(BASE_DIR /"Songs"/ song_file_name)
+    song = tt.TinyTag.get(str(BASE_DIR/"Temp_Downloads"/song_file_name))  # Extracting the metadata
     # Gives title of song if held in metadata otherise we use file name
     song_name = song.title if song.title != None else song_file_name
     song_duration = int(round(song.duration))  # Gives length of songs as seconds
@@ -133,27 +137,29 @@ def download(url: list, config: dict):
     :param progress_bar:
     :return:
     """
-
+    BASE_DIR = Path(__file__).parent
     with yt_dlp.YoutubeDL(config) as ydl:
         try:
             ydl.download(url)
         except Exception as err:
             tk.messagebox.showwarning("Error", err)
         db = init_database()
-        for file in os.listdir("Temp Downloads"):
+        for file in os.listdir(str(BASE_DIR/"Temp_Downloads")):
             # Try except for catching valid files
             try:
-                tt.TinyTag.get(f"Temp Downloads/{file}")
+                tt.TinyTag.get(str(BASE_DIR/"Temp_Downloads"/file))
                 print(f"{file} is an valid file")
                 add_song(db, file)
-                move_file(file, f"Temp Downloads/{file}", str(os.path.abspath(os.getcwd()))+"/Songs")
+                move_file(file, str(BASE_DIR/"Temp_Downloads"/file), str(BASE_DIR/"Songs"))
             except Exception as err:
                 print(f"{file} is not an audio file")  # Means file is not an audio file
                 print(err)
 
 def create_download_config(file_name, output=None, progress_bar=None):
-    dir = str(os.path.abspath(os.getcwd())) + "/Temp Downloads/"
-    f = open("Databases/config.json")
+    BASE_DIR = Path(__file__).parent
+    dir = str(BASE_DIR/"Temp_Downloads")
+    print(dir)
+    f = open(str(BASE_DIR/"Databases"/"config.json"))
     settings = json.load(f)
     f.close()
     download_config = {
@@ -162,8 +168,9 @@ def create_download_config(file_name, output=None, progress_bar=None):
         # Configures the file format of the video downloaded
         'format': settings['format'],  # If needed you can create an easy bug here
         # Configures the file name of the output
-        'outtmpl': {'default': f'{dir}%(title)s.%(ext)s',
+        'outtmpl': {'default': f'%(title)s.%(ext)s',
                     'pl_thumbnail': ''},  # Allow user configure
+        'paths': {'home': dir},
         # Used so invalid file name not created.
         "restrictfilenames": True,
         "windowsfilenames": True,

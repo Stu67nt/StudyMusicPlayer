@@ -19,11 +19,19 @@ dependencies = [
     "pillow",
     "pyglet",
     "tinytag",
-    "colorama",
     "yt-dlp"
 ]
 
 [project.scripts]
-StudyMusicPlayer = "main:main"
+studymusicplayer = "studymusicplayer.main:main"
+
+[tool.setuptools.package-data]
+"studymusicplayer" = [
+    "Images/**/*",
+    "Songs/**/*",
+    "Console_Logs/**/*",
+    "Temp_Downloads/**/*",
+    "Databases/**/*"
+]
 
 

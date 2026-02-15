@@ -6,6 +6,7 @@ import downloader
 import json
 import threading
 from utils import *
+from pathlib import Path
 
 """
 TODO: 
@@ -299,6 +300,7 @@ class SongLabel(ctk.CTkFrame):
 		self.font = font
 		self.prompt = None
 		self.player_callback = player_callback
+		self.BASE_DIR = Path(__file__).parent
 
 		self.songID = songID
 		self.song_details = self.retrieve_song()
@@ -384,7 +386,7 @@ class SongLabel(ctk.CTkFrame):
 
 
 	def load_queue(self):
-		with open("Databases/queue.json", "r") as f:
+		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "r") as f:
 			queue_settings = json.load(f)
 			f.close()
 		return queue_settings
@@ -429,6 +431,7 @@ class PlaylistLabel(ctk.CTkFrame):
 		self.playlist_name = playlist_name
 		self.playlistID = playlistID
 		self.player_callback = player_callback
+		self.BASE_DIR = Path(__file__).parent
 
 		self.name_label = ctk.CTkLabel(self, text = playlist_name, font = font)
 		self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
@@ -492,7 +495,7 @@ class PlaylistLabel(ctk.CTkFrame):
 			"current_index": current_index,
 			"queue": queue,
 		}
-		with open("Databases/queue.json", "w") as f:
+		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 
@@ -505,7 +508,7 @@ class PlaylistLabel(ctk.CTkFrame):
 			"current_index": current_index,
 			"queue": queue,
 		}
-		with open("Databases/queue.json", "w") as f:
+		with open(self.BASE_DIR/"Databases"/"queue.json", "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 		self.player_callback.load_song(queue[current_index])
