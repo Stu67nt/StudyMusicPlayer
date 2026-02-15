@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment=".">
+    <list default="true" id="8f695353-3e90-4ae2-bee5-3d88142a4728" name="Changes" comment="Now cloneable">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/studymusicplayer/Components.py" beforeDir="false" afterPath="$PROJECT_DIR$/studymusicplayer/Components.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/studymusicplayer/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/studymusicplayer/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/studymusicplayer/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/studymusicplayer/widgets.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,30 +100,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762512459658</updated>
-    </task>
-    <task id="LOCAL-00024" summary="Fixed flickering, memory leak and timing issues.">
-      <option name="closed" value="true" />
-      <created>1770070720356</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1770070720356</updated>
-    </task>
-    <task id="LOCAL-00025" summary="Changed file structure">
-      <option name="closed" value="true" />
-      <created>1770154732332</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1770154732332</updated>
-    </task>
-    <task id="LOCAL-00026" summary="Made downloader functional">
-      <option name="closed" value="true" />
-      <created>1770154746710</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1770154746710</updated>
     </task>
     <task id="LOCAL-00027" summary="Fixed syntax error">
       <option name="closed" value="true" />
@@ -496,7 +469,31 @@
       <option name="project" value="LOCAL" />
       <updated>1771176403470</updated>
     </task>
-    <option name="localTasksCounter" value="73" />
+    <task id="LOCAL-00073" summary=".">
+      <option name="closed" value="true" />
+      <created>1771177904164</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1771177904164</updated>
+    </task>
+    <task id="LOCAL-00074" summary=".">
+      <option name="closed" value="true" />
+      <created>1771178036859</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1771178036859</updated>
+    </task>
+    <task id="LOCAL-00075" summary="Now cloneable">
+      <option name="closed" value="true" />
+      <created>1771178395718</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1771178395718</updated>
+    </task>
+    <option name="localTasksCounter" value="76" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -517,7 +514,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Can now select a song from tracks to play" />
     <MESSAGE value="Basic Unmodifiable queue system exists." />
     <MESSAGE value="Downloads happen in seperate thread to prevent gui freezing" />
     <MESSAGE value="Enabled streaming songs which solved ALL MY PROBLEMS APPARENTLY" />
@@ -542,7 +538,8 @@
     <MESSAGE value="moving to src" />
     <MESSAGE value="Adding the image back" />
     <MESSAGE value="." />
-    <option name="LAST_COMMIT_MESSAGE" value="." />
+    <MESSAGE value="Now cloneable" />
+    <option name="LAST_COMMIT_MESSAGE" value="Now cloneable" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>

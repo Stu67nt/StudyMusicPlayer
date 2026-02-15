@@ -19,39 +19,55 @@ class MyLogger:
     def debug(self, msg):
         # For compatibility with youtube-dl, both debug and info are passed into debug
         # You can distinguish them by the prefix '[debug] '
-        if msg.startswith('[debug] '):
-            self.file.write(msg+"\n")
-            self.output.configure(state='normal')
-            self.output.insert(tk.END, msg+"\n")
-            self.output.configure(state='disabled')
-            self.output.yview(tk.END)
-        else:
-            self.info(msg)
-            self.output.configure(state='normal')
-            self.output.insert(tk.END, msg + "\n")
+        try:
+            if msg.startswith('[debug] '):
+                self.file.write(msg+"\n")
+                self.output.configure(state='normal')
+                self.output.insert(tk.END, msg+"\n")
+                self.output.configure(state='disabled')
+                self.output.yview(tk.END)
+            else:
+                self.info(msg)
+                self.output.configure(state='normal')
+                self.output.insert(tk.END, msg + "\n")
+                self.output.configure(state='disabled')
+                self.output.yview(tk.END)
+        except:
             self.output.configure(state='disabled')
             self.output.yview(tk.END)
 
     def info(self, msg):
-        self.file.write(msg+"\n")
-        self.output.configure(state='normal')
-        self.output.insert(tk.END, msg + "\n")
-        self.output.configure(state='disabled')
-        self.output.yview(tk.END)
+        try:
+            self.file.write(msg+"\n")
+            self.output.configure(state='normal')
+            self.output.insert(tk.END, msg + "\n")
+            self.output.configure(state='disabled')
+            self.output.yview(tk.END)
+        except:
+            self.output.configure(state='disabled')
+            self.output.yview(tk.END)
 
     def warning(self, msg):
-        self.file.write(msg+"\n")
-        self.output.configure(state='normal')
-        self.output.insert(tk.END, msg + "\n")
-        self.output.configure(state='disabled')
-        self.output.yview(tk.END)
+        try:
+            self.file.write(msg+"\n")
+            self.output.configure(state='normal')
+            self.output.insert(tk.END, msg + "\n")
+            self.output.configure(state='disabled')
+            self.output.yview(tk.END)
+        except:
+            self.output.configure(state='disabled')
+            self.output.yview(tk.END)
 
     def error(self, msg):
-        self.file.write(msg+"\n")
-        self.output.configure(state='normal')
-        self.output.insert(tk.END, msg + "\n")
-        self.output.configure(state='disabled')
-        self.output.yview(tk.END)
+        try:
+            self.file.write(msg+"\n")
+            self.output.configure(state='normal')
+            self.output.insert(tk.END, msg + "\n")
+            self.output.configure(state='disabled')
+            self.output.yview(tk.END)
+        except:
+            self.output.configure(state='disabled')
+            self.output.yview(tk.END)
 
 def createConsoleLog():
     """
