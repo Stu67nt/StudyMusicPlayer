@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "StudyMusicPlayer"
+version = "0.0.1"
+description = "A Music Player."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+dependencies = [
+    "customtkinter",
+    "pillow",
+    "pyglet",
+    "tinytag",
+    "colorama",
+    "yt-dlp"
+]
+
+[project.scripts]
+StudyMusicPlayer = "main:main"
+
+
