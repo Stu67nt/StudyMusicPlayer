@@ -236,7 +236,7 @@ class Playlists(ctk.CTkFrame):
 			self.playlistIDs = self.retrieve_playlistIDs()
 			self.old_playlist_names = current_playlist_names
 			destroy_widgets(self.widgets)
-			self.topbar = Components.ButtonFrame(self,
+			self.topbar = widgets.ButtonFrame(self,
 									  button_values=self.main_topbar_buttons,
 									  title=f"{len(self.playlistIDs)} Playlists",
 									  title_fg_color="transparent",
@@ -303,7 +303,7 @@ class Playlists(ctk.CTkFrame):
 			self.topbar.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="ew")
 			self.widgets.append(self.topbar)
 
-			self.track_list = widgets.SongFrame(self, song_ids=self.song_ids, font=self.font,
+			self.track_list = Components.SongFrame(self, song_ids=self.song_ids, font=self.font,
 										player_callback=self.player_callback)
 			self.track_list.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
 			self.widgets.append(self.track_list)
@@ -586,7 +586,7 @@ class Player(ctk.CTkFrame):
 		self.artist_name_label = ctk.CTkLabel(self.song_details_frame, text=self.printable_artist, font=self.song_artist_font)
 		self.artist_name_label.grid(row=1, column=1, pady=(5, 5), sticky="w")
 
-		self.playbar_buttons = Components.LabelFrame(self,
+		self.playbar_buttons = widgets.LabelFrame(self,
 										  values=self.button_icons,
 										  font=self.icons_font,
 										  is_horizontal=True,
