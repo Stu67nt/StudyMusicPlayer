@@ -2,13 +2,18 @@ import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
 import sqlite3
-from . import downloader
 import json
 import threading
-from . import utils
 from pathlib import Path
-from .Components import AddToPlaylist
 
+try:
+	from . import utils
+	from .Components import AddToPlaylist
+	from . import downloader
+except ImportError:
+	import utils
+	from Components import AddToPlaylist
+	import downloader
 """
 TODO: 
 Allow for fg_colour and corner radius to be scaled.

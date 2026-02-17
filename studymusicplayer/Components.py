@@ -1,6 +1,3 @@
-from . import downloader
-from . import widgets
-from . import utils
 import customtkinter as ctk
 from customtkinter import CTkFrame
 import tkinter as tk
@@ -13,6 +10,15 @@ from PIL import Image
 import io
 import tinytag as tt
 from pathlib import Path
+
+try:
+	from . import downloader
+	from . import widgets
+	from . import utils
+except ImportError:
+	import downloader
+	import widgets
+	import utils
 
 class ToDoList(ctk.CTkFrame):
 	def __init__(self, master, font: ctk.CTkFont):
@@ -582,10 +588,27 @@ class DownloadSettings(ctk.CTkToplevel):
 		self.confirm_button = ctk.CTkButton(self, text="Confirm", command=self.write_config)
 		self.confirm_button.grid(row=6, column=0, padx=(10, 10), pady=(10, 10))
 
+		self.deno_path_label = ctk.CTkLabel(self.settings_frame, text="Deno Path:", font=self.TEXT_FONT)
+		self.deno_path_label.grid(row=3, column=0, padx=(10, 10), sticky="w")
+		self.deno_path_entry = ctk.CTkEntry(self.settings_frame,
+											font=self.TEXT_FONT,
+											placeholder_text="Deno Path",
+											)
+		self.deno_path_entry.grid(row=3, column=1, padx=(10, 10), pady=(10, 10), sticky="ew")
+
+		self.ffmpeg_path_label = ctk.CTkLabel(self.settings_frame, text="FFmpeg Path:", font=self.TEXT_FONT)
+		self.ffmpeg_path_label.grid(row=4, column=0, padx=(10, 10), sticky="w")
+		self.ffmpeg_path_entry = ctk.CTkEntry(self.settings_frame,
+											  font=self.TEXT_FONT,
+											  placeholder_text="FFmpeg Path",
+											  )
+		self.ffmpeg_path_entry.grid(row=4, column=1, padx=(10, 10), pady=(10, 10), sticky="ew")
+
 	def write_config(self):
 		prefered_format = self.prefered_format_select.get()
 		add_thumbnail = self.add_thumbnail_select.get_radio_val()
-
+		deno_path = self.deno_path_entry.get()
+		ffmpeg_path = self.ffmpeg_path_entry.get()
 
 		if prefered_format == "mp3":
 			self.options['format'] = 'mp3/m4a/flac/bestaudio'
@@ -598,6 +621,12 @@ class DownloadSettings(ctk.CTkToplevel):
 			self.options["write_thumbnail"] = True
 		elif add_thumbnail == "No":
 			self.options["write_thumbnail"] = False
+
+		if os.path.isfile(deno_path):
+			self.options['deno_path'] = deno_path
+
+		if os.path.isfile(ffmpeg_path):
+			self.options['ffmpeg_path'] = ffmpeg_path
 
 		with open(str(self.BASE_DIR/"Databases"/"config.json"), "w") as f:
 			json.dump(self.options, f, indent=4)

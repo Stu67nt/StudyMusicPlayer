@@ -1,10 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
-from . import downloader
-from . import widgets
-from . import Components
-from . import utils
 from PIL import Image  # Used for thumbnails
 import pyglet  # Used for audio
 import tinytag as tt
@@ -13,6 +9,17 @@ import json
 import threading # Used so app doesnt freeze when doing longer processes
 from pathlib import Path
 import os
+
+try:
+	from . import downloader
+	from . import widgets
+	from . import Components
+	from . import utils
+except ImportError:
+	import downloader
+	import widgets
+	import Components
+	import utils
 
 
 class Home(ctk.CTkFrame): # Inheriting CTk class
@@ -869,3 +876,5 @@ def destroy_widgets(widgets):
 def main():
 	app = App("Study Music Player")
 	app.mainloop()
+
+main()
