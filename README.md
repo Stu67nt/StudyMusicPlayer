@@ -41,7 +41,7 @@ Build from source commnds
     studymusicplayer
     
 ## AI Usage
-Used for assistance with debugging, assisting with some GUI stuff and in line code suggestions. 
+Used for assistance with debugging, assisting with some GUI stuff and in line code suggestions as well as helping with compiling the project. 
 
 ## Extra Notes
 Hack Club People, if you are wondering how i have so much time built up it is because I had to learn a lot of new things for this and this is my first large scale GUI so that came with a lot of it's own headaches.
