@@ -776,7 +776,7 @@ class Player(ctk.CTkFrame):
 			"current_index": 0,
 			"queue": [-1]
 		}
-		with open("Databases/queue.json", "w") as f:
+		with open(self.BASE_DIR/"Databases"/"queue.json", "w") as f:
 			json.dump(queue_settings, f, indent=0)
 			f.close()
 

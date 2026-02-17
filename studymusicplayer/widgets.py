@@ -400,7 +400,7 @@ class SongLabel(ctk.CTkFrame):
 			"current_index": self.current_index,
 			"queue": self.queue,
 		}
-		with open("Databases/queue.json", "w") as f:
+		with open(self.BASE_DIR/"Databases"/"queue.json", "w") as f:
 			json.dump(queue_config, f, indent=0)
 			f.close()
 
