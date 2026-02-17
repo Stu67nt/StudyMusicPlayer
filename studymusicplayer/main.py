@@ -876,5 +876,3 @@ def destroy_widgets(widgets):
 def main():
 	app = App("Study Music Player")
 	app.mainloop()
-
-main()
