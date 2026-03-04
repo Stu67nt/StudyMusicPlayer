@@ -115,10 +115,9 @@ class ToDoList(ctk.CTkFrame):
 		Updates state of whether a task is checked or not.
 		:param task_id: Unique identifier of a specific task
 		:param is_completed: 1/0 dependant on if a task should be checked or not
-		:return:
 		"""
 		cursor = self.db.cursor()
-		# Query striiuctured like this to prevent SQL injection.
+		# Query structured like this to prevent SQL injection.
 		cursor.execute(
 			"UPDATE todo SET is_checked = ? WHERE taskID = ?",
 			(is_completed.get(), task_id)
@@ -155,12 +154,14 @@ class TimerCreate(ctk.CTkFrame):
 	def __init__(self, master, font: ctk.CTkFont):
 		super().__init__(master)
 
+		# Initalising weights and vars
 		self.grid_rowconfigure((1,2,3), weight=1)
 		self.grid_columnconfigure(1, weight=1)
 
 		self.BUTTON = [["Start Timer", self.start_timer]]
 		self.timer = None
 
+		# Placing widgets
 		self.title_label = ctk.CTkLabel(self, text="Timer", fg_color="gray30", corner_radius=6, font = font)
 		self.title_label.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="new", columnspan=2)
 
@@ -194,6 +195,9 @@ class TimerCreate(ctk.CTkFrame):
 
 
 	def start_timer(self, event=None):
+		"""
+		Gets all the timer information and starts the timer window
+		"""
 		# Input validation
 		if self.hours_spinbox.get().isdigit() and self.mins_spinbox.get().isdigit() and self.secs_spinbox.get().isdigit():
 			valid = True
@@ -211,6 +215,7 @@ class TimerCreate(ctk.CTkFrame):
 		else:
 			valid = False
 
+		# Creating the window or focusing it.
 		if (self.timer is None or not self.timer.winfo_exists()) and valid:
 			self.timer = Timer(self,
 							   hours=self.hours,
@@ -225,21 +230,25 @@ class Timer(ctk.CTkToplevel):
 	def __init__(self, master, hours, mins, secs, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
+		# Inialising window
 		self.title("Timer")
 		self.resizable(width = False, height = False)
 		self.rowconfigure((0,2), weight=1)
 		self.columnconfigure(0, weight=1)
 
+		# Initalising fonts
 		self.TEXT_FONT = ctk.CTkFont(family="Comic Sans MS", size= 25)
 		self.TIMER_FONT = ctk.CTkFont(family="Monospace", size= 50)
 		self.BUTTON_FONT = ctk.CTkFont(family="Comic Sans MS", size = 20)
 		self.BUTTONS = [["⏸", self.toggle_pause], ["⟳", self.reset_timer]]
 
+		# Initalising vars
 		self.init_secs = (3600*hours)+(60*mins)+secs
 		self.total_remaining_secs = self.init_secs
 		self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
 		self.is_paused = False
 
+		# Creating widgets
 		self.label = ctk.CTkLabel(self,
 								  text="Time Remaining",
 								  font = self.TEXT_FONT)
@@ -265,46 +274,25 @@ class Timer(ctk.CTkToplevel):
 								   font = self.BUTTON_FONT)
 		self.buttons.grid(row=2, column = 0, sticky = "ew", padx=(10,10), pady=(10,10))
 
-		# DOCUMENT BUG
-		# No warning given once time finishes. Due to total_remaining_secs only being checked once at start.
-		# TO recreate add the following lines to __init__():
-		"""
-				if self.total_remaining_secs <= 0:
-			print("TIMEEEE")
-			self.reset_timer()
-		"""
-
-		# DOCUMENT BUG
-		# When spamming unpausing after spamming pause seconds sick down much faster than expected.
-		# To recreate remove the self.after_cancel(self.deincrement)'s
-
-		# And remove the code in update time
 		if self.total_remaining_secs > 0:
 			self.deincrement = self.update_time()
 
 	def toggle_pause(self):
+		"""Pauses or unpauses the timer"""
 		if not self.is_paused:
 			self.is_paused = True
-			self.after_cancel(self.deincrement)
+			self.after_cancel(self.deincrement)  # Needed to prevent multiple timers running at once
 		else:
 			self.is_paused = False
 			if self.total_remaining_secs > 0:
 				self.deincrement = self.update_time()
 
 	def reset_timer(self):
+		"""Resets timer back to inital time"""
 		self.after_cancel(self.deincrement)
 		self.total_remaining_secs = self.init_secs
 		self.is_paused = True
-		# DOCUMNET BUG
-		# When timer reset the reset time is not immediately displayed instead only displayed after waiting a second for time to deincrement
-		# Recreate by adding the 3 lines below. REmove to recreate
-		"""
-		self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
-		self.time_remaining_label = ctk.CTkLabel(self.timer_frame,
-												 text=f"{self.hours_remaining.get()}:{self.mins_remaining.get()}:{self.secs_remaining.get()}",
-												 font=self.TIMER_FONT)
-		self.time_remaining_label.grid(row=0, column=0, sticky="nsew", padx=(10, 10), pady=(10, 10))
-		"""
+
 		# Displaying updated time
 		self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)
 		self.time_text_str = "%02d:%02d:%02d" % (self.hours_remaining.get(), self.mins_remaining.get(), self.secs_remaining.get())
@@ -312,15 +300,17 @@ class Timer(ctk.CTkToplevel):
 		pass
 
 	def convert_time(self, secs):
+		"""Converts seconds to hours mins and secs format"""
 		hours = ctk.IntVar(value=int(secs / 3600))
 		mins = ctk.IntVar(value=int((secs % 3600) / 60))
 		secs = ctk.IntVar(value=int((secs % 3600) % 60))
 		return hours, mins, secs
 
 	def update_time(self):
+		"""Updates the time display"""
 		self.total_remaining_secs -= 1
 		if (self.total_remaining_secs >= 0) and not self.is_paused:
-			self.deincrement = self.after(1000, self.update_time)  # Recursive
+			self.deincrement = self.after(1000, self.update_time)  # updates time after 1 second
 		if self.total_remaining_secs < 0:
 			print("TIMEEEE")
 			self.toggle_pause()
@@ -334,6 +324,7 @@ class AddToPlaylist(ctk.CTkToplevel):
 	def __init__(self, songIDs: list, font: ctk.CTkFont, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
+		# Initalising vars
 		self.geometry('450x450')
 		self.title("Add To Playlist")
 		self.resizable(width=False, height=False)
@@ -342,12 +333,15 @@ class AddToPlaylist(ctk.CTkToplevel):
 
 		self.songIDs = songIDs
 		self.font = font
-		self.playlists = self.retrieve_playlist_details()
+
+		# Getting all playlists and turning into a usable format
+		self.playlists = utils.retrieve_playlist_details()
 		self.playlist_names = []
 		for playlist in self.playlists:
 			playlist_name = f"{playlist[0]} - {playlist[1]}"
 			self.playlist_names.append(playlist_name)
 
+		# Creating widgets
 		self.frame = ctk.CTkFrame(self, fg_color="transparent")
 		self.frame.grid(row=0, column=0, padx = (10,10), pady=(10,10), sticky="nsew")
 		self.frame.rowconfigure(0, weight=1)
@@ -367,6 +361,7 @@ class AddToPlaylist(ctk.CTkToplevel):
 		self.submit.grid(row=1, column=0, padx=(10,10), pady=(10,10), sticky = "ew")
 
 	def submit_playlists(self):
+		"""Adds the songs to the selected playlists"""
 		checked = self.playlists_checkbox.get_checkboxes()
 		print(checked)
 		for playlist in checked:
@@ -377,6 +372,7 @@ class AddToPlaylist(ctk.CTkToplevel):
 		self.destroy()
 
 	def add_song_to_playlist(self, songID, playlistID):
+		"Adds songID to to playlist in specified playlistID"
 		db = utils.init_playlist_database()
 		cursor = db.cursor()
 		query = ("INSERT INTO "
@@ -389,17 +385,6 @@ class AddToPlaylist(ctk.CTkToplevel):
 		db.commit()
 		db.close()
 
-	def retrieve_playlist_details(self):
-		cursor = utils.init_playlist_list_database().cursor()
-		query = ("SELECT * FROM Playlist_List")
-		cursor.execute(query)
-		playlist_details = cursor.fetchall()
-		configured_playlist_details = []
-		for playlist in playlist_details:
-			configured_playlist_details.append([playlist[0],playlist[1]])
-		return configured_playlist_details
-
-
 
 class SongFrame(ctk.CTkFrame):
 	def __init__(self, master, song_ids, font: ctk.CTkFont, player_callback, is_scrollable=True):
@@ -410,6 +395,7 @@ class SongFrame(ctk.CTkFrame):
 		self.grid_rowconfigure(0, weight=1)
 		self.grid_columnconfigure(0, weight=1)
 
+		# Need to make a sub conatiner in case the frame needs to be scrollable
 		if is_scrollable:
 			self.container = ctk.CTkScrollableFrame(self)
 		else:
@@ -420,9 +406,11 @@ class SongFrame(ctk.CTkFrame):
 		self.container.grid_rowconfigure(0, weight=1)
 		self.container.grid_columnconfigure(0, weight=1)
 
+		# Initalising vars
 		self.track_list = song_ids
 		self.labels = []
 		i=0
+		# Creating a song label for each songID
 		for songID in self.track_list:
 			try:
 				self.song_label = widgets.SongLabel(self.container,
@@ -432,6 +420,8 @@ class SongFrame(ctk.CTkFrame):
 				self.song_label.grid(row=i, column=0, padx=(10,10), pady=1, sticky="ew")
 				self.labels.append(self.song_label)
 				i+=1
+			# If it tries to retrieve a song which does not exist it will remove it from the list of
+			# song ids and show a warning
 			except Exception as err:
 				try:
 					tk.messagebox.showerror("Missing song", err)
@@ -450,15 +440,18 @@ class PlaylistFrame(ctk.CTkFrame):
 				 is_scrollable=True):
 		super().__init__(master)
 
+		# Initalising Vars
 		self.player_callback = player_callback
 		self.song_ids = []
 		self.font = font
 		self.playlistIDs = playlistIDs
 		self.widgets = []
 
+		# Configuring weights
 		self.grid_rowconfigure(0, weight=1)
 		self.grid_columnconfigure(0, weight=1)
 
+		# Needed so can configure whether the frame is scrollable or not
 		if is_scrollable:
 			self.container = ctk.CTkScrollableFrame(self)
 		else:
@@ -469,6 +462,7 @@ class PlaylistFrame(ctk.CTkFrame):
 		self.container.grid_rowconfigure(0, weight=1)
 		self.container.grid_columnconfigure(0, weight=1)
 
+		# Creates all the playlist widgets
 		i=0
 		for playlistID in self.playlistIDs:
 			playlist_info = self.retrieve_playlist(playlistID)
@@ -485,6 +479,7 @@ class PlaylistFrame(ctk.CTkFrame):
 			i+=1
 
 	def retrieve_playlist(self, playlistID):
+		"""Retrieves all the playlist details of a specific playlist"""
 		db = utils.init_playlist_list_database()
 		cursor = db.cursor()
 		query = "SELECT * FROM Playlist_List WHERE PlaylistID = ?"
@@ -496,17 +491,19 @@ class SearchFrame(ctk.CTkFrame):
 	def __init__(self, master, font=ctk.CTkFont, progress_bar_callback=None, download_log_callback=None):
 		super().__init__(master)
 
+		# Configuring weights
 		self.grid_rowconfigure(3, weight=1)
 		self.grid_columnconfigure(0, weight=1)
 
-
-		self.BUTTONS = [["Download Song", self.search],
+		# Initialising Vars
+		self.BUTTONS = [["Download Song", self.download_song],
 						["Download Settings", self.download_settings]]
 		self.font = font
 		self.settings_screen = None
 		self.progress_bar_callback = progress_bar_callback
 		self.download_log_callback = download_log_callback
 
+		# Placing widgets
 		self.title = ctk.CTkLabel(self,
 								  text = "Download a song from YouTube",
 								  font = self.font,
@@ -519,21 +516,23 @@ class SearchFrame(ctk.CTkFrame):
 		self.buttons = widgets.ButtonFrame(self, button_values=self.BUTTONS, is_horizontal=True, font=self.font)
 		self.buttons.grid(row=2, column = 0, sticky = "ew", padx=(10,10), pady=(10,10))
 
-	def search(self, event = None):
+	def download_song(self, event = None):
+		"""Starts the download for the song."""
 		inp = self.entry.get()
 		print(f"Downloading the url {inp}")
 		try:
+			# Threaded as to not freeze the app when booting up downloader
 			threading.Thread(target = downloader.download,
 							 args = (inp,
 									 downloader.create_download_config(file_name = downloader.createConsoleLog(),
 																	   progress_bar = self.progress_bar_callback,
-																	   output = self.download_log_callback)),
-							 daemon = False).start()
+																	   output = self.download_log_callback))).start()
 		except Exception as err:
 			tk.messagebox.showerror("Download Error", err)
 
 
 	def download_settings(self, event = None):
+		"""Creates the download settings window"""
 		if self.settings_screen is None or not self.settings_screen.winfo_exists():
 			self.settings_screen = DownloadSettings(self)
 			self.settings_screen.after(100, self.settings_screen.lift)
@@ -543,14 +542,17 @@ class SearchFrame(ctk.CTkFrame):
 
 class DownloadSettings(ctk.CTkToplevel):
 	def __init__(self, event, *args, **kwargs):
+		# Initalising window
 		super().__init__(*args, **kwargs)
 		self.geometry('500x450')
 		self.title("Download Settings")
 		self.resizable(width = False, height = False)
 
+		# Configuring weights
 		self.rowconfigure(1, weight=1)
 		self.columnconfigure(0, weight=1)
 
+		# Initalising Vars
 		self.BASE_DIR = Path(__file__).parent
 		self.f = open(str(self.BASE_DIR/"Databases"/"config.json"))
 		self.options = json.load(self.f)
@@ -558,6 +560,7 @@ class DownloadSettings(ctk.CTkToplevel):
 
 		self.TEXT_FONT = ctk.CTkFont(family="Cascadia Mono", size=18)
 
+		# Placing widgets
 		self.label = ctk.CTkLabel(self,
 								  text="Download Settings",
 								  font = self.TEXT_FONT)
@@ -605,11 +608,14 @@ class DownloadSettings(ctk.CTkToplevel):
 		self.ffmpeg_path_entry.grid(row=4, column=1, padx=(10, 10), pady=(10, 10), sticky="ew")
 
 	def write_config(self):
+		"""Stores the selected settings to the config.json"""
+		# Getting inputs
 		prefered_format = self.prefered_format_select.get()
 		add_thumbnail = self.add_thumbnail_select.get_radio_val()
 		deno_path = self.deno_path_entry.get()
 		ffmpeg_path = self.ffmpeg_path_entry.get()
 
+		"""Changing config based on inputs"""
 		if prefered_format == "mp3":
 			self.options['format'] = 'mp3/m4a/flac/bestaudio'
 		elif prefered_format == "m4a":
@@ -622,12 +628,14 @@ class DownloadSettings(ctk.CTkToplevel):
 		elif add_thumbnail == "No":
 			self.options["write_thumbnail"] = False
 
+		# Checking if the paths are actual files.
 		if os.path.isfile(deno_path):
 			self.options['deno_path'] = deno_path
 
 		if os.path.isfile(ffmpeg_path):
 			self.options['ffmpeg_path'] = ffmpeg_path
 
+		# Writing the settings to config
 		with open(str(self.BASE_DIR/"Databases"/"config.json"), "w") as f:
 			json.dump(self.options, f, indent=4)
 			f.close()
@@ -637,9 +645,12 @@ class DownloadSettings(ctk.CTkToplevel):
 class QueueViewer(ctk.CTkToplevel):
 	def __init__(self, event, font: ctk.CTkFont, player_callback, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+
+		# Configuring weights
 		self.rowconfigure(1, weight=1)
 		self.columnconfigure(0, weight=1)
 
+		# Configuring window and initialising vars
 		self.title("Queue")
 		self.geometry("500x700")
 		self.font = font
@@ -648,6 +659,7 @@ class QueueViewer(ctk.CTkToplevel):
 		self.player_callback = player_callback
 		self.BASE_DIR = Path(__file__).parent
 
+		# Placing widgets
 		self.label = ctk.CTkLabel(self,
 								  text="Queue",
 								  font=self.font)
@@ -663,22 +675,24 @@ class QueueViewer(ctk.CTkToplevel):
 		self.queue_frame.grid(row=1, column=0, columnspan=2, pady=(10, 10), sticky="nsew")
 		self.queue_frame.grid_columnconfigure(0, weight=1)
 
+		# Settings the queue to continuously update
 		self.update_queue(event)
 
-	def load_queue(self):
-		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "r") as f:
-			queue_settings = json.load(f)
-			f.close()
-		return queue_settings
-
 	def update_queue(self, event):
-		self.queue_settings = self.load_queue()
+		# Getting the queue to compare
+		self.queue_settings = utils.load_queue()
 		current_index = self.queue_settings["current_index"]
+
+		# If queue has changed frame is regenerated to reflect the changes
 		if self.queue != self.queue_settings["queue"] or self.old_index != current_index:
-			self.old_index = self.queue_settings["current_index"]
+			# Destroying old widgets to prevent memory leaks and lag
 			for widget in self.queue_frame.winfo_children():
 				widget.destroy()
+
+			# Updating the queue refrences
+			self.old_index = self.queue_settings["current_index"]
 			self.queue = self.queue_settings["queue"]
+			# Redrawing queue
 			i = 0
 			for songID in self.queue:
 				self.song_details = self.retrieve_song(songID)
@@ -691,6 +705,9 @@ class QueueViewer(ctk.CTkToplevel):
 					self.song_label_frame.grid(column=0, row=i, sticky="ew", padx=(10, 10))
 					self.song_label_frame.grid_columnconfigure((1,2), weight=1)
 
+					# Checks if the current song being drawn is the current playing song
+					# event.widget.master.master.songID gives the current playing song
+					# I had to dig thru variable watch to find this
 					if songID == event.widget.master.master.songID:
 						self.song_label_frame.configure(fg_color="grey10")
 
@@ -706,6 +723,9 @@ class QueueViewer(ctk.CTkToplevel):
 					self.remove_button = ctk.CTkLabel(self.song_label_frame, text="X", font=options_button_font)
 					self.remove_button.grid(column=2, row=0, rowspan=2, padx=(5,5), pady=(5,5), sticky="e")
 
+					# Binding all parts of the label to jump to the song if it is clicked.
+					# A cleaner approach would be to place a transaprent frame on top of
+					# the song label so i only have bind once but it is laggy enough.
 					self.song_label_frame.bind("<Button-1>",
 											 lambda event, sID=songID: self.jump_to_song(event, sID))
 					self.song_label_frame.bind("<Enter>", lambda e: utils.on_enter(e))
@@ -728,6 +748,7 @@ class QueueViewer(ctk.CTkToplevel):
 
 					i += 1
 
+		# continuously check after 200 ms
 		self.after(200, lambda: self.update_queue(event))
 
 	def retrieve_song(self, songID):
@@ -739,34 +760,36 @@ class QueueViewer(ctk.CTkToplevel):
 		self.db.close()
 		return song_details
 
-	def menu_trigger(self, event):
-		try:
-			self.menu.tk_popup(event.x_root, event.y_root)
-		finally:
-			self.menu.grab_release()
-
 	def jump_to_song(self, event, songID):
-		queue_settings = self.load_queue()
+		"""If a song is seletced in the queue"""
+		# Loading the queue and changing the current index to the index of the selected song
+		queue_settings = utils.load_queue()
 		queue = queue_settings["queue"]
 		current_index = queue.index(songID)
 		queue_settings = {
 			"current_index": current_index,
 			"queue": queue
 		}
+		# Writing new config to settings
 		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
 			json.dump(queue_settings, f, indent=0)
 			f.close()
 		self.player_callback.load_song(songID)
 
 	def remove_from_queue(self, event, songID):
-		queue_settings = self.load_queue()
+		"""Removes triggered song from queue"""
+		# Loading queue
+		queue_settings = utils.load_queue()
 		queue = queue_settings["queue"]
 		current_index = queue_settings["current_index"]
+
+		# Removing an item from a list will change if current index needs to be moved depending on song removed
 		if current_index >= queue.index(songID):
 			queue.remove(songID)
 			current_index -= 1
 		else:
 			queue.remove(songID)
+
 		if len(queue) == 0:  # Queue cannot be left blank
 			queue = [-1]
 			current_index = 0
@@ -780,6 +803,7 @@ class QueueViewer(ctk.CTkToplevel):
 			f.close()
 
 	def queue_clear(self):
+		"""Clears the queue"""
 		queue_settings = {
 			"current_index": 0,
 			"queue": [-1]
@@ -789,6 +813,7 @@ class QueueViewer(ctk.CTkToplevel):
 			f.close()
 
 def destroy_widgets(widgets):
+	"""Destroys all widgets provided"""
 	for widget in widgets:
 		widget.destroy()
 		widgets.remove(widget)

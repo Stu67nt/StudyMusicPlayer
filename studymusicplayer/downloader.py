@@ -11,64 +11,80 @@ from pathlib import Path
 
 
 class MyLogger:
+    """This class is used by the yt-dlp logger"""
     def __init__(self, file_name:str, output):
+        # Initalising variables
         self.file_name = file_name
         self.output = output
         self.file = open(f"{file_name}", "w", encoding="utf-8")
 
     def debug(self, msg):
-        # For compatibility with youtube-dl, both debug and info are passed into debug
-        # You can distinguish them by the prefix '[debug] '
+        """Prints debug and info messages to the log"""
+        # Try except in case some messages cannot be printed
         try:
-            if msg.startswith('[debug] '):
-                self.file.write(msg+"\n")
-                self.output.configure(state='normal')
-                self.output.insert(tk.END, msg+"\n")
-                self.output.configure(state='disabled')
-                self.output.yview(tk.END)
-            else:
-                self.info(msg)
+            # Setting the box to allow writing only for sending the message
+            self.file.write(msg+"\n")
+            self.output.configure(state='normal')
+            self.output.insert(tk.END, msg+"\n")
+            self.output.configure(state='disabled')
+            self.output.yview(tk.END)
         except:
+            # If an error occurs it will be when inserting so we need to
+            # make sure it is disabled again to prevent user writing
             self.output.configure(state='disabled')
             self.output.yview(tk.END)
 
     def info(self, msg):
+        """Prints info messages to the log"""
+        # Try except in case some messages cannot be printed
         try:
+            # Setting the box to allow writing only for sending the message
             self.file.write(msg+"\n")
             self.output.configure(state='normal')
             self.output.insert(tk.END, msg + "\n")
             self.output.configure(state='disabled')
             self.output.yview(tk.END)
         except:
+            # If an error occurs it will be when inserting so we need to
+            # make sure it is disabled again to prevent user writing
             self.output.configure(state='disabled')
             self.output.yview(tk.END)
 
     def warning(self, msg):
+        """Prints warning messages to the log"""
+        # Try except in case some messages cannot be printed
         try:
+            # Setting the box to allow writing only for sending the message
             self.file.write(msg+"\n")
             self.output.configure(state='normal')
             self.output.insert(tk.END, msg + "\n")
             self.output.configure(state='disabled')
             self.output.yview(tk.END)
         except:
+            # If an error occurs it will be when inserting so we need to
+            # make sure it is disabled again to prevent user writing
             self.output.configure(state='disabled')
             self.output.yview(tk.END)
 
     def error(self, msg):
+        """Prints error messages to the log"""
+        # Try except in case some messages cannot be printed
         try:
+            # Setting the box to allow writing only for sending the message
             self.file.write(msg+"\n")
             self.output.configure(state='normal')
             self.output.insert(tk.END, msg + "\n")
             self.output.configure(state='disabled')
             self.output.yview(tk.END)
         except:
+            # If an error occurs it will be when inserting so we need to
+            # make sure it is disabled again to prevent user writing
             self.output.configure(state='disabled')
             self.output.yview(tk.END)
 
 def createConsoleLog():
     """
     Creates a file for storing logs of console.
-    :returns: file path of the created txt file
     """
     BASE_DIR = Path(__file__).parent
     print("Creating Console Log")
@@ -93,7 +109,6 @@ def progressHook(d, progress_bar):
 def init_database():
     """
     Initialises music_ops.db and songs table or creates them if they don't exist.
-    :return: SQLite3 db object
     """
     BASE_DIR = Path(__file__).parent
     db = sqlite3.connect(str(BASE_DIR/"Databases"/"music_ops.db"))
@@ -112,6 +127,7 @@ def init_database():
     return db
 
 def add_song(db, song_file_name):
+    """Adds song to the songs database"""
     BASE_DIR = Path(__file__).parent
     file_path = str(BASE_DIR /"Songs"/ song_file_name)
     song = tt.TinyTag.get(str(BASE_DIR/"Temp_Downloads"/song_file_name))  # Extracting the metadata
@@ -147,10 +163,6 @@ def move_file(file_name:str, current_dir:str, target_dir:str):
 def download(url: list, config: dict):
     """
     Downloads all urls in given list and adds them to songs.db
-    :param url:
-    :param config:
-    :param progress_bar:
-    :return:
     """
     BASE_DIR = Path(__file__).parent
     with yt_dlp.YoutubeDL(config) as ydl:
@@ -171,6 +183,7 @@ def download(url: list, config: dict):
                 print(err)
 
 def create_download_config(file_name, output=None, progress_bar=None):
+    """Creates the download configuration"""
     BASE_DIR = Path(__file__).parent
     dir = str(BASE_DIR/"Temp_Downloads")
     print(dir)
@@ -217,6 +230,7 @@ def create_download_config(file_name, output=None, progress_bar=None):
     }
     return download_config
 
+"""Used for testing downloads does not run normally"""
 if __name__ == "__main__":
     file_path = createConsoleLog()
     download_config = create_download_config(file_path)

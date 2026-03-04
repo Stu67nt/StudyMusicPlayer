@@ -300,9 +300,11 @@ class SongLabel(ctk.CTkFrame):
 				 player_callback):
 		super().__init__(master)
 
+		# Creatign weights
 		self.grid_rowconfigure(1, weight=1)
 		self.grid_columnconfigure(1, weight=1)
 
+		# Initialising vars
 		self.font = font
 		self.prompt = None
 		self.player_callback = player_callback
@@ -315,6 +317,7 @@ class SongLabel(ctk.CTkFrame):
 		self.mins, self.secs = self.convert_time(self.song_details[3])
 		self.artist = self.song_details[4]
 
+		# Drawing widgets
 		self.name_label = ctk.CTkLabel(self, text = self.song_name, font = self.font)
 		self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
 
@@ -329,6 +332,7 @@ class SongLabel(ctk.CTkFrame):
 		self.options_button = ctk.CTkLabel(self, text = "⋮", font = self.options_button_font)
 		self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
+		# Creating menu options
 		MENU_OPTIONS = [["Add to Queue", self.add_to_queue],
 						["Add to Playlist", self.add_to_playlist],
 						["Delete Song", self.delete_song]]
@@ -339,6 +343,7 @@ class SongLabel(ctk.CTkFrame):
 			func = option[1]
 			self.menu.add_command(label=name, command=func)
 
+		# Hover over and click events
 		self.options_button.bind("<Button-1>", self.menu_trigger)
 		self.options_button.bind("<Enter>", lambda e: utils.on_enter(e))
 		self.options_button.bind("<Leave>", lambda e: utils.on_leave(e))
@@ -347,18 +352,19 @@ class SongLabel(ctk.CTkFrame):
 		self.bind("<Enter>", lambda e: utils.on_enter(e))
 		self.bind("<Leave>", lambda e: utils.on_leave(e))
 
-
-	# ChatGPT Slop - Change it
 	def menu_trigger(self, event):
+		"""Creates the popup menu when 3 dots is clicked"""
 		try:
 			self.menu.tk_popup(event.x_root, event.y_root)
 		finally:
 			self.menu.grab_release()
 
 	def play_song(self, event):
+		"""Triggets call to play song"""
 		self.player_callback.load_song(self.songID)
 
 	def retrieve_song(self):
+		"""Gets all details about specific song"""
 		self.db = downloader.init_database()
 		cursor = self.db.cursor()
 		query = "SELECT * FROM songs WHERE songID = ?"
@@ -368,12 +374,15 @@ class SongLabel(ctk.CTkFrame):
 		return song_details
 
 	def add_to_playlist(self):
+		"""Ads song to songID selected in AddToPlaylist popup"""
 		songID = [self.songID]  # needs to be in a list so add to playlist can properly process the id
 		if self.prompt is None or not self.prompt.winfo_exists():
 			self.prompt = AddToPlaylist(songIDs=songID, font=self.font)
 		self.prompt.after(100, self.prompt.lift)
 
 	def delete_song(self):
+		"""Deletes song from database"""
+		# Removing from songs table
 		db = downloader.init_database()
 		cursor = db.cursor()
 		query = "DELETE FROM songs WHERE songID = ?"
@@ -381,6 +390,7 @@ class SongLabel(ctk.CTkFrame):
 		db.commit()
 		db.close()
 
+		# Removing from any connected playlists
 		db = utils.init_playlist_database()
 		cursor = db.cursor()
 		query = "DELETE FROM Playlist WHERE songID = ?"
@@ -388,15 +398,9 @@ class SongLabel(ctk.CTkFrame):
 		db.commit()
 		db.close()
 
-
-	def load_queue(self):
-		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "r") as f:
-			queue_settings = json.load(f)
-			f.close()
-		return queue_settings
-
 	def add_to_queue(self):
-		self.queue_settings = self.load_queue()
+		"""Adds song to the end of the queue"""
+		self.queue_settings = utils.load_queue()
 		self.queue = self.queue_settings['queue']
 		self.current_index = self.queue_settings['current_index']
 		self.queue.append(self.songID)
@@ -410,16 +414,12 @@ class SongLabel(ctk.CTkFrame):
 			f.close()
 
 	def convert_time(self, secs):
+		"""Converts time from seconds to mins and seconds"""
 		mins = int(secs // 60)
 		secs = int(secs % 60)
 		return mins, secs
 
 class PlaylistLabel(ctk.CTkFrame):
-	"""
-	TODO: Add default thumbnail.
-		  Create Checkboxable version
-		  BInding click to relevant playlist
-	"""
 	def __init__(self,
 				 master,
 				 playlistID: int,
@@ -429,14 +429,17 @@ class PlaylistLabel(ctk.CTkFrame):
 				 player_callback):
 		super().__init__(master)
 
+		# Configuring weights
 		self.grid_rowconfigure(1, weight=1)
 		self.grid_columnconfigure(1, weight=1)
 
+		# Initalising vars
 		self.playlist_name = playlist_name
 		self.playlistID = playlistID
 		self.player_callback = player_callback
 		self.BASE_DIR = Path(__file__).parent
 
+		# Placing widgets
 		self.name_label = ctk.CTkLabel(self, text = playlist_name, font = font)
 		self.name_label.grid(column=1, row=0, padx=(10,10), sticky= "nw")
 
@@ -444,6 +447,7 @@ class PlaylistLabel(ctk.CTkFrame):
 		self.options_button = ctk.CTkLabel(self, text = "⋮", font = self.options_button_font)
 		self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
+		# Creating popup menu
 		MENU_OPTIONS = [["Delete Playlist", self.delete_playlist],
 						["Add to Queue", self.add_to_queue],
 						["Rename Playlist", self.rename_playlist],
@@ -455,6 +459,7 @@ class PlaylistLabel(ctk.CTkFrame):
 			func = option[1]
 			self.menu.add_command(label=name, command=func)
 
+		# Adding bindings
 		self.options_button.bind("<Button-1>", self.menu_trigger)
 		self.options_button.bind("<Enter>", lambda e: utils.on_enter(e))
 		self.options_button.bind("<Leave>", lambda e: utils.on_leave(e))
@@ -464,15 +469,15 @@ class PlaylistLabel(ctk.CTkFrame):
 		self.bind("<Leave>", lambda e: utils.on_leave(e))
 
 	def menu_trigger(self, event):
+		"""Creates popup menu is 3 dots are clicked"""
 		try:
 			self.menu.tk_popup(event.x_root, event.y_root)
 		finally:
 			self.menu.grab_release()
 
-	def temp(self):
-		print("temp")
-
 	def delete_playlist(self):
+		"""Deletes playlist from database"""
+		# Removing connections to songs
 		db = utils.init_playlist_database()
 		cursor = db.cursor()
 		query = "DELETE FROM Playlist WHERE playlistID = (?)"
@@ -480,6 +485,7 @@ class PlaylistLabel(ctk.CTkFrame):
 		db.commit()
 		db.close()
 
+		# Removing from playlist table
 		db = utils.init_playlist_list_database()
 		cursor = db.cursor()
 		query = "DELETE FROM Playlist_List WHERE playlistID = (?)"
@@ -487,11 +493,13 @@ class PlaylistLabel(ctk.CTkFrame):
 		db.commit()
 		db.close()
 
+	# Marked for removing to utils
 	def add_to_queue(self):
+		"""Adds all songs in the playlist to the queue"""
 		queue_settings = self.player_callback.load_queue()
 		queue = queue_settings['queue']
 		current_index = queue_settings['current_index']
-		song_ids = self.retrieve_playlist_songIDs(self.playlistID)
+		song_ids = utils.retrieve_playlist_songIDs(self.playlistID)
 		for song_id in song_ids:
 			queue.append(song_id)
 
@@ -504,8 +512,9 @@ class PlaylistLabel(ctk.CTkFrame):
 			f.close()
 
 	def overwrite_queue(self):
+		"""Clears the queue and adds all songs in playlst to the queue"""
 		queue_settings = self.player_callback.load_queue()
-		queue = self.retrieve_playlist_songIDs(self.playlistID)
+		queue = utils.retrieve_playlist_songIDs(self.playlistID)
 		current_index = 0
 
 		queue_config = {
@@ -518,6 +527,7 @@ class PlaylistLabel(ctk.CTkFrame):
 		self.player_callback.load_song(queue[current_index])
 
 	def rename_playlist(self, event=None):
+		"""Creates a new window allowing for playlist name change"""
 		dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
 		name = dialog.get_input().strip()
 		if name != "" and name != None:
@@ -530,15 +540,3 @@ class PlaylistLabel(ctk.CTkFrame):
 				(name, self.playlistID,))
 			db.commit()
 			db.close()
-
-	def retrieve_playlist_songIDs(self, playlistID):
-		db = utils.init_playlist_database()
-		cursor = db.cursor()
-		query = "SELECT songID FROM Playlist WHERE playlistID = ?"
-		cursor.execute(query, (playlistID,))
-		songs_unfiltered = cursor.fetchall()
-
-		song_ids = []
-		for songID in songs_unfiltered:
-			song_ids.append(songID[0])
-		return song_ids
