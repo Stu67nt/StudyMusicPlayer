@@ -211,7 +211,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 			songIDs.append(song.split(" ")[0])
 		# Creates playlist
 		if self.prompt is None or not self.prompt.winfo_exists():
-			self.prompt = AddToPlaylist(songIDs=songID, font=self.font)
+			self.prompt = Components.AddToPlaylist(songIDs=songIDs, font=self.font)
 		self.prompt.after(100, self.prompt.lift)
 
 	def delete_songs(self):
@@ -661,7 +661,7 @@ class Player(ctk.CTkFrame):
 	def song_end(self, load_previous: bool = False):
 		"""
 		Handles the end of a song
-		:param load_previous: If true goes tot he previous song rather than the next.
+		:param load_previous: If true goes to the previous song rather than the next.
 		"""
 		self.queue_settings = utils.load_queue()
 		self.queue = self.queue_settings['queue']

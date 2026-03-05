@@ -1,6 +1,7 @@
 import sqlite3
 from pathlib import Path
 import json
+import gc
 
 try:
 	from . import downloader
@@ -128,7 +129,7 @@ def retrieve_all_playlistIDs():
 
 def retrieve_playlist_songIDs(playlistID):
 	"""Returns songID of all songs in the playlist in a 1d list"""
-	db = utils.init_playlist_database()
+	db = init_playlist_database()
 	cursor = db.cursor()
 	query = "SELECT songID FROM Playlist WHERE playlistID = ?"
 	cursor.execute(query, (playlistID,))
@@ -153,7 +154,7 @@ def delete_playlists(playlistIDs):
 	Deletes provided playlist and records of songs attatched to it.
 	"""
 	# Removing connections to any songs
-	db = utils.init_playlist_database()
+	db = init_playlist_database()
 	cursor = db.cursor()
 	query = "DELETE FROM Playlist WHERE playlistID = (?)"
 	for playlistID in playlistIDs:
@@ -162,7 +163,7 @@ def delete_playlists(playlistIDs):
 	db.close()
 
 	# Removing the playlist
-	db = utils.init_playlist_list_database()
+	db = init_playlist_list_database()
 	cursor = db.cursor()
 	query = "DELETE FROM Playlist_List WHERE playlistID = (?)"
 	for playlistID in playlistIDs:
@@ -222,8 +223,13 @@ def overwrite_queue(song_ids: list, player_callback):
 
 def destroy_widgets(widgets):
 	"""Destroys all listed widgets to clear memory and rpevent stacking"""
-	for widget in widgets:
-		widget.destroy()
-		widgets.remove(widget)
+	for x in range(len(widgets)):
+		object = widgets.pop()
+		for widget in object.winfo_children():
+			widget.destroy()  # deleting from tk
+			del widget  # deleting from python
+		del object
+	del widgets
+	gc.collect()
 
 print(Path(__file__).parent)
