@@ -14,14 +14,6 @@ except ImportError:
 	import utils
 	from Components import AddToPlaylist
 	import downloader
-"""
-TODO: 
-Allow for fg_colour and corner radius to be scaled.
-Fix Sticky
-
-Widgets exists to hold the most fundamental GUI elements which make up the program. Complex GUI elements such as 
-the To Do Lists will be found in Components.py
-"""
 
 class ButtonFrame(ctk.CTkFrame):
 	"""
@@ -228,6 +220,7 @@ class RadioButtonFrame(ctk.CTkFrame):
 				self.radio_button.grid(row=i + 1, column=0, padx=20, pady=20, sticky=button_sticky)
 
 	def get_radio_val(self):
+		"""Returns the selected value of the radio buttons"""
 		return self.var.get()
 
 
@@ -311,7 +304,7 @@ class SongLabel(ctk.CTkFrame):
 		self.BASE_DIR = Path(__file__).parent
 
 		self.songID = songID
-		self.song_details = self.retrieve_song()
+		self.song_details = utils.retrieve_song(self.songID)
 		self.song_filepath = self.song_details[1]
 		self.song_name = self.song_details[2]
 		self.mins, self.secs = self.convert_time(self.song_details[3])
@@ -333,7 +326,7 @@ class SongLabel(ctk.CTkFrame):
 		self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
 		# Creating menu options
-		MENU_OPTIONS = [["Add to Queue", self.add_to_queue],
+		MENU_OPTIONS = [["Add to Queue", lambda: utils.add_to_queue([self.songID])],
 						["Add to Playlist", self.add_to_playlist],
 						["Delete Song", self.delete_song]]
 
@@ -363,16 +356,6 @@ class SongLabel(ctk.CTkFrame):
 		"""Triggets call to play song"""
 		self.player_callback.load_song(self.songID)
 
-	def retrieve_song(self):
-		"""Gets all details about specific song"""
-		self.db = downloader.init_database()
-		cursor = self.db.cursor()
-		query = "SELECT * FROM songs WHERE songID = ?"
-		cursor.execute(query, (self.songID,))
-		song_details = cursor.fetchone()
-		self.db.close()
-		return song_details
-
 	def add_to_playlist(self):
 		"""Ads song to songID selected in AddToPlaylist popup"""
 		songID = [self.songID]  # needs to be in a list so add to playlist can properly process the id
@@ -397,21 +380,6 @@ class SongLabel(ctk.CTkFrame):
 		cursor.execute(query, (self.songID,))
 		db.commit()
 		db.close()
-
-	def add_to_queue(self):
-		"""Adds song to the end of the queue"""
-		self.queue_settings = utils.load_queue()
-		self.queue = self.queue_settings['queue']
-		self.current_index = self.queue_settings['current_index']
-		self.queue.append(self.songID)
-
-		queue_config = {
-			"current_index": self.current_index,
-			"queue": self.queue,
-		}
-		with open(self.BASE_DIR/"Databases"/"queue.json", "w") as f:
-			json.dump(queue_config, f, indent=0)
-			f.close()
 
 	def convert_time(self, secs):
 		"""Converts time from seconds to mins and seconds"""
@@ -448,10 +416,11 @@ class PlaylistLabel(ctk.CTkFrame):
 		self.options_button.grid(column=3, row=0, rowspan=2, padx=(10, 10), pady=(10, 10), sticky="e")
 
 		# Creating popup menu
-		MENU_OPTIONS = [["Delete Playlist", self.delete_playlist],
-						["Add to Queue", self.add_to_queue],
+		MENU_OPTIONS = [["Delete Playlist", lambda: utils.delete_playlists([self.playlistID])],
+						["Add to Queue", lambda: utils.add_to_queue(utils.retrieve_playlist_songIDs(self.playlistID))],
 						["Rename Playlist", self.rename_playlist],
-						["Overwrite Queue", self.overwrite_queue]]
+						["Overwrite Queue", lambda: utils.overwrite_queue(song_ids = utils.retrieve_playlist_songIDs(self.playlistID),
+																		  player_callback = self.player_callback)]]
 
 		self.menu = tk.Menu(self, tearoff=0)
 		for option in MENU_OPTIONS:
@@ -475,60 +444,9 @@ class PlaylistLabel(ctk.CTkFrame):
 		finally:
 			self.menu.grab_release()
 
-	def delete_playlist(self):
-		"""Deletes playlist from database"""
-		# Removing connections to songs
-		db = utils.init_playlist_database()
-		cursor = db.cursor()
-		query = "DELETE FROM Playlist WHERE playlistID = (?)"
-		cursor.execute(query, (self.playlistID,))
-		db.commit()
-		db.close()
-
-		# Removing from playlist table
-		db = utils.init_playlist_list_database()
-		cursor = db.cursor()
-		query = "DELETE FROM Playlist_List WHERE playlistID = (?)"
-		cursor.execute(query, (self.playlistID,))
-		db.commit()
-		db.close()
-
-	# Marked for removing to utils
-	def add_to_queue(self):
-		"""Adds all songs in the playlist to the queue"""
-		queue_settings = self.player_callback.load_queue()
-		queue = queue_settings['queue']
-		current_index = queue_settings['current_index']
-		song_ids = utils.retrieve_playlist_songIDs(self.playlistID)
-		for song_id in song_ids:
-			queue.append(song_id)
-
-		queue_config = {
-			"current_index": current_index,
-			"queue": queue,
-		}
-		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
-			json.dump(queue_config, f, indent=0)
-			f.close()
-
-	def overwrite_queue(self):
-		"""Clears the queue and adds all songs in playlst to the queue"""
-		queue_settings = self.player_callback.load_queue()
-		queue = utils.retrieve_playlist_songIDs(self.playlistID)
-		current_index = 0
-
-		queue_config = {
-			"current_index": current_index,
-			"queue": queue,
-		}
-		with open(self.BASE_DIR/"Databases"/"queue.json", "w") as f:
-			json.dump(queue_config, f, indent=0)
-			f.close()
-		self.player_callback.load_song(queue[current_index])
-
 	def rename_playlist(self, event=None):
 		"""Creates a new window allowing for playlist name change"""
-		dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Create Playlist")
+		dialog = ctk.CTkInputDialog(text="Enter Playlist Name:", title="Rename Playlist")
 		name = dialog.get_input().strip()
 		if name != "" and name != None:
 			db = utils.init_playlist_list_database()

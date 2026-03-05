@@ -335,7 +335,7 @@ class AddToPlaylist(ctk.CTkToplevel):
 		self.font = font
 
 		# Getting all playlists and turning into a usable format
-		self.playlists = utils.retrieve_playlist_details()
+		self.playlists = utils.retrieve_all_playlist_details()
 		self.playlist_names = []
 		for playlist in self.playlists:
 			playlist_name = f"{playlist[0]} - {playlist[1]}"
@@ -668,7 +668,7 @@ class QueueViewer(ctk.CTkToplevel):
 		self.label = ctk.CTkButton(self,
 								  text="Clear Queue",
 								  font=self.font,
-								  command = self.queue_clear)
+								  command = utils.queue_clear)
 		self.label.grid(row=0, column=1, padx=(10, 10), pady=(10, 10), sticky="ew")
 
 		self.queue_frame = ctk.CTkScrollableFrame(self, fg_color="transparent")
@@ -695,7 +695,7 @@ class QueueViewer(ctk.CTkToplevel):
 			# Redrawing queue
 			i = 0
 			for songID in self.queue:
-				self.song_details = self.retrieve_song(songID)
+				self.song_details = utils.retrieve_song(songID)
 				if self.song_details != None:
 					self.songID = songID
 					self.song_name = self.song_details[2]
@@ -751,15 +751,6 @@ class QueueViewer(ctk.CTkToplevel):
 		# continuously check after 200 ms
 		self.after(200, lambda: self.update_queue(event))
 
-	def retrieve_song(self, songID):
-		self.db = downloader.init_database()
-		cursor = self.db.cursor()
-		query = "SELECT * FROM songs WHERE songID = ?"
-		cursor.execute(query, (songID,))
-		song_details = cursor.fetchone()
-		self.db.close()
-		return song_details
-
 	def jump_to_song(self, event, songID):
 		"""If a song is seletced in the queue"""
 		# Loading the queue and changing the current index to the index of the selected song
@@ -801,20 +792,3 @@ class QueueViewer(ctk.CTkToplevel):
 		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
 			json.dump(queue_settings, f, indent=0)
 			f.close()
-
-	def queue_clear(self):
-		"""Clears the queue"""
-		queue_settings = {
-			"current_index": 0,
-			"queue": [-1]
-		}
-		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
-			json.dump(queue_settings, f, indent=0)
-			f.close()
-
-def destroy_widgets(widgets):
-	"""Destroys all widgets provided"""
-	for widget in widgets:
-		widget.destroy()
-		widgets.remove(widget)
-	return widgets

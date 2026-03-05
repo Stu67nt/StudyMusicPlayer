@@ -65,7 +65,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 
 		# Destoying widgets incase any exist (none should but it acts as safety)
 		# Needed to prevent memory leaks
-		destroy_widgets(self.widgets)
+		utils.destroy_widgets(self.widgets)
 
 		# Creating the main view
 		self.main_view()
@@ -83,7 +83,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 			# Updating song ids as song ids changed
 			self.song_ids = current_song_ids
 			# Clearing old widgets
-			destroy_widgets(self.widgets)
+			utils.destroy_widgets(self.widgets)
 
 			self.topbar = widgets.ButtonFrame(self,
 									  button_values=self.main_topbar_buttons,
@@ -108,7 +108,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		Select Multiple View of the Tracks window.
 		"""
 		# Clearing previous widgets to save memory
-		destroy_widgets(self.widgets)
+		utils.destroy_widgets(self.widgets)
 
 		# Defining Buttons and varibales
 		self.select_mult_topbar_buttons = [
@@ -211,8 +211,8 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 			songIDs.append(song.split(" ")[0])
 		# Creates playlist
 		if self.prompt is None or not self.prompt.winfo_exists():
-			self.prompt = Components.AddToPlaylist(songIDs = songIDs, font= self.font)
-		self.prompt.focus()
+			self.prompt = AddToPlaylist(songIDs=songID, font=self.font)
+		self.prompt.after(100, self.prompt.lift)
 
 	def delete_songs(self):
 		"""
@@ -261,7 +261,7 @@ class Playlists(ctk.CTkFrame):
 		self.main_topbar_buttons = [["Create Playlist", self.create_playlist],
 									["Select Multiple", self.select_multiple]]
 		self.select_mult_topbar_buttons = [
-			["Delete Playlists", lambda: self.delete_playlists(self.get_checked_ids(self.checkbox_playlist_list))],
+			["Delete Playlists", lambda: utils.delete_playlists(self.get_checked_ids(self.checkbox_playlist_list))],
 			["Exit Select", lambda :self.main_view(force=True)]]
 		self.specific_playlist_topbar_buttons = [["Overwrite Queue", lambda: utils.overwrite_queue(self.song_ids, self.player_callback)],
 												 ["Add to Queue", lambda: utils.add_to_queue(self.song_ids)],
@@ -279,12 +279,12 @@ class Playlists(ctk.CTkFrame):
 		Main view of the playlists screen
 		"""
 		# Gets current list of playlists
-		current_playlist_names = utils.retrieve_playlist_names()
+		current_playlist_names = utils.retrieve_all_playlist_names()
 		# If forced to or playlists have been updtaed the view refreshes
 		if current_playlist_names != self.old_playlist_names or force:
-			self.playlistIDs = utils.retrieve_playlistIDs()
+			self.playlistIDs = utils.retrieve_all_playlistIDs()
 			self.old_playlist_names = current_playlist_names
-			destroy_widgets(self.widgets)
+			utils.destroy_widgets(self.widgets)
 
 			# Creating widgets
 			self.topbar = widgets.ButtonFrame(self,
@@ -311,9 +311,9 @@ class Playlists(ctk.CTkFrame):
 		Select Multiple view of playlists
 		"""
 		# Clearing main view screen to prevent memory leak.
-		destroy_widgets(self.widgets)
+		utils.destroy_widgets(self.widgets)
 
-		playlist_details = utils.retrieve_playlist_details()
+		playlist_details = utils.retrieve_all_playlist_details()
 
 		# Creating list of playlist names for the checkbox frame widget
 		# Playlist id needs to be in the name due to technical limitations with custom tkinter checkbox widget
@@ -350,7 +350,7 @@ class Playlists(ctk.CTkFrame):
 		self.playlistID = event.widget.master.playlistID
 
 		# Deleting old frame to prevent memory leak
-		destroy_widgets(self.widgets)
+		utils.destroy_widgets(self.widgets)
 		self.songs_view(force=True)
 
 	def songs_view(self, force: bool = False):
@@ -358,12 +358,12 @@ class Playlists(ctk.CTkFrame):
 		Opens the specific selected playlist and shows it's songs.
 		"""
 		# Getting song ids in database for the playlist
-		current_song_ids = self.retrieve_playlist_songIDs(self.playlistID)
+		current_song_ids = utils.retrieve_playlist_songIDs(self.playlistID)
 		# checking if playlist has been updated since last time.
 		if current_song_ids != self.song_ids or force:
 			# Updating view if playlist has changed
 			self.song_ids = current_song_ids
-			destroy_widgets(self.widgets)
+			utils.destroy_widgets(self.widgets)
 
 			# Creating widgets
 			self.topbar = widgets.ButtonFrame(self,
@@ -390,10 +390,10 @@ class Playlists(ctk.CTkFrame):
 		Multi select for specific playlist
 		"""
 		# Clearing old frame to prevent memory leaks
-		destroy_widgets(self.widgets)
+		utils.destroy_widgets(self.widgets)
 
 		# Creating song name for checkbox frame
-		songIDs = self.retrieve_playlist_songIDs(self.playlistID)
+		songIDs = utils.retrieve_playlist_songIDs(self.playlistID)
 		all_song_details = utils.retrieve_song_names(songIDs)
 		song_names = []
 		for song_details in all_song_details:
@@ -489,22 +489,6 @@ class Playlists(ctk.CTkFrame):
 		db.commit()
 		db.close()
 
-	def retrieve_playlist_songIDs(self, playlistID):
-		"""
-		Returns the songIDs of every song attached to the playlist.
-		"""
-		db = utils.init_playlist_database()
-		cursor = db.cursor()
-		query = "SELECT songID FROM Playlist WHERE playlistID = ?"
-		cursor.execute(query, (playlistID,))
-		songs_unfiltered = cursor.fetchall()
-
-		song_ids = []
-		for songID in songs_unfiltered:
-			song_ids.append(songID[0])
-		return song_ids
-
-
 class MusicFinder(ctk.CTkFrame):
 	"""
 	Frame which is used for downloading music.
@@ -565,7 +549,7 @@ class Player(ctk.CTkFrame):
 
 		# Attempting to retrieve song
 		try:
-			self.song_details = self.retrieve_song()
+			self.song_details = utils.retrieve_song(self.songID)
 			self.song_name = self.song_details[2]
 			self.artist = self.song_details[4]
 			self.duration = tk.IntVar(value=self.song_details[3])
@@ -715,7 +699,7 @@ class Player(ctk.CTkFrame):
 
 		# Initalising variables and details
 		self.songID = songID
-		self.song_details = self.retrieve_song()
+		self.song_details = utils.retrieve_song(self.songID)
 
 		# Checking if song details coulf be found
 		# If not blank song details are loaded
@@ -782,16 +766,6 @@ class Player(ctk.CTkFrame):
 		self.player = pyglet.media.Player()
 		self.init_queue()
 
-	def retrieve_song(self):
-		"""Gets all details of song specified from current self.songID"""
-		self.db = downloader.init_database()
-		cursor = self.db.cursor()
-		query = "SELECT * FROM songs WHERE songID = ?"
-		cursor.execute(query, (self.songID,))
-		song_details = cursor.fetchone()
-		self.db.close()
-		return song_details
-
 	def update_progress(self):
 		"""Updates the progress of the song every 100ms"""
 		if self.songID != -1:
@@ -801,27 +775,6 @@ class Player(ctk.CTkFrame):
 				self.song_end()
 			self.seeking = False
 		self.after(100, self.update_progress)
-
-	def delete_song(self):
-		"""
-		Removes song referenced by self.songID from the database.
-		Does not actually delete or remove the song can will be added back by refresh songs if left.
-		"""
-		# Removing song from songs db
-		db = downloader.init_database()
-		cursor = db.cursor()
-		query = "DELETE FROM songs WHERE songID = ?"
-		cursor.execute(query, (self.songID,))
-		db.commit()
-		db.close()
-
-		# Detaching song from any playlists
-		db = utils.init_playlist_database()
-		cursor = db.cursor()
-		query = "DELETE FROM Playlist WHERE songID = ?"
-		cursor.execute(query, (self.songID,))
-		db.commit()
-		db.close()
 
 	def seek(self, time):
 		"""Used for seeking in the song"""
@@ -840,19 +793,7 @@ class Player(ctk.CTkFrame):
 			except Exception as err:
 				tk.messagebox.showwarning("Can't play song", "Resetting Queue")
 				print(err)
-				self.queue_clear()
-
-	def queue_clear(self):
-		"""
-		Clears the queue
-		"""
-		queue_settings = {
-			"current_index": 0,
-			"queue": [-1]
-		}
-		with open(self.BASE_DIR/"Databases"/"queue.json", "w") as f:
-			json.dump(queue_settings, f, indent=0)
-			f.close()
+				utils.queue_clear()
 
 	def volume_adjust(self, value):
 		"""Adjusts the player volume"""
@@ -940,11 +881,6 @@ class App(ctk.CTk):
 		self.tab_view.grid(row=0, column=0, padx=(10,10), pady=(5,5), sticky="nsew")
 		self.tab_view.grid_columnconfigure(0, weight=1)
 		self.tab_view.grid_rowconfigure(0, weight=1)
-
-def destroy_widgets(widgets):
-	"""Destroys all listed widgets to clear memory and rpevent stacking"""
-	for widget in widgets:
-		widget.destroy()
 
 def main():
 	app = App("Study Music Player")

@@ -42,12 +42,15 @@ def init_playlist_list_database():
 	return db
 
 def on_enter(event=None):
+	"""Creates the hover over effect for clickable labels"""
 	event.widget.configure(cursor="hand2")
 
 def on_leave(event=None):
+	"""Removes the hover over effect for labels"""
 	event.widget.configure(cursor="")
 
 def retrieve_all_song_ids():
+	"""Returns all songIDs in a list"""
 	db = downloader.init_database()
 	cursor = db.cursor()
 	query = "SELECT songID FROM songs"
@@ -55,11 +58,13 @@ def retrieve_all_song_ids():
 	raw_song_ids = cursor.fetchall()
 	db.close()
 	song_ids = []
+	# Putting all ids into a 1d list from a 2d tuple
 	for id in raw_song_ids:
 		song_ids.append(id[0])
 	return song_ids
 
-def retrieve_song_names(self, songIDs):
+def retrieve_song_names(songIDs):
+	"""Returns song_name, artist ,and songID of provided songIDs in a 2d list"""
 	raw_song_names = []
 	db = downloader.init_database()
 	cursor = db.cursor()
@@ -73,7 +78,18 @@ def retrieve_song_names(self, songIDs):
 		song_names.append([name[0], name[1], name[2]])
 	return song_names
 
+def retrieve_song(songID):
+	"""Gets all details of song specified from songID"""
+	db = downloader.init_database()
+	cursor = db.cursor()
+	query = "SELECT * FROM songs WHERE songID = ?"
+	cursor.execute(query, (songID,))
+	song_details = cursor.fetchone()
+	db.close()
+	return song_details
+
 def retrieve_all_song_names():
+	"""Returns song_name, artist ,and songID of all songs in a 2d list"""
 	db = downloader.init_database()
 	cursor = db.cursor()
 	query = "SELECT song_name, artist, songID FROM songs"
@@ -85,7 +101,8 @@ def retrieve_all_song_names():
 		song_names.append([name[0], name[1], name[2]])
 	return song_names
 
-def retrieve_playlist_names():
+def retrieve_all_playlist_names():
+	"""Returns name of all playlists in a 1d list"""
 	db = init_playlist_list_database()
 	cursor = db.cursor()
 	query = "SELECT Name FROM Playlist_List"
@@ -97,7 +114,8 @@ def retrieve_playlist_names():
 	db.close()
 	return configured_playlist_names
 
-def retrieve_playlistIDs():
+def retrieve_all_playlistIDs():
+	"""Returns playlistID of all playlists in a 1d list"""
 	db = init_playlist_list_database()
 	cursor = db.cursor()
 	query = "SELECT PlaylistID FROM Playlist_List"
@@ -108,7 +126,8 @@ def retrieve_playlistIDs():
 		configured_playlistIDs.append(playlistID[0])
 	return configured_playlistIDs
 
-def retrieve_playlist_songIDs(self, playlistID):
+def retrieve_playlist_songIDs(playlistID):
+	"""Returns songID of all songs in the playlist in a 1d list"""
 	db = utils.init_playlist_database()
 	cursor = db.cursor()
 	query = "SELECT songID FROM Playlist WHERE playlistID = ?"
@@ -120,15 +139,39 @@ def retrieve_playlist_songIDs(self, playlistID):
 		song_ids.append(songID[0])
 	return song_ids
 
-def retrieve_playlist_details():
-	playlistIDs = retrieve_playlistIDs()
-	playlist_names = retrieve_playlist_names()
+def retrieve_all_playlist_details():
+	"""Returns name and id of all playlists in a 2d list"""
+	playlistIDs = retrieve_all_playlistIDs()
+	playlist_names = retrieve_all_playlist_names()
 	playlist_details = []
 	for i in range(0, len(playlistIDs)):
 		playlist_details.append([playlistIDs[i], playlist_names[i]])
 	return playlist_details
 
+def delete_playlists(playlistIDs):
+	"""
+	Deletes provided playlist and records of songs attatched to it.
+	"""
+	# Removing connections to any songs
+	db = utils.init_playlist_database()
+	cursor = db.cursor()
+	query = "DELETE FROM Playlist WHERE playlistID = (?)"
+	for playlistID in playlistIDs:
+		cursor.execute(query, (int(playlistID),))
+	db.commit()
+	db.close()
+
+	# Removing the playlist
+	db = utils.init_playlist_list_database()
+	cursor = db.cursor()
+	query = "DELETE FROM Playlist_List WHERE playlistID = (?)"
+	for playlistID in playlistIDs:
+		cursor.execute(query, (int(playlistID),))
+	db.commit()
+	db.close()
+
 def load_queue():
+	"""Loads up the queue"""
 	BASE_DIR = Path(__file__).parent
 	with open(str(BASE_DIR / "Databases" / "queue.json"), "r") as f:
 		queue_settings = json.load(f)
@@ -138,6 +181,7 @@ def load_queue():
 	return queue_settings
 
 def add_to_queue(song_ids: list):
+	"""Adds all songs in song_ids to the end of the queue"""
 	BASE_DIR = Path(__file__).parent
 	queue_settings = load_queue()
 	queue = queue_settings['queue']
@@ -153,7 +197,19 @@ def add_to_queue(song_ids: list):
 		json.dump(queue_config, f, indent=0)
 		f.close()
 
+def queue_clear():
+	"""Clears the queue"""
+	BASE_DIR = Path(__file__).parent
+	queue_settings = {
+		"current_index": 0,
+		"queue": [-1]
+	}
+	with open(str(BASE_DIR / "Databases" / "queue.json"), "w") as f:
+		json.dump(queue_settings, f, indent=0)
+		f.close()
+
 def overwrite_queue(song_ids: list, player_callback):
+	"""Clears the queue and adds the provided songs to the queue in order. Then starts playing the queue."""
 	BASE_DIR = Path(__file__).parent
 	queue_config = {
 		"current_index": 0,
@@ -163,5 +219,11 @@ def overwrite_queue(song_ids: list, player_callback):
 		json.dump(queue_config, f, indent=0)
 		f.close()
 	player_callback.load_song(song_ids[0])
+
+def destroy_widgets(widgets):
+	"""Destroys all listed widgets to clear memory and rpevent stacking"""
+	for widget in widgets:
+		widget.destroy()
+		widgets.remove(widget)
 
 print(Path(__file__).parent)
