@@ -219,17 +219,6 @@ def overwrite_queue(song_ids: list, player_callback):
 	with open(str(BASE_DIR / "Databases" / "queue.json"), "w") as f:
 		json.dump(queue_config, f, indent=0)
 		f.close()
-	player_callback.load_song(song_ids[0])
-
-def destroy_widgets(widgets):
-	"""Destroys all listed widgets to clear memory and rpevent stacking"""
-	for x in range(len(widgets)):
-		object = widgets.pop()
-		for widget in object.winfo_children():
-			widget.destroy()  # deleting from tk
-			del widget  # deleting from python
-		del object
-	del widgets
-	gc.collect()
+	player_callback(song_ids[0])
 
 print(Path(__file__).parent)

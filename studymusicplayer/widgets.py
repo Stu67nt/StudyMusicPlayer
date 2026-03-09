@@ -354,7 +354,8 @@ class SongLabel(ctk.CTkFrame):
 
 	def play_song(self, event):
 		"""Triggets call to play song"""
-		self.player_callback.load_song(self.songID)
+		pass
+		self.player_callback(self.songID)
 
 	def add_to_playlist(self):
 		"""Ads song to songID selected in AddToPlaylist popup"""

@@ -708,7 +708,7 @@ class QueueViewer(ctk.CTkToplevel):
 					# Checks if the current song being drawn is the current playing song
 					# event.widget.master.master.songID gives the current playing song
 					# I had to dig thru variable watch to find this
-					if songID == event.widget.master.master.songID:
+					if songID == event.widget.master.master.master.master.songID:
 						self.song_label_frame.configure(fg_color="grey10")
 
 					self.song_name_label = ctk.CTkLabel(self.song_label_frame, text=self.song_name,
@@ -765,7 +765,7 @@ class QueueViewer(ctk.CTkToplevel):
 		with open(str(self.BASE_DIR/"Databases"/"queue.json"), "w") as f:
 			json.dump(queue_settings, f, indent=0)
 			f.close()
-		self.player_callback.load_song(songID)
+		self.player_callback(songID)
 
 	def remove_from_queue(self, event, songID):
 		"""Removes triggered song from queue"""

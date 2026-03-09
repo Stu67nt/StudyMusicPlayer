@@ -9,6 +9,7 @@ import json
 import threading # Used so app doesnt freeze when doing longer processes
 from pathlib import Path
 import os
+import random
 
 # Needed for packaging
 try:
@@ -49,10 +50,10 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		self.BASE_DIR = Path(__file__).parent
 		self.master = master
 		self.font = font
-		self.widgets = []
 		self.player_callback= player_callback
 		self.prompt = None
 		self.song_ids = None
+		self.main_loop = None
 
 		super().__init__(self.master, fg_color="transparent")  # Calls parent class
 
@@ -60,14 +61,9 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		self.grid_rowconfigure(2, weight=1)
 
 		# Defining buttons
-		self.main_topbar_buttons = [["Refresh Tracks", lambda: self.refresh_tracks()],
-									["Select Multiple", lambda: self.select_multiple()]]
+		self.main_topbar_buttons = [["Refresh Tracks", self.refresh_tracks],
+									["Select Multiple", self.select_multiple]]
 
-		# Destoying widgets incase any exist (none should but it acts as safety)
-		# Needed to prevent memory leaks
-		utils.destroy_widgets(self.widgets)
-
-		# Creating the main view
 		self.main_view()
 
 	def main_view(self, force = False):
@@ -75,6 +71,8 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		Main view of the Tracks window. Shows all the songs and some options.
 		:param force: Forces a refresh if True
 		"""
+		if hasattr(self, "_loop_id"):
+			self.after_cancel(self._loop_id)
 
 		# Checking if refresh is needed
 		# Refresh is needed if forced or new songs added to the database.
@@ -82,8 +80,6 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		if current_song_ids != self.song_ids or force:
 			# Updating song ids as song ids changed
 			self.song_ids = current_song_ids
-			# Clearing old widgets
-			utils.destroy_widgets(self.widgets)
 
 			self.topbar = widgets.ButtonFrame(self,
 									  button_values=self.main_topbar_buttons,
@@ -94,25 +90,22 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 									  button_sticky="e",
 									  font=self.font)
 			self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
-			self.widgets.append(self.topbar)
 
 			self.track_list = Components.SongFrame(self, song_ids=self.song_ids, font=self.font, player_callback = self.player_callback)
 			self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
-			# Adding to widgets list so can clear later if needed
-			self.widgets.append(self.track_list)
+
 		# Rerunning function after 500ms to recheck if song ids updated
-		self.after(500, self.main_view)
+		self.main_loop = self.after(500, self.main_view)
 
 	def select_multiple(self):
 		"""
 		Select Multiple View of the Tracks window.
 		"""
-		# Clearing previous widgets to save memory
-		utils.destroy_widgets(self.widgets)
-
+		if hasattr(self, "_loop_id"):
+			self.after_cancel(self._loop_id)
 		# Defining Buttons and varibales
 		self.select_mult_topbar_buttons = [
-			["Exit Select", lambda: self.main_view(force=True)],
+			["Exit Select", self.trigger_main_view],
 			["Add to Playlist", self.add_to_playlist],
 			["Delete Songs", self.delete_songs]]
 		self.song_names = utils.retrieve_all_song_names()
@@ -135,14 +128,12 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 								  button_sticky="e",
 								  font=self.font)
 		self.topbar.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="ew")
-		self.widgets.append(self.topbar)
 
 		self.track_list = widgets.CheckboxFrame(master=self,
 										values=self.songs,
 										font=self.font,
 										is_scrollable=True)
 		self.track_list.grid(row=2, column=0, padx=10, pady=(10, 10), sticky="nsew")
-		self.widgets.append(self.track_list)
 
 	def refresh_tracks(self):
 		"""
@@ -172,6 +163,11 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 					print(f"{file} is not an audio file")  # Means file is not an audio file
 					print(err)
 		db.close()
+
+	def trigger_main_view(self):
+		if hasattr(self, "_loop_id"):
+			self.after_cancel(self._loop_id)
+		self.main_view(force = True)
 
 	def add_song(self, song_file_name):
 		"""
@@ -256,6 +252,8 @@ class Playlists(ctk.CTkFrame):
 		self.font=font
 		self.old_playlist_names = None
 		self.BASE_DIR = Path(__file__).parent
+		self.songs_loop = None
+		self.main_loop = None
 
 		# Initalising buttons
 		self.main_topbar_buttons = [["Create Playlist", self.create_playlist],
@@ -284,7 +282,6 @@ class Playlists(ctk.CTkFrame):
 		if current_playlist_names != self.old_playlist_names or force:
 			self.playlistIDs = utils.retrieve_all_playlistIDs()
 			self.old_playlist_names = current_playlist_names
-			utils.destroy_widgets(self.widgets)
 
 			# Creating widgets
 			self.topbar = widgets.ButtonFrame(self,
@@ -304,14 +301,14 @@ class Playlists(ctk.CTkFrame):
 			self.widgets.append(self.playlist_list)
 
 		# rerunning function after 100 ms.
-		self.after(100, self.main_view)
+		self.main_loop = self.after(100, self.main_view)
 
 	def select_multiple(self):
 		"""
 		Select Multiple view of playlists
 		"""
-		# Clearing main view screen to prevent memory leak.
-		utils.destroy_widgets(self.widgets)
+		if hasattr(self, "_loop_id"):
+			self.after_cancel(self._loop_id)
 
 		playlist_details = utils.retrieve_all_playlist_details()
 
@@ -349,22 +346,21 @@ class Playlists(ctk.CTkFrame):
 		# Specific variable path for selected playlistID
 		self.playlistID = event.widget.master.playlistID
 
-		# Deleting old frame to prevent memory leak
-		utils.destroy_widgets(self.widgets)
 		self.songs_view(force=True)
 
 	def songs_view(self, force: bool = False):
 		"""
 		Opens the specific selected playlist and shows it's songs.
 		"""
+		if hasattr(self, "_loop_id"):
+			self.after_cancel(self._loop_id)
+
 		# Getting song ids in database for the playlist
 		current_song_ids = utils.retrieve_playlist_songIDs(self.playlistID)
 		# checking if playlist has been updated since last time.
 		if current_song_ids != self.song_ids or force:
 			# Updating view if playlist has changed
 			self.song_ids = current_song_ids
-			utils.destroy_widgets(self.widgets)
-
 			# Creating widgets
 			self.topbar = widgets.ButtonFrame(self,
 									  button_values=self.specific_playlist_topbar_buttons,
@@ -383,14 +379,14 @@ class Playlists(ctk.CTkFrame):
 			self.widgets.append(self.track_list)
 
 		# Rerunning function after 100ms
-		self.after(100, self.songs_view)
+		self.songs_loop = self.after(100, self.songs_view)
 
 	def songs_view_select_multiple(self):
 		"""
 		Multi select for specific playlist
 		"""
-		# Clearing old frame to prevent memory leaks
-		utils.destroy_widgets(self.widgets)
+		if hasattr(self, "_loop_id"):
+			self.after_cancel(self._loop_id)
 
 		# Creating song name for checkbox frame
 		songIDs = utils.retrieve_playlist_songIDs(self.playlistID)
@@ -416,14 +412,12 @@ class Playlists(ctk.CTkFrame):
 								  button_sticky="e",
 								  font=self.font)
 		self.topbar.grid(row=0, column=0, padx=10, pady=(10, 10), sticky="ew")
-		self.widgets.append(self.topbar)
 
 		self.song_list = widgets.CheckboxFrame(master=self,
 										   values=song_names,
 										   font=self.font,
 										   is_scrollable=True)
 		self.song_list.grid(row=1, column=0, padx=10, pady=(10, 10), sticky="nsew")
-		self.widgets.append(self.topbar)
 
 	def get_checked_ids(self, obj):
 		"""
@@ -535,11 +529,13 @@ class Player(ctk.CTkFrame):
 		self.seeking = False
 
 		# initalising Buttons
-		self.button_icons = [["↺", self.rewind],
+		self.button_icons = [["🔀", self.shuffle],
+							 ["↺", self.rewind],
 							 ["⏮", self.previous_song],
 							 ["⏯", self.toggle_pause],
 							 ["⏭", self.skip_song],
-							 ["↻", self.skip_foward]]
+							 ["↻", self.skip_foward],
+							 ["≡", lambda e: self.queue_trigger(e)]]
 
 		# Initalising Queue
 		self.queue_settings = utils.load_queue()
@@ -628,11 +624,12 @@ class Player(ctk.CTkFrame):
 		self.playbar.grid(row=1, column=1, padx=(5, 5), pady=(5, 5), sticky="sew")
 		self.playbar.set(0)
 
+		"""
 		self.queue_button_label = ctk.CTkLabel(self, text="≡", font=self.icons_font)
 		self.queue_button_label.grid(row=0, column=2, rowspan=2, padx=(10, 10), pady=(5, 5), sticky="e")
 		self.queue_button_label.bind("<Button-1>", self.queue_trigger)
 		self.queue_button_label.bind("<Enter>", lambda e:utils.on_enter(e))
-		self.queue_button_label.bind("<Leave>", lambda e:utils.on_leave(e))
+		self.queue_button_label.bind("<Leave>", lambda e:utils.on_leave(e))"""
 
 		self.volume_icon = ctk.CTkLabel(self, text="🔈", font=self.icons_font)
 		self.volume_icon.grid(row=0, column=3, rowspan=2, padx=(2, 2), pady=(5, 5), sticky="e")
@@ -655,7 +652,7 @@ class Player(ctk.CTkFrame):
 		Opens the queue.
 		"""
 		if self.queue_window is None or not self.queue_window.winfo_exists():
-			self.queue_window = Components.QueueViewer(event, font= self.font, player_callback=self)
+			self.queue_window = Components.QueueViewer(event, font= self.font, player_callback=self.load_song)
 		self.queue_window.after(100, self.queue_window.lift)
 
 	def song_end(self, load_previous: bool = False):
@@ -788,7 +785,7 @@ class Player(ctk.CTkFrame):
 		current_queue = [self.filepath]
 		for song_fp in current_queue:
 			try:
-				song_obj = pyglet.media.load(song_fp, streaming=True)  # Turn freaming to false for Lots of bugs
+				song_obj = pyglet.media.load(song_fp, streaming=True)  # Turn streaming to false for Lots of bugs
 				self.player.queue(song_obj)
 			except Exception as err:
 				tk.messagebox.showwarning("Can't play song", "Resetting Queue")
@@ -805,7 +802,9 @@ class Player(ctk.CTkFrame):
 
 	def shuffle(self, event=None):
 		"""Deprecated function"""
-		print("Shuffle")
+		queue = utils.load_queue()["queue"]
+		random.shuffle(queue)
+		utils.overwrite_queue(queue, self.load_song)
 
 	def toggle_pause(self, event=None):
 		"""Pauses or unpauses the song"""
@@ -839,7 +838,6 @@ class MyTabView(ctk.CTkTabview):
 		self.grid_columnconfigure(0, weight=1)
 
 		# Configuring vars and tabs
-		self.player_callback=player_callback
 		TABS = ["    Home    ",
 				"   Tracks   ",
 				"  Playlist  ",
@@ -853,7 +851,7 @@ class MyTabView(ctk.CTkTabview):
 		self.home = Home(master=self.tab(TABS[0]), font=font)
 		self.home.grid(row=0, column=0, sticky="nsew")
 
-		self.tracks = Tracks(master=self.tab(TABS[1]), font=font, player_callback=self.player_callback)
+		self.tracks = Tracks(master=self.tab(TABS[1]), font=font, player_callback=player_callback)
 		self.tracks.grid(row=0, column=0, sticky="nsew")
 
 		self.playlists = Playlists(master=self.tab(TABS[2]), font=font, player_callback=player_callback)
@@ -877,7 +875,7 @@ class App(ctk.CTk):
 		self.player = Player(self, font=DEFAULT_FONT)
 		self.player.grid(row=1, column=0, padx=(10, 10), pady=(5, 5), sticky="ew")
 
-		self.tab_view = MyTabView(self, font=DEFAULT_FONT, player_callback=self.player)
+		self.tab_view = MyTabView(self, font=DEFAULT_FONT, player_callback=self.player.load_song)
 		self.tab_view.grid(row=0, column=0, padx=(10,10), pady=(5,5), sticky="nsew")
 		self.tab_view.grid_columnconfigure(0, weight=1)
 		self.tab_view.grid_rowconfigure(0, weight=1)
