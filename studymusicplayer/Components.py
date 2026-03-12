@@ -1,15 +1,12 @@
-import customtkinter as ctk
+import customtkinter as ctk  # GUI
 from customtkinter import CTkFrame
 import tkinter as tk
-import sqlite3
-import json
-import os
-import threading
-import pyglet
-from PIL import Image
-import io
-import tinytag as tt
-from pathlib import Path
+import sqlite3  # Database
+import json  # Used for accessing queue.json and config.json
+import os # Used for validating file paths
+import threading # Used for running processes in parallel
+import tinytag as tt # Used for extracting file metadata
+from pathlib import Path # Used for standardising file paths
 
 try:
 	from . import downloader
@@ -221,6 +218,7 @@ class TimerCreate(ctk.CTkFrame):
 							   hours=self.hours,
 							   mins=self.mins,
 							   secs=self.secs)
+			# Brought to the top after 100ms so window has time to be drawn
 			self.timer.after(100, self.timer.lift)
 		if self.timer is not None and self.timer.winfo_exists():
 			self.timer.focus() # if window exists focus it
@@ -275,23 +273,26 @@ class Timer(ctk.CTkToplevel):
 		self.buttons.grid(row=2, column = 0, sticky = "ew", padx=(10,10), pady=(10,10))
 
 		if self.total_remaining_secs > 0:
-			self.deincrement = self.update_time()
+			self.update_time()
 
 	def toggle_pause(self):
 		"""Pauses or unpauses the timer"""
 		if not self.is_paused:
 			self.is_paused = True
+			self.buttons.button_list[0].configure(text="▶")
 			self.after_cancel(self.deincrement)  # Needed to prevent multiple timers running at once
 		else:
 			self.is_paused = False
+			self.buttons.button_list[0].configure(text="⏸")
 			if self.total_remaining_secs > 0:
-				self.deincrement = self.update_time()
+				self.deincrement = self.after(1000, self.update_time)
 
 	def reset_timer(self):
 		"""Resets timer back to inital time"""
 		self.after_cancel(self.deincrement)
 		self.total_remaining_secs = self.init_secs
 		self.is_paused = True
+		self.buttons.button_list[0].configure(text="▶")
 
 		# Displaying updated time
 		self.hours_remaining, self.mins_remaining, self.secs_remaining = self.convert_time(self.total_remaining_secs)

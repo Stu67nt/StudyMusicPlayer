@@ -1,13 +1,12 @@
-import yt_dlp
-import logging
-import os
-import time
-import sqlite3
-import tinytag as tt
-import shutil
-import tkinter as tk
-import json
-from pathlib import Path
+import yt_dlp # Used for downloading songs
+import os # Used for parsing file directories
+import time # Used for naming console logs
+import sqlite3 # Database
+import tinytag as tt # Extracting metadata
+import shutil # Moving files
+import tkinter as tk # GUI
+import json # Parsing config.json
+from pathlib import Path # Standardising filepaths
 
 
 class MyLogger:
@@ -229,15 +228,3 @@ def create_download_config(file_name, output=None, progress_bar=None):
         'progress_hooks': [lambda d: progressHook(d, progress_bar=progress_bar)],
     }
     return download_config
-
-"""Used for testing downloads does not run normally"""
-if __name__ == "__main__":
-    file_path = createConsoleLog()
-    download_config = create_download_config(file_path)
-    download("https://www.youtube.com/playlist?list=PLETosy7ETA_uKsH9Zi8WazVPMtHuri4gQ", download_config)
-    print(str(os.path.abspath(os.getcwd()))+"/Songs")
-
-"""
-TEST CASE:
-Only adding to db and moving to songs valid files out of (mp4, m4a, part, webp, txt) valid ones are (mp4, m4a) 
-"""

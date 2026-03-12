@@ -1,7 +1,6 @@
-import sqlite3
-from pathlib import Path
-import json
-import gc
+import sqlite3 # Database
+from pathlib import Path # Standarising file paths
+import json # Accessing queue.json
 
 try:
 	from . import downloader

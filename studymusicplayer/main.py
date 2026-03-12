@@ -4,12 +4,11 @@ from tkinter.scrolledtext import ScrolledText
 from PIL import Image  # Used for thumbnails
 import pyglet  # Used for audio
 import tinytag as tt  # Used for retrieving audio metadata
-import io
-import json
-import threading # Used so app doesnt freeze when doing longer processes
-from pathlib import Path
-import os
-import random
+import io # Used for image loading
+import json # Used for accessing config and queue
+from pathlib import Path # Used for standarised file paths
+import os # Used for parsing file directories
+import random # Used for shuffle
 
 # Needed for packaging
 try:
@@ -624,13 +623,6 @@ class Player(ctk.CTkFrame):
 		self.playbar.grid(row=1, column=1, padx=(5, 5), pady=(5, 5), sticky="sew")
 		self.playbar.set(0)
 
-		"""
-		self.queue_button_label = ctk.CTkLabel(self, text="≡", font=self.icons_font)
-		self.queue_button_label.grid(row=0, column=2, rowspan=2, padx=(10, 10), pady=(5, 5), sticky="e")
-		self.queue_button_label.bind("<Button-1>", self.queue_trigger)
-		self.queue_button_label.bind("<Enter>", lambda e:utils.on_enter(e))
-		self.queue_button_label.bind("<Leave>", lambda e:utils.on_leave(e))"""
-
 		self.volume_icon = ctk.CTkLabel(self, text="🔈", font=self.icons_font)
 		self.volume_icon.grid(row=0, column=3, rowspan=2, padx=(2, 2), pady=(5, 5), sticky="e")
 
@@ -829,11 +821,11 @@ class Player(ctk.CTkFrame):
 
 
 class MyTabView(ctk.CTkTabview):
-	def __init__(self, master, font: ctk.CTkFont, player_callback):
+	def __init__(self, master, font: ctk.CTkFont, player_callback=None):
 		# Anchor "s" is needed as otherwise we run into sizing issues with tabview
 		super().__init__(master, anchor="s", fg_color="gray10")
 
-		# Configuringn weights
+		# Configuring weights
 		self.grid_rowconfigure(0, weight=1)
 		self.grid_columnconfigure(0, weight=1)
 
@@ -841,9 +833,11 @@ class MyTabView(ctk.CTkTabview):
 		TABS = ["    Home    ",
 				"   Tracks   ",
 				"  Playlist  ",
-				"Music Finder"]
+				"Music Finder"
+				]
 
 		for current_tab in TABS:
+			# Iteratively adding all tabs
 			self.add(current_tab)
 			self.tab(current_tab).grid_columnconfigure(0, weight=1)
 			self.tab(current_tab).grid_rowconfigure(0, weight=1)

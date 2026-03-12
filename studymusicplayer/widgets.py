@@ -1,10 +1,7 @@
-import customtkinter as ctk
+import customtkinter as ctk # Used for GUI
 from customtkinter import CTkFrame
 import tkinter as tk
-import sqlite3
-import json
-import threading
-from pathlib import Path
+from pathlib import Path # Used for standarised file paths
 
 try:
 	from . import utils
@@ -46,6 +43,7 @@ class ButtonFrame(ctk.CTkFrame):
 		# Initialising variables
 		self.button_values = button_values
 		self.title = title
+		self.button_list = []
 
 		# Creating and positioning title in frame only if requested
 		if self.title != "":
@@ -77,6 +75,7 @@ class ButtonFrame(ctk.CTkFrame):
 			else:
 				self.button.grid(row=i, column=0, padx=20, pady=20, sticky=button_sticky)
 				self.grid_rowconfigure(i, weight=1)
+			self.button_list.append(self.button)
 
 
 class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
