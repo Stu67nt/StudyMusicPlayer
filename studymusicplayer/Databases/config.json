@@ -1,6 +1,6 @@
 {
-    "format": "mp3/m4a/flac/bestaudio",
-    "write_thumbnail": true,
+    "format": "m4a/mp3/flac/bestaudio",
+    "write_thumbnail": false,
     "deno_path": "",
     "ffmpeg_path": ""
 }

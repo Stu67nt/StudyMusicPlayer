@@ -218,8 +218,8 @@ class TimerCreate(ctk.CTkFrame):
 							   hours=self.hours,
 							   mins=self.mins,
 							   secs=self.secs)
-			# Brought to the top after 100ms so window has time to be drawn
-			self.timer.after(100, self.timer.lift)
+			# Brought to the top after 200ms so window has time to be drawn
+			self.timer.after(200, self.timer.lift)
 		if self.timer is not None and self.timer.winfo_exists():
 			self.timer.focus() # if window exists focus it
 
@@ -536,7 +536,7 @@ class SearchFrame(ctk.CTkFrame):
 		"""Creates the download settings window"""
 		if self.settings_screen is None or not self.settings_screen.winfo_exists():
 			self.settings_screen = DownloadSettings(self)
-			self.settings_screen.after(100, self.settings_screen.lift)
+			self.settings_screen.after(200, self.settings_screen.lift)
 		if self.settings_screen is not None and self.settings_screen.winfo_exists():
 			self.settings_screen.focus()  # if window exists focus it
 

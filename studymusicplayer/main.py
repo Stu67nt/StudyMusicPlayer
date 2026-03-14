@@ -106,6 +106,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		self.select_mult_topbar_buttons = [
 			["Exit Select", self.trigger_main_view],
 			["Add to Playlist", self.add_to_playlist],
+			["Select All", self.select_all],
 			["Delete Songs", self.delete_songs]]
 		self.song_names = utils.retrieve_all_song_names()
 		self.songs = []
@@ -207,7 +208,7 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		# Creates playlist
 		if self.prompt is None or not self.prompt.winfo_exists():
 			self.prompt = Components.AddToPlaylist(songIDs=songIDs, font=self.font)
-		self.prompt.after(100, self.prompt.lift)
+		self.prompt.after(200, self.prompt.lift)
 
 	def delete_songs(self):
 		"""
@@ -235,6 +236,9 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 		# Refreshing tracks screen
 		self.select_multiple()
 
+	def select_all(self):
+		self.track_list.check_all()
+
 class Playlists(ctk.CTkFrame):
 	def __init__(self, master, font: ctk.CTkFont, player_callback):
 		# Needs to be transparednt so no extra layer.
@@ -259,7 +263,9 @@ class Playlists(ctk.CTkFrame):
 									["Select Multiple", self.select_multiple]]
 		self.select_mult_topbar_buttons = [
 			["Delete Playlists", lambda: utils.delete_playlists(self.get_checked_ids(self.checkbox_playlist_list))],
-			["Exit Select", lambda :self.main_view(force=True)]]
+			["Select All", self.playlist_select_all],
+			["Exit Select", lambda :self.main_view(force=True)],
+			]
 		self.specific_playlist_topbar_buttons = [["Overwrite Queue", lambda: utils.overwrite_queue(self.song_ids, self.player_callback)],
 												 ["Add to Queue", lambda: utils.add_to_queue(self.song_ids)],
 												 ["Select Multiple", self.songs_view_select_multiple],
@@ -397,6 +403,7 @@ class Playlists(ctk.CTkFrame):
 
 		# Defining buttons
 		self.mult_specific_playlist_buttons = [
+			["Select All", self.song_select_all],
 			["Remove from Playlist", lambda: self.remove_from_playlist(self.get_checked_ids(obj=self.song_list), self.playlistID)],
 			["Add to Queue", lambda: utils.add_to_queue(self.get_checked_ids(obj=self.song_list))],
 			["Exit Select", lambda: self.main_view(force=True)]]
@@ -481,6 +488,12 @@ class Playlists(ctk.CTkFrame):
 			cursor.execute(query, (int(playlistID),))
 		db.commit()
 		db.close()
+
+	def playlist_select_all(self):
+		self.checkbox_playlist_list.check_all()
+
+	def song_select_all(self):
+		self.song_list.check_all()
 
 class MusicFinder(ctk.CTkFrame):
 	"""
@@ -645,7 +658,7 @@ class Player(ctk.CTkFrame):
 		"""
 		if self.queue_window is None or not self.queue_window.winfo_exists():
 			self.queue_window = Components.QueueViewer(event, font= self.font, player_callback=self.load_song)
-		self.queue_window.after(100, self.queue_window.lift)
+		self.queue_window.after(200, self.queue_window.lift)
 
 	def song_end(self, load_previous: bool = False):
 		"""
@@ -802,8 +815,10 @@ class Player(ctk.CTkFrame):
 		"""Pauses or unpauses the song"""
 		if not self.player.playing:
 			self.player.play()
+			self.playbar_buttons.labels[3].configure(text="⏸")
 		else:
 			self.player.pause()
+			self.playbar_buttons.labels[3].configure(text="⏯")
 
 	def skip_foward(self, event=None):
 		"""Jumps foward 10 seconds in the song"""

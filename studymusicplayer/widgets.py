@@ -145,6 +145,11 @@ class CheckboxFrame(ctk.CTkFrame):  # Inheriting CTkFrame class
 				checked.append(box.cget("text"))
 		return checked
 
+	def check_all(self):
+		"""Marks all checkboxes as checked"""
+		for checkbox in self.checkboxes:
+			checkbox.select()
+
 
 class RadioButtonFrame(ctk.CTkFrame):
 	"""
@@ -361,7 +366,7 @@ class SongLabel(ctk.CTkFrame):
 		songID = [self.songID]  # needs to be in a list so add to playlist can properly process the id
 		if self.prompt is None or not self.prompt.winfo_exists():
 			self.prompt = AddToPlaylist(songIDs=songID, font=self.font)
-		self.prompt.after(100, self.prompt.lift)
+		self.prompt.after(200, self.prompt.lift)
 
 	def delete_song(self):
 		"""Deletes song from database"""
