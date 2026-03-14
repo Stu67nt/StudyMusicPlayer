@@ -613,9 +613,8 @@ class DownloadSettings(ctk.CTkToplevel):
 		# Getting inputs
 		prefered_format = self.prefered_format_select.get()
 		add_thumbnail = self.add_thumbnail_select.get_radio_val()
-		deno_path = self.deno_path_entry.get()
-		ffmpeg_path = self.ffmpeg_path_entry.get()
-
+		deno_path = self.deno_path_entry.get().strip(r"\"")
+		ffmpeg_path = self.ffmpeg_path_entry.get().strip(r"\"")
 		"""Changing config based on inputs"""
 		if prefered_format == "mp3":
 			self.options['format'] = 'mp3/m4a/flac/bestaudio'
