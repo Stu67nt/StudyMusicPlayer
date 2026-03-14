@@ -61,7 +61,8 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 
 		# Defining buttons
 		self.main_topbar_buttons = [["Refresh Tracks", self.refresh_tracks],
-									["Select Multiple", self.select_multiple]]
+									["Select Multiple", self.select_multiple],
+									["Open Songs Folder", self.open_folder]]
 
 		self.main_view()
 
@@ -238,6 +239,14 @@ class Tracks(ctk.CTkFrame): # Inheriting CTk class
 
 	def select_all(self):
 		self.track_list.check_all()
+
+	def open_folder(self):
+		if os.name == "nt":
+			os.system(fr'start {self.BASE_DIR / "Songs"}')
+		else:
+			tk.messagebox.showinfo("Songs Directory", "Cannot open the directory directly. \n"
+													  f"Go to {self.BASE_DIR / "Songs"} to find it.")
+
 
 class Playlists(ctk.CTkFrame):
 	def __init__(self, master, font: ctk.CTkFont, player_callback):
@@ -757,7 +766,9 @@ class Player(ctk.CTkFrame):
 		if self.songID != -1:
 			try:
 				self.boot_player()
+
 				self.player.play()
+				self.playbar_buttons.labels[3].configure(text="⏸")
 				self.player.volume = self.volume_slider.get() / 100  # Change this to 0.5 to recreate a bug where volume woudl reset upon song change
 			# If an error occurs when trying to boot the song we skip to the next song
 			except:
