@@ -903,5 +903,3 @@ class App(ctk.CTk):
 def main():
 	app = App("Study Music Player")
 	app.mainloop()
-
-main()
