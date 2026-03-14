@@ -12,8 +12,12 @@ A Python music player with some study features such as a to do list and a timer.
 - Downloading songs from YouTube.
 
 ## Usage Tutorial
-Download and Extract zip.  
+Download and extract the zip.  
 Open the extracted zip and run main.exe  
+OR  
+Download from the source as explained later on.
+
+THEN
 
 EITHER:  
 Go to Music Finder
@@ -22,11 +26,16 @@ Click Download Video
 Once downloaded, go to tracks and click on a song for it to start playing.
 
 OR:  
-Move in any songs you wish to listen to, into the Songs folder.  
-Inside the program go to Tracks.  
+Move any songs you wish to listen to, into the Songs folder.  
+Inside the program, go to Tracks.  
 Hit refresh.  
 
+## Dependencies
+FFmpeg (Pretty much required) [https://www.ffmpeg.org/download.html]  
+Deno (Pretty much required for using downloader) [https://deno.com/]
+
 ## Build & Run
+NOTE: CURRENT COMPILED RELEASE IS OUTDATED. USE BUILD FROM SOURCE FOR THE UPDATED VERSION.
 This program has only been compiled for Windows 11.
 #### Windows
 Download the main.zip in the latest release.  
@@ -39,9 +48,6 @@ Build from source commnds
 
     pip install git+https://github.com/Stu67nt/StudyMusicPlayer
     studymusicplayer
-    
+
 ## AI Usage
 Used for assistance with debugging, assisting with some GUI stuff and in line code suggestions as well as helping with compiling the project. 
-
-## Extra Notes
-Hack Club People, if you are wondering how i have so much time built up it is because I had to learn a lot of new things for this and this is my first large scale GUI so that came with a lot of it's own headaches.
